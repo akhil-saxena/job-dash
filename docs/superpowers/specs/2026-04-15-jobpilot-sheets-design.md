@@ -43,6 +43,7 @@ A fully automated Google Sheets job application tracker that replaces scattered 
 | Tab | Type | Visibility | Purpose |
 |-----|------|-----------|---------|
 | Dashboard | Master table | Visible | All applications at a glance |
+| Analytics | Charts & stats | Visible | Visual pipeline analytics |
 | {Company} - {Role} | Job detail | Visible | One per application, auto-created |
 | _Template | Template | Hidden | Blank job tab, cloned for each new application |
 | _Config | Settings | Hidden | Dropdown values, color hex codes, settings |
@@ -60,11 +61,11 @@ Top row, frozen, auto-computed:
 | Stat | Formula logic |
 |------|--------------|
 | Total Active | Count where status not in (Rejected, Withdrawn, Accepted) |
-| Interviews This Week | Count interview dates in current week across all job tabs |
+| Interviews This Week | Script-computed (daily trigger + on form submit): scans interview dates across all job tabs |
 | Avg Days to Response | Average of (first status change date - applied date) |
 | Offer Rate % | Count(Offer + Accepted) / Count(all non-Wishlist) |
 
-### 4.2 Columns (16)
+### 4.2 Columns (16 visible + 1 hidden)
 
 | # | Column | Type | Notes |
 |---|--------|------|-------|
@@ -78,12 +79,13 @@ Top row, frozen, auto-computed:
 | 8 | Applied Date | Date | Auto-set when status changes from Wishlist |
 | 9 | Last Updated | Date | Auto-timestamps on any edit (onEdit trigger) |
 | 10 | Next Deadline | Date | Red <3 days, yellow 3-7, green >7 |
-| 11 | Days in Status | Number | Auto-calculated. Amber at 7+, red at 14+ |
+| 11 | Days in Status | Number | Script-computed from hidden "Status Changed Date" column. Amber at 7+, red at 14+ |
 | 12 | Next Action | Text | Free-text one-liner: "Send follow-up", "Prep for R3" |
 | 13 | Referral | Text | Name of referrer |
 | 14 | Tags | Text | Comma-separated |
 | 15 | Job URL | URL | Link to job posting |
 | 16 | Details | Hyperlink | Auto-generated link to job's detail tab |
+| 17 | Status Changed Date | Date (hidden column) | Auto-set when status changes. Used to compute Days in Status. |
 
 ### 4.3 Dashboard Behaviors
 
@@ -91,7 +93,7 @@ Top row, frozen, auto-computed:
 - **Rejected/Withdrawn rows:** Entire row dimmed (light gray text)
 - **Auto-sort:** By status priority order, then by deadline urgency (onEdit or manual menu action)
 - **Last Updated:** Auto-timestamps via onEdit trigger when any cell in the row changes
-- **Days in Status:** Formula: `=TODAY() - [Last Updated]`, conditional formatting for amber/red
+- **Days in Status:** Script-computed: `TODAY() - [Status Changed Date]` (hidden column tracks when status last changed, distinct from Last Updated). Conditional formatting for amber/red
 - **Details column:** Hyperlink auto-created by Apps Script pointing to the job's tab
 
 ### 4.4 Status Color Palette (pastel)
@@ -117,7 +119,79 @@ Top row, frozen, auto-computed:
 
 ---
 
-## 5. Job Detail Tab
+## 5. Analytics Tab
+
+A dedicated visible tab with charts that visualize the job search pipeline. Contains native Sheets charts plus a Sankey diagram rendered via Google Charts API.
+
+### 5.1 Layout
+
+The Analytics tab has a data section (hidden rows at the bottom, script-computed) and a charts section (visible area with embedded charts). Refreshed via menu action "JobPilot → Refresh Stats" or the daily trigger.
+
+### 5.2 Native Sheets Charts
+
+**Chart 1: Status Funnel (horizontal bar chart)**
+- One bar per status, ordered by pipeline stage
+- Bar length = count of applications in that status
+- Colored using the pastel status palette
+- Shows the shape of your pipeline at a glance
+
+**Chart 2: Source Effectiveness (grouped bar chart)**
+- X-axis: sources (LinkedIn, Referral, Naukri, etc.)
+- Two bars per source: total applications vs. applications that reached Interviewing or beyond
+- Shows which sources actually convert
+
+**Chart 3: Applications Over Time (line chart)**
+- X-axis: weeks or months
+- Y-axis: count of applications added
+- Shows your activity cadence — are you applying consistently or in bursts
+
+**Chart 4: Pipeline Aging (horizontal bar chart)**
+- Groups active applications into buckets: 0-7 days, 8-14 days, 15-30 days, 30+ days in current status
+- Visual indicator of how many apps are going stale
+
+**Chart 5: Response Rate by Source (pie or donut chart)**
+- Percentage of applications per source that received any response (moved past "Applied")
+- Helps identify which channels are worth your time
+
+### 5.3 Sankey Diagram (Google Charts API)
+
+Native Sheets charts cannot render Sankey diagrams. This is rendered via Apps Script HtmlService in a modal dialog.
+
+**Trigger:** Menu → JobPilot → View Sankey Diagram (or a button/link on the Analytics tab)
+
+**Implementation:**
+- Apps Script reads all applications from Dashboard, computes flow counts between statuses (Applied→Screening: N, Applied→Rejected: N, Screening→Interviewing: N, etc.)
+- Passes data to an HTML template that uses Google Charts `google.visualization.Sankey`
+- Renders in a centered modal dialog (800x500px)
+- Shows the flow: Applied → Screening → Interviewing → Offer → Accepted, with rejection/withdrawal branches at each stage
+- Uses the pastel color palette for nodes
+
+**Sankey data structure:**
+```
+[
+  ['Applied', 'Screening', count],
+  ['Applied', 'Rejected', count],
+  ['Screening', 'Interviewing', count],
+  ['Screening', 'Rejected', count],
+  ['Interviewing', 'Offer', count],
+  ['Interviewing', 'Rejected', count],
+  ['Offer', 'Accepted', count],
+  ['Offer', 'Rejected', count],
+  ['Offer', 'Withdrawn', count],
+  // ... all observed transitions
+]
+```
+
+### 5.4 Data Source
+
+All charts are driven from the Dashboard table data. A hidden section at the bottom of the Analytics tab holds pre-computed aggregation tables (pivot-style) that the charts reference. These are updated by Apps Script on:
+- Menu → Refresh Stats
+- Daily time-driven trigger
+- After any form submission (Add Application, Update Status)
+
+---
+
+## 6. Job Detail Tab
 
 Each job gets its own tab, cloned from _Template. Two-column layout with 8 sections. **Hide-if-empty rule:** rows with no data are hidden, not shown with dashes.
 
@@ -149,12 +223,8 @@ Each person row: Name + LinkedIn URL + email (if known). Only show rows that hav
 | Hiring Manager | Name, LinkedIn link |
 | Referral | Name, LinkedIn link, "Thanked" checkbox |
 
-**Section 3: Salary**
+**Salary** is a row within the Job Info table above (not its own section):
 
-Single field:
-
-| Field | Type |
-|-------|------|
 | Salary Range | Text (e.g. "₹35L – ₹50L") |
 
 **Section 4: Documents**
@@ -229,7 +299,7 @@ Auto-generated, append-only. Each entry: date + event description. Events logged
 
 ---
 
-## 6. Sidebar Forms
+## 7. Sidebar Forms
 
 HTML forms served via Apps Script HtmlService, displayed in the right sidebar panel. Pastel/off-white styling matching the spreadsheet aesthetic.
 
@@ -314,7 +384,7 @@ HTML forms served via Apps Script HtmlService, displayed in the right sidebar pa
 
 ---
 
-## 7. Menu Structure
+## 8. Menu Structure
 
 Custom menu bar: **JobPilot**
 
@@ -327,34 +397,35 @@ JobPilot
 ├── ─────────────────
 ├── Sort Dashboard         → re-sorts by status priority + deadline urgency
 ├── Archive Rejected       → dims rejected/withdrawn rows, moves to bottom
-├── Refresh Stats          → recalculates summary stats row
-└── ─────────────────
+├── Refresh Stats          → recalculates summary stats row + analytics charts
+└── View Sankey Diagram    → opens modal dialog with pipeline flow visualization
 ```
 
 ---
 
-## 8. Automation (Apps Script Triggers)
+## 9. Automation (Apps Script Triggers)
 
-### 8.1 onEdit Trigger (installable)
+### 9.1 onEdit Trigger (installable)
 
 Fires on any cell edit in the spreadsheet:
 
 - **Dashboard edits:**
   - Update "Last Updated" timestamp for the edited row
   - Recalculate "Days in Status" for the edited row
-  - If Status column changed: log to Activity Log in the job's detail tab, update tab color
+  - If Status column changed: update hidden "Status Changed Date" column, log to Activity Log in the job's detail tab, update tab color
 
-### 8.2 Time-Driven Trigger (daily)
+### 9.2 Time-Driven Trigger (daily)
 
 Runs once per day:
 
 - Recalculate all "Days in Status" values
 - Update deadline urgency colors (red/yellow/green)
 - Recalculate summary stats row
+- Refresh Analytics tab: recompute aggregation data and update chart source ranges
 
 ---
 
-## 9. _Config Tab
+## 10. _Config Tab
 
 Hidden tab storing configuration data:
 
@@ -371,7 +442,7 @@ Hidden tab storing configuration data:
 
 ---
 
-## 10. _Template Tab
+## 11. _Template Tab
 
 Hidden tab that gets cloned for each new application. Pre-formatted with:
 
@@ -384,7 +455,7 @@ Hidden tab that gets cloned for each new application. Pre-formatted with:
 
 ---
 
-## 11. Visual Style
+## 12. Visual Style
 
 - **Background:** Off-white (#faf9f6) for content areas, light cream (#f0eeea) for headers
 - **Borders:** Subtle (#e5e2dc), not heavy grid lines
@@ -398,37 +469,40 @@ Hidden tab that gets cloned for each new application. Pre-formatted with:
 
 ---
 
-## 12. Limitations & Constraints
+## 13. Limitations & Constraints
 
 - **Google Sheets formatting:** No true "collapsible sections" — JD snapshot will use row grouping (group/ungroup rows) as the closest equivalent
 - **Rich text in cells:** Google Sheets supports bold, italic, color, links within cells — not full markdown. Research & Prep notes and interview fields use this.
 - **Sidebar forms:** Google Apps Script sidebar is 300px wide, fixed. Forms must fit within this constraint.
 - **Hide-if-empty:** Implemented via Apps Script row hiding, not CSS. Runs on form submission and can be triggered manually from menu.
 - **Interview round cards:** In Sheets, these are row groups with merged cells and formatting to visually approximate cards. Not actual card components.
+- **Duplicate tab names:** If applying to same company+role twice (e.g. reapply after rejection), append number suffix to tab name (e.g. "Google - SDE2 (2)")
 - **onEdit trigger:** Cannot detect which user made the edit (irrelevant for single-user, but noted). Has a ~1 second execution delay.
 - **Daily trigger:** Runs at approximately the scheduled time (Google doesn't guarantee exact timing).
+- **Collapsible JD:** Uses row grouping with a visible label row "Click + to expand Job Description" above the grouped rows
 
 ---
 
-## 13. File Structure (Apps Script)
+## 14. File Structure (Apps Script)
 
 ```
 Code.gs              — Menu setup, trigger handlers, core logic
+Analytics.gs         — Chart data computation, analytics refresh
 Sidebar.html         — Add Application form
 InterviewForm.html   — Add Interview Round form
 StatusForm.html      — Update Status form
 DeadlineForm.html    — Add Deadline form
-Styles.html          — Shared CSS for all sidebar forms
+SankeyDialog.html    — Sankey diagram modal (Google Charts API)
+Styles.html          — Shared CSS for all sidebar/dialog forms
 Utils.gs             — Helper functions (find row, get config, format dates)
 ```
 
 ---
 
-## 14. What This Spec Does NOT Cover
+## 15. What This Spec Does NOT Cover
 
 - Chrome extension or browser integration
 - Email notifications or reminders
 - Multi-user sharing or permissions
 - Mobile-specific optimizations
 - Data import/export tooling
-- Analytics charts (summary stats row is sufficient)
