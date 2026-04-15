@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html><head><base target="_top"><?!= include('Styles') ?></head>
+<body>
+  <div class="sidebar-header">
+    <h2>Update Status</h2>
+    <p>Quick status change for an application</p>
+  </div>
+  <div class="sidebar-body">
+    <form id="statusForm" onsubmit="handleSubmit(event)">
+      <div class="field"><label>Application *</label><select name="application" id="appSelect" required></select></div>
+      <div class="field"><label>New Status *</label><select name="status" id="statusSelect" required></select></div>
+      <div class="btn-row">
+        <button type="submit" class="btn-primary" id="submitBtn">Update Status</button>
+        <button type="button" class="btn-cancel" onclick="google.script.host.close()">Cancel</button>
+      </div>
+    </form>
+    <div id="statusMsg" class="status-msg" style="display:none;"></div>
+  </div>
+  <script>
+    google.script.run.withSuccessHandler(function(data) {
+      populateSelect('appSelect', data.jobTabs, '');
+      populateSelect('statusSelect', data.statuses, '');
+    }).getFormDropdowns();
+
+    function handleSubmit(e) {
+      e.preventDefault();
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true; btn.textContent = 'Updating...';
+      var f = document.getElementById('statusForm');
+      google.script.run
+        .withSuccessHandler(function() {
+          var msg = document.getElementById('statusMsg');
+          msg.className = 'status-msg success';
+          msg.textContent = 'Status updated!';
+          msg.style.display = 'block';
+          setTimeout(function() { google.script.host.close(); }, 1500);
+        })
+        .withFailureHandler(function(err) {
+          var msg = document.getElementById('statusMsg');
+          msg.className = 'status-msg error';
+          msg.textContent = 'Error: ' + err.message;
+          msg.style.display = 'block';
+          btn.disabled = false; btn.textContent = 'Update Status';
+        })
+        .updateApplicationStatus(f.application.value, f.status.value);
+    }
+  </script>
+</body></html>

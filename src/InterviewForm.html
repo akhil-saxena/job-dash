@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html><head><base target="_top"><?!= include('Styles') ?></head>
+<body>
+  <div class="sidebar-header">
+    <h2>Add Interview Round</h2>
+    <p>Adds a round to the selected job tab</p>
+  </div>
+  <div class="sidebar-body">
+    <form id="interviewForm" onsubmit="handleSubmit(event)">
+      <div class="field"><label>Application *</label><select name="application" id="appSelect" required></select></div>
+      <div class="field"><label>Round Type *</label><select name="roundType" id="roundTypeSelect" required></select></div>
+      <div class="field" id="customTypeField" style="display:none;"><label>Custom Type Name</label><input type="text" name="customTypeName"></div>
+      <div class="field"><label>Date</label><input type="date" name="date"></div>
+      <div class="field-row">
+        <div class="field"><label>Duration (min)</label><input type="number" name="duration" value="60"></div>
+        <div class="field"><label>Status</label><select name="status" id="roundStatusSelect"></select></div>
+      </div>
+      <div class="field"><label>Outcome</label><select name="outcome" id="outcomeSelect"></select></div>
+      <div class="field"><label>Interviewer Name</label><input type="text" name="interviewer"></div>
+      <div class="field"><label>Interviewer LinkedIn</label><input type="url" name="interviewerLinkedin"></div>
+      <div class="field"><label>Meeting Link</label><input type="url" name="meetingLink"></div>
+      <div class="field"><label>Questions to Ask Them</label><textarea name="questionsToAsk" placeholder="e.g. Team size? On-call? Tech debt approach?"></textarea></div>
+      <div class="btn-row">
+        <button type="submit" class="btn-primary" id="submitBtn">Add Round</button>
+        <button type="button" class="btn-cancel" onclick="google.script.host.close()">Cancel</button>
+      </div>
+    </form>
+    <div id="statusMsg" class="status-msg" style="display:none;"></div>
+  </div>
+  <script>
+    google.script.run.withSuccessHandler(function(data) {
+      populateSelect('appSelect', data.jobTabs, '');
+      populateSelect('roundTypeSelect', data.roundTypes, 'Technical');
+      populateSelect('roundStatusSelect', data.roundStatuses, 'Scheduled');
+      populateSelect('outcomeSelect', [''].concat(data.roundOutcomes), '');
+    }).getFormDropdowns();
+
+    document.getElementById('roundTypeSelect').addEventListener('change', function() {
+      document.getElementById('customTypeField').style.display = this.value === 'Custom' ? 'block' : 'none';
+    });
+
+    function handleSubmit(e) {
+      e.preventDefault();
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true; btn.textContent = 'Adding...';
+      var f = document.getElementById('interviewForm');
+      var data = {
+        application: f.application.value, roundType: f.roundType.value,
+        customTypeName: f.customTypeName.value, date: f.date.value,
+        duration: f.duration.value, status: f.status.value, outcome: f.outcome.value,
+        interviewer: f.interviewer.value, interviewerLinkedin: f.interviewerLinkedin.value,
+        meetingLink: f.meetingLink.value, questionsToAsk: f.questionsToAsk.value
+      };
+      google.script.run
+        .withSuccessHandler(function(result) {
+          var msg = document.getElementById('statusMsg');
+          msg.className = 'status-msg success';
+          msg.textContent = 'Added: R' + result.roundNumber + ' — ' + result.roundType;
+          msg.style.display = 'block';
+          setTimeout(function() { google.script.host.close(); }, 1500);
+        })
+        .withFailureHandler(function(err) {
+          var msg = document.getElementById('statusMsg');
+          msg.className = 'status-msg error';
+          msg.textContent = 'Error: ' + err.message;
+          msg.style.display = 'block';
+          btn.disabled = false; btn.textContent = 'Add Round';
+        })
+        .addInterviewRound(data);
+    }
+  </script>
+</body></html>

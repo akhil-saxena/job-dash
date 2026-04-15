@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html><head><base target="_top"><?!= include('Styles') ?></head>
+<body>
+  <div class="sidebar-header">
+    <h2>Add Deadline</h2>
+    <p>Set a deadline for an application</p>
+  </div>
+  <div class="sidebar-body">
+    <form id="deadlineForm" onsubmit="handleSubmit(event)">
+      <div class="field"><label>Application *</label><select name="application" id="appSelect" required></select></div>
+      <div class="field"><label>Deadline Date *</label><input type="date" name="date" required></div>
+      <div class="field"><label>Description *</label><input type="text" name="description" placeholder="e.g. Offer expiry" required></div>
+      <div class="btn-row">
+        <button type="submit" class="btn-primary" id="submitBtn">Add Deadline</button>
+        <button type="button" class="btn-cancel" onclick="google.script.host.close()">Cancel</button>
+      </div>
+    </form>
+    <div id="statusMsg" class="status-msg" style="display:none;"></div>
+  </div>
+  <script>
+    google.script.run.withSuccessHandler(function(data) {
+      populateSelect('appSelect', data.jobTabs, '');
+    }).getFormDropdowns();
+
+    function handleSubmit(e) {
+      e.preventDefault();
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true; btn.textContent = 'Adding...';
+      var f = document.getElementById('deadlineForm');
+      google.script.run
+        .withSuccessHandler(function() {
+          var msg = document.getElementById('statusMsg');
+          msg.className = 'status-msg success';
+          msg.textContent = 'Deadline added!';
+          msg.style.display = 'block';
+          setTimeout(function() { google.script.host.close(); }, 1500);
+        })
+        .withFailureHandler(function(err) {
+          var msg = document.getElementById('statusMsg');
+          msg.className = 'status-msg error';
+          msg.textContent = 'Error: ' + err.message;
+          msg.style.display = 'block';
+          btn.disabled = false; btn.textContent = 'Add Deadline';
+        })
+        .addDeadline(f.application.value, f.date.value, f.description.value);
+    }
+  </script>
+</body></html>

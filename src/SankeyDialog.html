@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #faf9f6; margin: 0; padding: 20px;
+    }
+    h2 { font-size: 16px; font-weight: 600; color: #2d2d2d; margin: 0 0 4px 0; }
+    p { font-size: 12px; color: #aaa; margin: 0 0 16px 0; }
+    #sankey_chart { width: 100%; height: 420px; }
+    .empty-msg { text-align: center; padding: 100px 0; color: #aaa; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h2>Application Pipeline Flow</h2>
+  <p>How applications move through your pipeline</p>
+  <div id="sankey_chart"></div>
+  <script>
+    google.charts.load('current', { packages: ['sankey'] });
+    google.charts.setOnLoadCallback(loadData);
+
+    function loadData() {
+      google.script.run
+        .withSuccessHandler(drawChart)
+        .withFailureHandler(function(err) {
+          document.getElementById('sankey_chart').innerHTML =
+            '<div class="empty-msg">Error: ' + err.message + '</div>';
+        })
+        .getSankeyData();
+    }
+
+    function drawChart(sankeyData) {
+      if (!sankeyData || sankeyData.length === 0) {
+        document.getElementById('sankey_chart').innerHTML =
+          '<div class="empty-msg">Not enough data yet. Need applications with status changes.</div>';
+        return;
+      }
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'From');
+      data.addColumn('string', 'To');
+      data.addColumn('number', 'Count');
+      data.addRows(sankeyData);
+
+      var options = {
+        sankey: {
+          node: {
+            colors: ['#ececec','#e3eef8','#ede8f5','#fef3e2','#e5f0e8','#dff0e8','#f5e5e5','#eaeaea'],
+            label: { fontName: '-apple-system, sans-serif', fontSize: 13, color: '#555' }
+          },
+          link: { colorMode: 'gradient' }
+        }
+      };
+      var chart = new google.visualization.Sankey(document.getElementById('sankey_chart'));
+      chart.draw(data, options);
+    }
+  </script>
+</body>
+</html>

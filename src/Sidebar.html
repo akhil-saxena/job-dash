@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html><head><base target="_top"><?!= include('Styles') ?></head>
+<body>
+  <div class="sidebar-header">
+    <h2>New Application</h2>
+    <p>Creates dashboard row + detail tab</p>
+  </div>
+  <div class="sidebar-body">
+    <form id="appForm" onsubmit="handleSubmit(event)">
+      <div class="field"><label>Company *</label><input type="text" name="company" required></div>
+      <div class="field"><label>Role *</label><input type="text" name="role" required></div>
+      <div class="field"><label>Status</label><select name="status" id="statusSelect"></select></div>
+      <div class="field-row">
+        <div class="field"><label>Priority</label><select name="priority" id="prioritySelect"></select></div>
+        <div class="field"><label>Location</label><select name="location" id="locationSelect"></select></div>
+      </div>
+      <div class="field"><label>Location City</label><input type="text" name="locationCity" placeholder="e.g. Bangalore"></div>
+      <div class="field"><label>Salary Range</label><input type="text" name="salaryRange" placeholder="e.g. 35-50L"></div>
+      <div class="field"><label>Source</label><select name="source" id="sourceSelect"></select></div>
+      <div class="field"><label>Referral Name</label><input type="text" name="referral"></div>
+      <div class="field"><label>Job Posting URL</label><input type="url" name="jobUrl"></div>
+      <div class="field"><label>Tags</label><input type="text" name="tags" placeholder="Comma-separated"></div>
+      <div class="field"><label>Resume Version</label><input type="text" name="resumeName" placeholder="e.g. Backend-focused v3"></div>
+      <div class="field"><label>Resume Drive Link</label><input type="url" name="resumeLink"></div>
+      <div class="btn-row">
+        <button type="submit" class="btn-primary" id="submitBtn">Create Application</button>
+        <button type="button" class="btn-cancel" onclick="google.script.host.close()">Cancel</button>
+      </div>
+    </form>
+    <div id="statusMsg" class="status-msg" style="display:none;"></div>
+  </div>
+  <script>
+    google.script.run.withSuccessHandler(function(data) {
+      populateSelect('statusSelect', data.statuses, 'Wishlist');
+      populateSelect('prioritySelect', data.priorities, 'Medium');
+      populateSelect('locationSelect', data.locations, 'Remote');
+      populateSelect('sourceSelect', data.sources, 'LinkedIn');
+    }).getFormDropdowns();
+
+    function handleSubmit(e) {
+      e.preventDefault();
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true; btn.textContent = 'Creating...';
+      var f = document.getElementById('appForm');
+      var data = {
+        company: f.company.value, role: f.role.value, status: f.status.value,
+        priority: f.priority.value, location: f.location.value,
+        locationCity: f.locationCity.value, salaryRange: f.salaryRange.value,
+        source: f.source.value, referral: f.referral.value, jobUrl: f.jobUrl.value,
+        tags: f.tags.value, resumeName: f.resumeName.value, resumeLink: f.resumeLink.value
+      };
+      google.script.run
+        .withSuccessHandler(function(result) {
+          var msg = document.getElementById('statusMsg');
+          msg.className = 'status-msg success';
+          msg.textContent = 'Created: ' + result.tabName;
+          msg.style.display = 'block';
+          setTimeout(function() { google.script.host.close(); }, 1500);
+        })
+        .withFailureHandler(function(err) {
+          var msg = document.getElementById('statusMsg');
+          msg.className = 'status-msg error';
+          msg.textContent = 'Error: ' + err.message;
+          msg.style.display = 'block';
+          btn.disabled = false; btn.textContent = 'Create Application';
+        })
+        .createApplication(data);
+    }
+  </script>
+</body></html>

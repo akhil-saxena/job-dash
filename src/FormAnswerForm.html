@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html><head><base target="_top"><?!= include('Styles') ?></head>
+<body>
+  <div class="sidebar-header">
+    <h2>Log Form Answer</h2>
+    <p>Save application form Q&A to Google Doc</p>
+  </div>
+  <div class="sidebar-body">
+    <form id="qaForm" onsubmit="handleSubmit(event)">
+      <div class="field"><label>Application *</label><select name="application" id="appSelect" required></select></div>
+      <div class="field"><label>Question *</label><input type="text" name="question" required placeholder="e.g. Why do you want to work here?"></div>
+      <div class="field"><label>Answer *</label><textarea name="answer" required placeholder="Your answer..."></textarea></div>
+      <div class="btn-row">
+        <button type="submit" class="btn-primary" id="submitBtn">Save Answer</button>
+        <button type="button" class="btn-cancel" onclick="google.script.host.close()">Cancel</button>
+      </div>
+    </form>
+    <div id="statusMsg" class="status-msg" style="display:none;"></div>
+  </div>
+  <script>
+    google.script.run.withSuccessHandler(function(data) {
+      populateSelect('appSelect', data.jobTabs, '');
+    }).getFormDropdowns();
+
+    function handleSubmit(e) {
+      e.preventDefault();
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true; btn.textContent = 'Saving...';
+      var f = document.getElementById('qaForm');
+      google.script.run
+        .withSuccessHandler(function(result) {
+          var msg = document.getElementById('statusMsg');
+          msg.className = 'status-msg success';
+          msg.innerHTML = 'Saved! <a href="' + result.url + '" target="_blank" style="color:#7b9ec4;">Open doc</a>';
+          msg.style.display = 'block';
+          f.question.value = ''; f.answer.value = '';
+          btn.disabled = false; btn.textContent = 'Save Answer';
+        })
+        .withFailureHandler(function(err) {
+          var msg = document.getElementById('statusMsg');
+          msg.className = 'status-msg error';
+          msg.textContent = 'Error: ' + err.message;
+          msg.style.display = 'block';
+          btn.disabled = false; btn.textContent = 'Save Answer';
+        })
+        .logFormAnswer(f.application.value, f.question.value, f.answer.value);
+    }
+  </script>
+</body></html>
