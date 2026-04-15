@@ -1,4 +1,4 @@
-# JobPilot
+# JobDash
 
 A fully automated Google Sheets job application tracker. Replaces scattered emails and bookmarks with a structured spreadsheet powered by Apps Script sidebar forms, Google Drive integration, and analytics charts.
 
@@ -68,7 +68,7 @@ job-track/
    ```
 4. Push the code: `clasp push`
 5. Run `initialSetup()` from the Apps Script editor (installs triggers + creates charts)
-6. Reload the spreadsheet — the JobPilot menu appears
+6. Reload the spreadsheet — the JobDash menu appears
 
 ## Menu Actions
 
@@ -87,7 +87,7 @@ job-track/
 
 ## Design
 
-See [design spec](docs/superpowers/specs/2026-04-15-jobpilot-sheets-design.md) for full details on:
+See [design spec](docs/superpowers/specs/2026-04-15-jobdash-sheets-design.md) for full details on:
 - Dashboard columns and conditional formatting
 - Job detail tab sections (8 sections, hide-if-empty)
 - Pastel color palette
@@ -97,4 +97,4 @@ See [design spec](docs/superpowers/specs/2026-04-15-jobpilot-sheets-design.md) f
 
 ## Implementation
 
-See [implementation plan](docs/superpowers/plans/2026-04-15-jobpilot-sheets.md) for step-by-step build instructions (17 tasks across 5 chunks).
+See [implementation plan](docs/superpowers/plans/2026-04-15-jobdash-sheets.md) for step-by-step build instructions (17 tasks across 5 chunks).

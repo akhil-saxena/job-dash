@@ -4,7 +4,7 @@
 
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
-  ui.createMenu('JobPilot')
+  ui.createMenu('JobDash')
     .addItem('Add Application', 'showAddApplicationSidebar')
     .addItem('Add Interview Round', 'showAddInterviewSidebar')
     .addItem('Update Status', 'showUpdateStatusSidebar')
@@ -488,5 +488,5 @@ function setupAnalyticsTab() {
   sheet.setTabColor('#7b9ec4');
   sheet.getRange('A1:J50').setBackground('#faf9f6');
   sheet.getRange('A1').setValue('Analytics').setFontSize(16).setFontWeight('bold').setFontColor('#2d2d2d');
-  sheet.getRange('A2').setValue('Refresh via JobPilot menu or auto-refreshes daily').setFontSize(11).setFontColor('#aaaaaa');
+  sheet.getRange('A2').setValue('Refresh via JobDash menu or auto-refreshes daily').setFontSize(11).setFontColor('#aaaaaa');
 }

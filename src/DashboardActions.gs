@@ -33,7 +33,7 @@ function sortDashboard() {
   }
 
   reapplyDetailsLinks();
-  SpreadsheetApp.getActiveSpreadsheet().toast('Dashboard sorted.', 'JobPilot');
+  SpreadsheetApp.getActiveSpreadsheet().toast('Dashboard sorted.', 'JobDash');
 }
 
 function reapplyDetailsLinks() {
@@ -57,7 +57,7 @@ function reapplyDetailsLinks() {
 
 function archiveRejected() {
   sortDashboard();
-  SpreadsheetApp.getActiveSpreadsheet().toast('Rejected/withdrawn moved to bottom.', 'JobPilot');
+  SpreadsheetApp.getActiveSpreadsheet().toast('Rejected/withdrawn moved to bottom.', 'JobDash');
 }
 
 function refreshStats() {
@@ -65,7 +65,7 @@ function refreshStats() {
   var dashboard = getDashboardSheet();
   var lastRow = dashboard.getLastRow();
   if (lastRow < 3) {
-    SpreadsheetApp.getActiveSpreadsheet().toast('No data yet.', 'JobPilot');
+    SpreadsheetApp.getActiveSpreadsheet().toast('No data yet.', 'JobDash');
     return;
   }
 
@@ -128,5 +128,5 @@ function refreshStats() {
   // Refresh analytics
   try { refreshAnalytics(); } catch(e) {}
 
-  SpreadsheetApp.getActiveSpreadsheet().toast('Stats refreshed.', 'JobPilot');
+  SpreadsheetApp.getActiveSpreadsheet().toast('Stats refreshed.', 'JobDash');
 }

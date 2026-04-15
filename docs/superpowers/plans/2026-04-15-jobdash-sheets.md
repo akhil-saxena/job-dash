@@ -1,4 +1,4 @@
-# JobPilot Google Sheets Tracker — Implementation Plan
+# JobDash Google Sheets Tracker — Implementation Plan
 
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -8,7 +8,7 @@
 
 **Tech Stack:** Google Apps Script, Google Sheets API, Google Drive API, HTML Service (sidebar/dialog), Google Charts API (Sankey), clasp CLI (local development)
 
-**Spec:** `docs/superpowers/specs/2026-04-15-jobpilot-sheets-design.md`
+**Spec:** `docs/superpowers/specs/2026-04-15-jobdash-sheets-design.md`
 
 ---
 
@@ -63,7 +63,7 @@ src/
 
 - [ ] **Step 1: Create a new Google Spreadsheet**
 
-Go to Google Sheets and create a new spreadsheet. Name it "JobPilot". Note the spreadsheet ID from the URL: `https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/edit`
+Go to Google Sheets and create a new spreadsheet. Name it "JobDash". Note the spreadsheet ID from the URL: `https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/edit`
 
 - [ ] **Step 2: Open the bound Apps Script editor**
 
@@ -109,11 +109,11 @@ This creates `.clasp.json` in the project root and pulls `appsscript.json` into 
 // src/Code.gs
 
 /**
- * Runs when the spreadsheet is opened. Creates the JobPilot menu.
+ * Runs when the spreadsheet is opened. Creates the JobDash menu.
  */
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
-  ui.createMenu('JobPilot')
+  ui.createMenu('JobDash')
     .addItem('Add Application', 'showAddApplicationSidebar')
     .addItem('Add Interview Round', 'showAddInterviewSidebar')
     .addItem('Update Status', 'showUpdateStatusSidebar')
@@ -148,7 +148,7 @@ function showSankeyDialog() { SpreadsheetApp.getUi().alert('Coming soon'); }
 clasp push
 ```
 
-Reload the spreadsheet. Verify: "JobPilot" menu appears in the menu bar. Click any item → shows "Coming soon" alert.
+Reload the spreadsheet. Verify: "JobDash" menu appears in the menu bar. Click any item → shows "Coming soon" alert.
 
 - [ ] **Step 8: Commit**
 
@@ -1091,7 +1091,7 @@ function hideEmptyRows(sheet) {
 clasp push
 ```
 
-In the spreadsheet: JobPilot → Add Application. Fill in: Company="Test Co", Role="SDE", Status=Applied, Priority=High, Source=LinkedIn. Click Create.
+In the spreadsheet: JobDash → Add Application. Fill in: Company="Test Co", Role="SDE", Status=Applied, Priority=High, Source=LinkedIn. Click Create.
 
 Verify:
 - New row appears in Dashboard with all fields
@@ -1536,7 +1536,7 @@ function addInterviewRound(data) {
 clasp push
 ```
 
-Create a test application, then: JobPilot → Add Interview Round. Select the test job, pick "Technical", set a date, add interviewer name + LinkedIn.
+Create a test application, then: JobDash → Add Interview Round. Select the test job, pick "Technical", set a date, add interviewer name + LinkedIn.
 
 Verify:
 - Round card appears in the job detail tab with R1 header
@@ -1697,7 +1697,7 @@ function updateApplicationStatus(tabName, newStatus) {
 clasp push
 ```
 
-Verify: JobPilot → Update Status → pick a job → change to "Offer". Dashboard row, tab color, and activity log should all update.
+Verify: JobDash → Update Status → pick a job → change to "Offer". Dashboard row, tab color, and activity log should all update.
 
 ```bash
 git add src/StatusForm.html src/Code.gs
@@ -2147,9 +2147,9 @@ function logFormAnswer(tabName, question, answer) {
 clasp push
 ```
 
-Verify Save JD: Navigate to a job tab → JobPilot → Save Job Description. Should create "Job Interviews/Google - SDE2/Job Description" in Drive and open it. Job tab row 21 should show "View JD ↗" link.
+Verify Save JD: Navigate to a job tab → JobDash → Save Job Description. Should create "Job Interviews/Google - SDE2/Job Description" in Drive and open it. Job tab row 21 should show "View JD ↗" link.
 
-Verify Log Form Answer: JobPilot → Log Form Answer → select job, enter question + answer. Should append to the doc. Form should reset for another entry. Job tab row 22 should show "View Form Answers ↗" link.
+Verify Log Form Answer: JobDash → Log Form Answer → select job, enter question + answer. Should append to the doc. Form should reset for another entry. Job tab row 22 should show "View Form Answers ↗" link.
 
 - [ ] **Step 6: Commit**
 
@@ -2210,7 +2210,7 @@ function sortDashboard() {
   // Re-apply Details hyperlinks (formulas get lost on setValues)
   reapplyDetailsLinks();
 
-  SpreadsheetApp.getActiveSpreadsheet().toast('Dashboard sorted.', 'JobPilot');
+  SpreadsheetApp.getActiveSpreadsheet().toast('Dashboard sorted.', 'JobDash');
 }
 
 /**
@@ -2240,7 +2240,7 @@ function reapplyDetailsLinks() {
  */
 function archiveRejected() {
   sortDashboard(); // This already sorts rejected to bottom via sort priority 7/8
-  SpreadsheetApp.getActiveSpreadsheet().toast('Rejected/withdrawn moved to bottom.', 'JobPilot');
+  SpreadsheetApp.getActiveSpreadsheet().toast('Rejected/withdrawn moved to bottom.', 'JobDash');
 }
 ```
 
@@ -2250,7 +2250,7 @@ function archiveRejected() {
 clasp push
 ```
 
-Verify: Add a few test applications with different statuses. JobPilot → Sort Dashboard. Interviewing should be at top, rejected at bottom.
+Verify: Add a few test applications with different statuses. JobDash → Sort Dashboard. Interviewing should be at top, rejected at bottom.
 
 ```bash
 git add src/Code.gs
@@ -2374,7 +2374,7 @@ function refreshStats() {
   // Refresh analytics if tab exists
   try { refreshAnalytics(); } catch(e) { /* Analytics tab may not exist yet */ }
 
-  SpreadsheetApp.getActiveSpreadsheet().toast('Stats refreshed.', 'JobPilot');
+  SpreadsheetApp.getActiveSpreadsheet().toast('Stats refreshed.', 'JobDash');
 }
 ```
 
@@ -2625,7 +2625,7 @@ function createAnalyticsCharts() {
     .build();
   sheet.insertChart(chart5);
 
-  SpreadsheetApp.getActiveSpreadsheet().toast('Charts created.', 'JobPilot');
+  SpreadsheetApp.getActiveSpreadsheet().toast('Charts created.', 'JobDash');
 }
 ```
 
@@ -2815,7 +2815,7 @@ function getSankeyData() {
 clasp push
 ```
 
-JobPilot → View Sankey Diagram. If you have applications with status changes, the Sankey should render showing flow between statuses. If no data, shows "Not enough data yet" message.
+JobDash → View Sankey Diagram. If you have applications with status changes, the Sankey should render showing flow between statuses. If no data, shows "Not enough data yet" message.
 
 - [ ] **Step 4: Commit**
 
@@ -2906,7 +2906,7 @@ git commit -m "feat: add initialSetup function for one-time configuration"
 - [ ] **Step 1: Full flow test**
 
 Test the complete flow:
-1. Open spreadsheet → JobPilot menu appears
+1. Open spreadsheet → JobDash menu appears
 2. Add Application → fill form → dashboard row + job tab created
 3. Navigate to job tab via "→ Open" link → all sections visible
 4. Add Interview Round → round card appears in job tab
@@ -2927,5 +2927,5 @@ Delete test applications (rows and tabs) used during development. Keep the sprea
 
 ```bash
 git add -A
-git commit -m "feat: JobPilot Google Sheets tracker — complete implementation"
+git commit -m "feat: JobDash Google Sheets tracker — complete implementation"
 ```

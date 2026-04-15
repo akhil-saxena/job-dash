@@ -171,5 +171,5 @@ function createAnalyticsCharts() {
     .build();
   sheet.insertChart(chart5);
 
-  SpreadsheetApp.getActiveSpreadsheet().toast('Charts created.', 'JobPilot');
+  SpreadsheetApp.getActiveSpreadsheet().toast('Charts created.', 'JobDash');
 }

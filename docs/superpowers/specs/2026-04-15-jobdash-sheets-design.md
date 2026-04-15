@@ -1,4 +1,4 @@
-# JobPilot — Google Sheets Job Tracker
+# JobDash — Google Sheets Job Tracker
 
 ## Design Spec
 
@@ -125,7 +125,7 @@ A dedicated visible tab with charts that visualize the job search pipeline. Cont
 
 ### 5.1 Layout
 
-The Analytics tab has a data section (hidden rows at the bottom, script-computed) and a charts section (visible area with embedded charts). Refreshed via menu action "JobPilot → Refresh Stats" or the daily trigger.
+The Analytics tab has a data section (hidden rows at the bottom, script-computed) and a charts section (visible area with embedded charts). Refreshed via menu action "JobDash → Refresh Stats" or the daily trigger.
 
 ### 5.2 Native Sheets Charts
 
@@ -157,7 +157,7 @@ The Analytics tab has a data section (hidden rows at the bottom, script-computed
 
 Native Sheets charts cannot render Sankey diagrams. This is rendered via Apps Script HtmlService in a modal dialog.
 
-**Trigger:** Menu → JobPilot → View Sankey Diagram (or a button/link on the Analytics tab)
+**Trigger:** Menu → JobDash → View Sankey Diagram (or a button/link on the Analytics tab)
 
 **Implementation:**
 - Apps Script reads all applications from Dashboard, computes flow counts between statuses (Applied→Screening: N, Applied→Rejected: N, Screening→Interviewing: N, etc.)
@@ -348,7 +348,7 @@ HTML forms served via Apps Script HtmlService, displayed in the right sidebar pa
 
 ### 8.1 Add Application
 
-**Trigger:** Menu → JobPilot → Add Application
+**Trigger:** Menu → JobDash → Add Application
 
 **Fields:**
 - Company (required)
@@ -376,7 +376,7 @@ HTML forms served via Apps Script HtmlService, displayed in the right sidebar pa
 
 ### 8.2 Add Interview Round
 
-**Trigger:** Menu → JobPilot → Add Interview Round
+**Trigger:** Menu → JobDash → Add Interview Round
 
 **Fields:**
 - Application (dropdown of active job tabs)
@@ -397,7 +397,7 @@ HTML forms served via Apps Script HtmlService, displayed in the right sidebar pa
 
 ### 8.3 Update Status
 
-**Trigger:** Menu → JobPilot → Update Status
+**Trigger:** Menu → JobDash → Update Status
 
 **Fields:**
 - Application (dropdown of active job tabs)
@@ -413,7 +413,7 @@ HTML forms served via Apps Script HtmlService, displayed in the right sidebar pa
 
 ### 8.4 Add Deadline
 
-**Trigger:** Menu → JobPilot → Add Deadline
+**Trigger:** Menu → JobDash → Add Deadline
 
 **Fields:**
 - Application (dropdown)
@@ -427,7 +427,7 @@ HTML forms served via Apps Script HtmlService, displayed in the right sidebar pa
 
 ### 8.5 Save Job Description
 
-**Trigger:** Menu → JobPilot → Save Job Description
+**Trigger:** Menu → JobDash → Save Job Description
 
 **Fields:**
 - Application (dropdown of active job tabs)
@@ -442,7 +442,7 @@ HTML forms served via Apps Script HtmlService, displayed in the right sidebar pa
 
 ### 8.6 Log Form Answer
 
-**Trigger:** Menu → JobPilot → Log Form Answer
+**Trigger:** Menu → JobDash → Log Form Answer
 
 **Fields:**
 - Application (dropdown of active job tabs)
@@ -461,10 +461,10 @@ HTML forms served via Apps Script HtmlService, displayed in the right sidebar pa
 
 ## 9. Menu Structure
 
-Custom menu bar: **JobPilot**
+Custom menu bar: **JobDash**
 
 ```
-JobPilot
+JobDash
 ├── Add Application        → opens sidebar form
 ├── Add Interview Round    → opens sidebar form
 ├── Update Status          → opens sidebar form

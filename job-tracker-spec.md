@@ -1,4 +1,4 @@
-# JobPilot — Job Application Tracker
+# JobDash — Job Application Tracker
 
 ## Product Spec v1.0
 
