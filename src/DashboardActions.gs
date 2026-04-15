@@ -8,17 +8,20 @@ function sortDashboard() {
   if (lastRow < 3) return;
 
   var statusColors = getStatusColors();
-  var numCols = 17;
+  // Slim dashboard: 11 cols (A-K)
+  var numCols = 11;
   var dataRange = dashboard.getRange(3, 1, lastRow - 2, numCols);
   var data = dataRange.getValues();
 
   data.sort(function(a, b) {
+    // C=Status (index 2)
     var statusA = statusColors[a[2]] ? statusColors[a[2]].sort : 99;
     var statusB = statusColors[b[2]] ? statusColors[b[2]].sort : 99;
     if (statusA !== statusB) return statusA - statusB;
-    var deadlineA = a[9] ? new Date(a[9]).getTime() : Infinity;
-    var deadlineB = b[9] ? new Date(b[9]).getTime() : Infinity;
-    return deadlineA - deadlineB;
+    // G=Applied (index 6) — most recent first
+    var appliedA = a[6] ? new Date(a[6]).getTime() : 0;
+    var appliedB = b[6] ? new Date(b[6]).getTime() : 0;
+    return appliedB - appliedA;
   });
 
   dataRange.setValues(data);
@@ -49,9 +52,11 @@ function reapplyDetailsLinks() {
       var jobSheet = ss.getSheetByName(tabName);
       if (jobSheet) {
         var gid = jobSheet.getSheetId();
-        dashboard.getRange(r, 16).setFormula('=HYPERLINK("#gid=' + gid + '", "→ Open")').setFontColor('#7b9ec4');
+        dashboard.getRange(r, 10).setFormula('=HYPERLINK("#gid=' + gid + '", "→ Open")').setFontColor('#7b9ec4'); // J=10
       }
     }
+    // Re-bold company
+    dashboard.getRange(r, 1).setFontWeight('bold').setFontColor('#2d2d2d');
   }
 }
 
@@ -69,18 +74,16 @@ function refreshStats() {
     return;
   }
 
-  var data = dashboard.getRange(3, 1, lastRow - 2, 17).getValues();
+  var data = dashboard.getRange(3, 1, lastRow - 2, 11).getValues(); // 11 cols (A-K)
 
   // Total Active
   var concluded = ['Rejected', 'Withdrawn', 'Accepted'];
   var active = data.filter(function(row) { return row[2] && concluded.indexOf(row[2]) === -1; });
-  dashboard.getRange('B1').setValue(active.length);
 
   // Offer Rate
   var applied = data.filter(function(row) { return row[2] && row[2] !== 'Wishlist'; });
   var offers = data.filter(function(row) { return ['Offer', 'Accepted'].indexOf(row[2]) !== -1; });
   var offerRate = applied.length > 0 ? Math.round((offers.length / applied.length) * 100) : 0;
-  dashboard.getRange('H1').setValue(offerRate + '%');
 
   // Interviews This Week
   var today = new Date();
@@ -108,14 +111,17 @@ function refreshStats() {
       }
     }
   }
-  dashboard.getRange('D1').setValue(interviewsThisWeek);
+  // Write merged stat cells
+  dashboard.getRange('A1').setValue('  Total Active: ' + active.length);
+  dashboard.getRange('C1').setValue('  Interviews: ' + interviewsThisWeek);
+  dashboard.getRange('G1').setValue('  Offer Rate: ' + offerRate + '%');
 
   // Avg Days to Response
   var responseDays = [];
   for (var i = 0; i < data.length; i++) {
-    if (data[i][7] && data[i][16]) {
-      var appliedD = new Date(data[i][7]);
-      var changedD = new Date(data[i][16]);
+    if (data[i][6] && data[i][10]) { // G=Applied(6), K=StatusChanged(10)
+      var appliedD = new Date(data[i][6]);
+      var changedD = new Date(data[i][10]);
       var diff = Math.floor((changedD - appliedD) / (1000 * 60 * 60 * 24));
       if (diff > 0) responseDays.push(diff);
     }
@@ -123,7 +129,7 @@ function refreshStats() {
   var avgDays = responseDays.length > 0
     ? Math.round(responseDays.reduce(function(a, b) { return a + b; }, 0) / responseDays.length)
     : null;
-  dashboard.getRange('F1').setValue(avgDays ? avgDays + 'd' : '—');
+  dashboard.getRange('E1').setValue('  Avg Response: ' + (avgDays ? avgDays + 'd' : '—'));
 
   // Refresh analytics
   try { refreshAnalytics(); } catch(e) {}

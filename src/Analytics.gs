@@ -11,7 +11,7 @@ function refreshAnalytics() {
   var lastRow = dashboard.getLastRow();
   if (lastRow < 3) return;
 
-  var data = dashboard.getRange(3, 1, lastRow - 2, 17).getValues();
+  var data = dashboard.getRange(3, 1, lastRow - 2, 11).getValues(); // 11 cols
 
   // Chart 1: Status Funnel (row 30+)
   var statusCounts = {};
@@ -35,7 +35,7 @@ function refreshAnalytics() {
   sources.forEach(function(s) { sourceTotal[s] = 0; sourceAdvanced[s] = 0; });
   var advancedStatuses = ['Screening', 'Interviewing', 'Offer', 'Accepted'];
   data.forEach(function(row) {
-    var source = row[6];
+    var source = row[5]; // F=Source (index 5)
     if (source && sourceTotal.hasOwnProperty(source)) {
       sourceTotal[source]++;
       if (advancedStatuses.indexOf(row[2]) !== -1) sourceAdvanced[source]++;
@@ -54,8 +54,8 @@ function refreshAnalytics() {
   // Chart 3: Applications Over Time (row 55+)
   var weekCounts = {};
   data.forEach(function(row) {
-    if (row[7]) {
-      var d = new Date(row[7]);
+    if (row[6]) { // G=Applied (index 6)
+      var d = new Date(row[6]);
       var weekStart = new Date(d);
       weekStart.setDate(d.getDate() - d.getDay());
       var key = Utilities.formatDate(weekStart, 'Asia/Kolkata', 'MMM dd');
@@ -74,8 +74,8 @@ function refreshAnalytics() {
   var buckets = { '0-7 days': 0, '8-14 days': 0, '15-30 days': 0, '30+ days': 0 };
   var concluded = ['Rejected', 'Withdrawn', 'Accepted'];
   data.forEach(function(row) {
-    if (row[2] && concluded.indexOf(row[2]) === -1 && row[10]) {
-      var days = parseInt(row[10], 10);
+    if (row[2] && concluded.indexOf(row[2]) === -1 && row[7]) { // H=Days (index 7)
+      var days = parseInt(row[7], 10);
       if (days <= 7) buckets['0-7 days']++;
       else if (days <= 14) buckets['8-14 days']++;
       else if (days <= 30) buckets['15-30 days']++;

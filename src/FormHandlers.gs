@@ -27,21 +27,28 @@ function createApplication(data) {
   var subtitle = [data.location, data.locationCity, data.source].filter(Boolean).join(' · ');
   newSheet.getRange('A2').setValue(subtitle);
 
-  if (data.jobUrl) newSheet.getRange('B6').setValue(data.jobUrl);
-  if (data.locationCity) newSheet.getRange('B7').setValue(data.locationCity);
+  // Job Info section (new template rows)
+  if (data.jobUrl) {
+    newSheet.getRange('B5').setFormula('=HYPERLINK("' + data.jobUrl + '", "' + data.jobUrl.substring(0, 40) + '...")');
+    newSheet.getRange('B5').setFontColor('#7b9ec4');
+  }
+  if (data.locationCity) newSheet.getRange('B6').setValue(data.locationCity);
+  else newSheet.getRange('B6').setValue(data.location || '');
   var now = new Date();
   var appliedDate = (data.status !== 'Wishlist') ? now : '';
-  if (appliedDate) newSheet.getRange('B8').setValue(formatDate(appliedDate));
-  if (data.tags) newSheet.getRange('B10').setValue(data.tags);
-  if (data.salaryRange) newSheet.getRange('B11').setValue(data.salaryRange);
-  if (data.referral) newSheet.getRange('B16').setValue(data.referral);
+  if (appliedDate) newSheet.getRange('B7').setValue(formatDate(appliedDate));
+  if (data.tags) newSheet.getRange('B9').setValue(data.tags);
+  if (data.salaryRange) newSheet.getRange('B10').setValue(data.salaryRange);
 
+  // People section
+  if (data.referral) newSheet.getRange('B15').setValue(data.referral);
+
+  // Documents section
   if (data.resumeName && data.resumeLink) {
-    newSheet.getRange('B19').setValue(data.resumeName);
-    newSheet.getRange('B19').setFormula('=HYPERLINK("' + data.resumeLink + '", "' + data.resumeName + ' ↗")');
-    newSheet.getRange('B19').setFontColor('#7b9ec4');
+    newSheet.getRange('B18').setFormula('=HYPERLINK("' + data.resumeLink + '", "' + data.resumeName + ' ↗")');
+    newSheet.getRange('B18').setFontColor('#7b9ec4');
   } else if (data.resumeName) {
-    newSheet.getRange('B19').setValue(data.resumeName);
+    newSheet.getRange('B18').setValue(data.resumeName);
   }
 
   // Activity Log
@@ -54,34 +61,32 @@ function createApplication(data) {
   var nextRow = dashboard.getLastRow() + 1;
   if (nextRow < 3) nextRow = 3;
 
-  dashboard.getRange(nextRow, 1, 1, 17).setValues([[
-    data.company,
-    data.role,
-    data.status,
-    data.priority,
-    data.location + (data.locationCity ? ' · ' + data.locationCity : ''),
-    data.salaryRange || '',
-    data.source,
-    appliedDate || '',
-    now,
-    '',
-    0,
-    '',
-    data.referral || '',
-    data.tags || '',
-    data.jobUrl || '',
-    '',
-    now
+  // Slim dashboard: A=Company B=Role C=Status D=Priority E=Location F=Source G=Applied H=Days I=NextAction J=Details K=StatusChanged
+  dashboard.getRange(nextRow, 1, 1, 11).setValues([[
+    data.company,                          // A
+    data.role,                             // B
+    data.status,                           // C
+    data.priority,                         // D
+    data.location + (data.locationCity ? ' · ' + data.locationCity : ''),  // E
+    data.source,                           // F
+    appliedDate || '',                     // G
+    0,                                     // H (Days in Status)
+    '',                                    // I (Next Action)
+    '',                                    // J (Details — formula below)
+    now                                    // K (StatusChanged — hidden)
   ]]);
 
-  // Details hyperlink
+  // Details hyperlink (J=10)
   var detailsLink = '=HYPERLINK("#gid=' + newSheet.getSheetId() + '", "→ Open")';
-  dashboard.getRange(nextRow, 16).setFormula(detailsLink).setFontColor('#7b9ec4');
+  dashboard.getRange(nextRow, 10).setFormula(detailsLink).setFontColor('#7b9ec4');
 
-  // Status color
+  // Status color (C=3)
   if (statusColor) {
     dashboard.getRange(nextRow, 3).setBackground(statusColor.bg).setFontColor(statusColor.text);
   }
+
+  // Company bold
+  dashboard.getRange(nextRow, 1).setFontWeight('bold').setFontColor('#2d2d2d');
 
   hideEmptyRows(newSheet);
 
@@ -194,13 +199,12 @@ function updateApplicationStatus(tabName, newStatus) {
   var statusColors = getStatusColors();
   var color = statusColors[newStatus];
 
-  dashboard.getRange(targetRow, 3).setValue(newStatus);
-  dashboard.getRange(targetRow, 9).setValue(now);
-  dashboard.getRange(targetRow, 17).setValue(now);
-  dashboard.getRange(targetRow, 11).setValue(0);
+  dashboard.getRange(targetRow, 3).setValue(newStatus);   // C=Status
+  dashboard.getRange(targetRow, 11).setValue(now);         // K=StatusChanged
+  dashboard.getRange(targetRow, 8).setValue(0);            // H=Days reset
 
   if (oldStatus === 'Wishlist' && newStatus !== 'Wishlist') {
-    dashboard.getRange(targetRow, 8).setValue(now);
+    dashboard.getRange(targetRow, 7).setValue(now);         // G=Applied
   }
 
   if (color) {
@@ -220,18 +224,11 @@ function updateApplicationStatus(tabName, newStatus) {
  */
 function addDeadline(tabName, dateStr, description) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var dashboard = getDashboardSheet();
   var jobSheet = ss.getSheetByName(tabName);
   if (!jobSheet) throw new Error('Tab not found: ' + tabName);
 
   var deadlineDate = new Date(dateStr);
-
-  var targetRow = findDashboardRowByTab(tabName);
-  if (targetRow) {
-    dashboard.getRange(targetRow, 10).setValue(deadlineDate);
-  }
-
-  jobSheet.getRange('B9').setValue(formatDateShort(deadlineDate) + ' — ' + description);
+  jobSheet.getRange('B8').setValue(formatDateShort(deadlineDate) + ' — ' + description);
   appendActivityLog(jobSheet, 'Deadline added: ' + description + ' (' + formatDateShort(deadlineDate) + ')');
 }
 
@@ -257,8 +254,8 @@ function saveJobDescription() {
   if (!jobSheet) { ui.alert('Tab not found: ' + tabName); return; }
 
   var url = createJDDoc(tabName);
-  jobSheet.getRange('B21').setFormula('=HYPERLINK("' + url + '", "View JD ↗")');
-  jobSheet.getRange('B21').setFontColor('#7b9ec4');
+  jobSheet.getRange('B20').setFormula('=HYPERLINK("' + url + '", "View JD ↗")');
+  jobSheet.getRange('B20').setFontColor('#7b9ec4');
   hideEmptyRows(jobSheet);
 
   var htmlOutput = HtmlService.createHtmlOutput(
@@ -277,10 +274,10 @@ function logFormAnswer(tabName, question, answer) {
 
   var url = appendFormAnswer(tabName, question, answer);
 
-  var existing = jobSheet.getRange('B22').getValue();
+  var existing = jobSheet.getRange('B21').getValue();
   if (!existing) {
-    jobSheet.getRange('B22').setFormula('=HYPERLINK("' + url + '", "View Form Answers ↗")');
-    jobSheet.getRange('B22').setFontColor('#7b9ec4');
+    jobSheet.getRange('B21').setFormula('=HYPERLINK("' + url + '", "View Form Answers ↗")');
+    jobSheet.getRange('B21').setFontColor('#7b9ec4');
     hideEmptyRows(jobSheet);
   }
 

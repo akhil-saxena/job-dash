@@ -155,10 +155,11 @@ function appendActivityLog(jobSheet, description) {
  * Hides rows with empty values in a job detail tab.
  */
 function hideEmptyRows(sheet) {
-  var leftValueRows = [6,7,8,9,10,11, 14,15,16, 19,20,21,22];
+  // New template rows: Job Info 5-10, People 13-15, Documents 18-21
+  var leftValueRows = [5,6,7,8,9,10, 13,14,15, 18,19,20,21];
   for (var i = 0; i < leftValueRows.length; i++) {
     var row = leftValueRows[i];
-    var val = sheet.getRange(row, 2).getValue();
+    var val = sheet.getRange(row, 2).getDisplayValue();
     if (!val || val === '') {
       sheet.hideRows(row);
     } else {

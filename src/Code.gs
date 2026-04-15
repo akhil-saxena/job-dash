@@ -65,23 +65,20 @@ function onEditHandler(e) {
 
   var col = range.getColumn();
 
-  // Update Last Updated (column 9) on any edit
-  sheet.getRange(row, 9).setValue(new Date());
-
-  // If Status column (3) changed
+  // If Status column (C=3) changed
   if (col === 3) {
     var newStatus = range.getValue();
     var oldStatus = e.oldValue || '';
 
-    // Update Status Changed Date (hidden column 17)
-    sheet.getRange(row, 17).setValue(new Date());
+    // Update StatusChanged (hidden K=11)
+    sheet.getRange(row, 11).setValue(new Date());
 
-    // Reset Days in Status
-    sheet.getRange(row, 11).setValue(0);
+    // Reset Days in Status (H=8)
+    sheet.getRange(row, 8).setValue(0);
 
-    // Auto-set Applied Date if transitioning from Wishlist
+    // Auto-set Applied Date (G=7) if transitioning from Wishlist
     if (oldStatus === 'Wishlist' && newStatus !== 'Wishlist') {
-      sheet.getRange(row, 8).setValue(new Date());
+      sheet.getRange(row, 7).setValue(new Date());
     }
 
     // Update status cell color
@@ -154,12 +151,12 @@ function refreshDaysInStatus() {
   today.setHours(0, 0, 0, 0);
 
   for (var r = 3; r <= lastRow; r++) {
-    var statusChangedDate = dashboard.getRange(r, 17).getValue();
+    var statusChangedDate = dashboard.getRange(r, 11).getValue(); // K=11
     if (statusChangedDate) {
       var changed = new Date(statusChangedDate);
       changed.setHours(0, 0, 0, 0);
       var days = Math.floor((today - changed) / (1000 * 60 * 60 * 24));
-      dashboard.getRange(r, 11).setValue(days);
+      dashboard.getRange(r, 8).setValue(days); // H=8
     }
   }
 }
@@ -207,9 +204,23 @@ function initialSetup() {
   createAnalyticsCharts();
   SpreadsheetApp.getUi().alert(
     'Setup Complete',
-    'All tabs, triggers, and charts created. You are ready to go!',
+    'All tabs, triggers, and charts created. You are ready to go!\n\nReload the spreadsheet to see the JobDash menu.',
     SpreadsheetApp.getUi().ButtonSet.OK
   );
+}
+
+/**
+ * Resets and re-applies formatting to an existing application tab.
+ * Use if you want to refresh the look of an existing job tab.
+ */
+function reformatExistingTabs() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var tabNames = getJobTabNames();
+  for (var t = 0; t < tabNames.length; t++) {
+    var sheet = ss.getSheetByName(tabNames[t]);
+    if (sheet) applyJobTabFormatting(sheet);
+  }
+  SpreadsheetApp.getActiveSpreadsheet().toast('All job tabs reformatted.', 'JobDash');
 }
 
 function setupConfigTab() {
@@ -286,106 +297,116 @@ function setupDashboardTab() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName('Dashboard');
   if (!sheet) {
-    // Rename Sheet1 if it exists, otherwise create
     var sheet1 = ss.getSheetByName('Sheet1');
-    if (sheet1) {
-      sheet1.setName('Dashboard');
-      sheet = sheet1;
-    } else {
-      sheet = ss.insertSheet('Dashboard');
-    }
+    if (sheet1) { sheet1.setName('Dashboard'); sheet = sheet1; }
+    else { sheet = ss.insertSheet('Dashboard'); }
   }
   sheet.clear();
+  sheet.clearConditionalFormatRules();
   sheet.setTabColor('#7c9a72');
 
-  // Row 1: Summary stats
-  sheet.getRange('A1').setValue('Total Active');
-  sheet.getRange('C1').setValue('Interviews');
-  sheet.getRange('E1').setValue('Avg Response');
-  sheet.getRange('G1').setValue('Offer Rate');
-  sheet.getRange('B1').setValue(0);
-  sheet.getRange('D1').setValue(0);
-  sheet.getRange('F1').setValue('—');
-  sheet.getRange('H1').setValue('0%');
+  // === NEW SLIM DASHBOARD: 10 visible columns + 1 hidden ===
+  // A=Company B=Role C=Status D=Priority E=Location F=Source G=Applied H=Days I=NextAction J=Details K=StatusChanged(hidden)
 
-  var statsRange = sheet.getRange('A1:Q1');
-  statsRange.setBackground('#f0eeea').setFontSize(11);
-  sheet.getRange('A1').setFontWeight('bold');
-  sheet.getRange('C1').setFontWeight('bold');
-  sheet.getRange('E1').setFontWeight('bold');
-  sheet.getRange('G1').setFontWeight('bold');
+  // Whole sheet background
+  sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns()).setBackground('#faf9f6')
+    .setFontFamily('Google Sans').setFontSize(11).setFontColor('#555555');
+
+  // Row 1: Summary stats
+  sheet.getRange('A1:B1').mergeAcross();
+  sheet.getRange('C1:D1').mergeAcross();
+  sheet.getRange('E1:F1').mergeAcross();
+  sheet.getRange('G1:H1').mergeAcross();
+
+  sheet.getRange('A1').setValue('  Active: 0').setFontWeight('bold').setFontColor('#2d2d2d');
+  sheet.getRange('C1').setValue('  Interviews: 0').setFontWeight('bold').setFontColor('#2d2d2d');
+  sheet.getRange('E1').setValue('  Avg Response: —').setFontWeight('bold').setFontColor('#2d2d2d');
+  sheet.getRange('G1').setValue('  Offer Rate: 0%').setFontWeight('bold').setFontColor('#2d2d2d');
+
+  sheet.getRange('A1:J1').setBackground('#f0eeea').setFontSize(11)
+    .setBorder(null, null, true, null, null, null, '#e5e2dc', SpreadsheetApp.BorderStyle.SOLID);
+  sheet.setRowHeight(1, 36);
 
   // Row 2: Column headers
-  var headers = [
-    'Company', 'Role', 'Status', 'Priority', 'Location', 'Salary Range',
-    'Source', 'Applied', 'Last Updated', 'Next Deadline', 'Days in Status',
-    'Next Action', 'Referral', 'Tags', 'Job URL', 'Details', 'Status Changed'
-  ];
+  var headers = ['Company', 'Role', 'Status', 'Priority', 'Location', 'Source', 'Applied', 'Days', 'Next Action', 'Details', 'StatusChanged'];
   sheet.getRange(2, 1, 1, headers.length).setValues([headers]);
-  var headerRange = sheet.getRange('A2:Q2');
-  headerRange.setBackground('#f0eeea').setFontColor('#888888').setFontSize(10)
-    .setFontWeight('bold');
+  sheet.getRange('A2:K2').setBackground('#f0eeea').setFontColor('#999999').setFontSize(10)
+    .setFontWeight('bold').setVerticalAlignment('middle')
+    .setBorder(null, null, true, null, null, null, '#e5e2dc', SpreadsheetApp.BorderStyle.SOLID);
+  sheet.setRowHeight(2, 32);
 
-  // Freeze rows 1-2
   sheet.setFrozenRows(2);
-
-  // Hide column Q (Status Changed Date)
-  sheet.hideColumns(17);
+  sheet.hideColumns(11); // Hide StatusChanged
 
   // Column widths
-  var widths = [120, 140, 110, 80, 100, 90, 90, 80, 80, 90, 60, 150, 100, 100, 60, 60, 80];
+  var widths = [150, 200, 115, 85, 95, 95, 90, 55, 220, 70, 80];
   for (var i = 0; i < widths.length; i++) {
     sheet.setColumnWidth(i + 1, widths[i]);
   }
 
+  // Data row defaults
+  sheet.getRange('A3:K200').setVerticalAlignment('middle').setFontSize(11);
+  sheet.setRowHeightsForced(3, 198, 32);
+
+  // Alternating row colors
+  var banding = sheet.getRange('A3:J200').applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY);
+  banding.setFirstRowColor('#faf9f6').setSecondRowColor('#f5f3ef');
+  banding.setHeaderRowColor(null);
+
+  // Company column bold
+  sheet.getRange('A3:A200').setFontWeight('bold').setFontColor('#2d2d2d');
+
+  // Details column style
+  sheet.getRange('J3:J200').setFontColor('#7b9ec4');
+
   // Data validation
   var configSheet = getConfigSheet();
-  var statusRule = SpreadsheetApp.newDataValidation()
-    .requireValueInRange(configSheet.getRange('A2:A9')).build();
-  sheet.getRange('C3:C1000').setDataValidation(statusRule);
+  sheet.getRange('C3:C200').setDataValidation(
+    SpreadsheetApp.newDataValidation().requireValueInRange(configSheet.getRange('A2:A9')).build()
+  );
+  sheet.getRange('D3:D200').setDataValidation(
+    SpreadsheetApp.newDataValidation().requireValueInRange(configSheet.getRange('A12:A14')).build()
+  );
+  sheet.getRange('E3:E200').setDataValidation(
+    SpreadsheetApp.newDataValidation().requireValueInRange(configSheet.getRange('A50:A52')).build()
+  );
+  sheet.getRange('F3:F200').setDataValidation(
+    SpreadsheetApp.newDataValidation().requireValueInRange(configSheet.getRange('A17:A23')).build()
+  );
 
-  var priorityRule = SpreadsheetApp.newDataValidation()
-    .requireValueInRange(configSheet.getRange('A12:A14')).build();
-  sheet.getRange('D3:D1000').setDataValidation(priorityRule);
-
-  var locationRule = SpreadsheetApp.newDataValidation()
-    .requireValueInRange(configSheet.getRange('A50:A52')).build();
-  sheet.getRange('E3:E1000').setDataValidation(locationRule);
-
-  var sourceRule = SpreadsheetApp.newDataValidation()
-    .requireValueInRange(configSheet.getRange('A17:A23')).build();
-  sheet.getRange('G3:G1000').setDataValidation(sourceRule);
-
-  // Conditional formatting: status colors
+  // Conditional formatting
+  var rules = [];
   var statusColors = getStatusColors();
   var statuses = getStatuses();
+
   for (var i = 0; i < statuses.length; i++) {
-    var status = statuses[i];
-    var c = statusColors[status];
+    var c = statusColors[statuses[i]];
     if (!c) continue;
-    var rule = SpreadsheetApp.newConditionalFormatRule()
-      .whenTextEqualTo(status)
-      .setBackground(c.bg)
-      .setFontColor(c.text)
-      .setRanges([sheet.getRange('C3:C1000')])
-      .build();
-    var rules = sheet.getConditionalFormatRules();
-    rules.push(rule);
-    sheet.setConditionalFormatRules(rules);
+    rules.push(SpreadsheetApp.newConditionalFormatRule()
+      .whenTextEqualTo(statuses[i])
+      .setBackground(c.bg).setFontColor(c.text).setBold(true)
+      .setRanges([sheet.getRange('C3:C200')]).build());
   }
 
   // Row dimming for Rejected/Withdrawn
-  var dimRule = SpreadsheetApp.newConditionalFormatRule()
+  rules.push(SpreadsheetApp.newConditionalFormatRule()
     .whenFormulaSatisfied('=OR($C3="Rejected",$C3="Withdrawn")')
     .setFontColor('#cccccc')
-    .setRanges([sheet.getRange('A3:Q1000')])
-    .build();
-  var allRules = sheet.getConditionalFormatRules();
-  allRules.push(dimRule);
-  sheet.setConditionalFormatRules(allRules);
+    .setRanges([sheet.getRange('A3:J200')]).build());
 
-  // Background
-  sheet.getRange('A3:Q1000').setBackground('#faf9f6');
+  // Days in Status — amber at 7+
+  rules.push(SpreadsheetApp.newConditionalFormatRule()
+    .whenNumberGreaterThanOrEqualTo(7)
+    .setFontColor('#b8860b')
+    .setRanges([sheet.getRange('H3:H200')]).build());
+
+  // Days in Status — red at 14+
+  rules.push(SpreadsheetApp.newConditionalFormatRule()
+    .whenNumberGreaterThanOrEqualTo(14)
+    .setFontColor('#c0705e').setBold(true)
+    .setRanges([sheet.getRange('H3:H200')]).build());
+
+  sheet.setConditionalFormatRules(rules);
 }
 
 function setupTemplateTab() {
@@ -394,90 +415,137 @@ function setupTemplateTab() {
   if (!sheet) sheet = ss.insertSheet('_Template');
   sheet.clear();
 
-  // Set background
-  sheet.getRange('A1:F60').setBackground('#faf9f6');
+  // Ensure enough rows/columns
+  if (sheet.getMaxRows() < 60) sheet.insertRowsAfter(sheet.getMaxRows(), 60 - sheet.getMaxRows());
+  if (sheet.getMaxColumns() < 6) sheet.insertColumnsAfter(sheet.getMaxColumns(), 6 - sheet.getMaxColumns());
 
-  // Header
-  sheet.getRange('A1').setValue('{Company} — {Role}').setFontSize(18).setFontWeight('bold').setFontColor('#2d2d2d');
-  sheet.getRange('A2').setValue('{Team} · {Location} · {Source}').setFontSize(12).setFontColor('#888888');
-
-  // Left column sections
-  var sectionStyle = function(range) {
-    range.setFontSize(11).setFontColor('#aaaaaa').setFontWeight('bold');
-    range.setBorder(null, null, true, null, null, null, '#eceae5', SpreadsheetApp.BorderStyle.SOLID);
-  };
-  var labelStyle = function(range) {
-    range.setFontSize(12).setFontColor('#999999');
-  };
-  var valueStyle = function(range) {
-    range.setFontSize(12).setFontColor('#555555');
-  };
-
-  // JOB INFO
-  sheet.getRange('A5').setValue('JOB INFO');
-  sectionStyle(sheet.getRange('A5:B5'));
-  var jobLabels = ['Posting URL', 'Team / Org', 'Applied', 'Next Deadline', 'Tags', 'Salary Range'];
-  for (var i = 0; i < jobLabels.length; i++) {
-    sheet.getRange(6 + i, 1).setValue(jobLabels[i]);
-    labelStyle(sheet.getRange(6 + i, 1));
-    valueStyle(sheet.getRange(6 + i, 2));
-  }
-
-  // PEOPLE
-  sheet.getRange('A13').setValue('PEOPLE');
-  sectionStyle(sheet.getRange('A13:B13'));
-  var peopleLabels = ['Recruiter', 'Hiring Manager', 'Referral'];
-  for (var i = 0; i < peopleLabels.length; i++) {
-    sheet.getRange(14 + i, 1).setValue(peopleLabels[i]);
-    labelStyle(sheet.getRange(14 + i, 1));
-    valueStyle(sheet.getRange(14 + i, 2));
-  }
-
-  // DOCUMENTS
-  sheet.getRange('A18').setValue('DOCUMENTS');
-  sectionStyle(sheet.getRange('A18:B18'));
-  var docLabels = ['Resume', 'Offer Letter', 'View JD', 'Form Answers'];
-  for (var i = 0; i < docLabels.length; i++) {
-    sheet.getRange(19 + i, 1).setValue(docLabels[i]);
-    labelStyle(sheet.getRange(19 + i, 1));
-    valueStyle(sheet.getRange(19 + i, 2));
-  }
-
-  // Right column: RESEARCH & PREP
-  sheet.getRange('D5').setValue('RESEARCH & PREP');
-  sectionStyle(sheet.getRange('D5:E5'));
-  sheet.getRange('D6').setFontSize(12).setFontColor('#555555');
-  sheet.getRange('D6').setNote('Interview style, known questions, tech stack, green/red flags');
-
-  // INTERVIEW ROUNDS header
-  sheet.getRange('D13').setValue('INTERVIEW ROUNDS');
-  sectionStyle(sheet.getRange('D13:E13'));
-
-  // POST-PROCESS (greyed out)
-  sheet.getRange('A40').setValue('POST-PROCESS (unlocks when concluded)');
-  sectionStyle(sheet.getRange('A40:E40'));
-  var postLabels = [
-    ['Rating', '', 'Rejection Reason', ''],
-    ['Review', '', 'Rejection Stage', ''],
-    ['', '', 'Re-apply?', ''],
-    ['', '', 'Reapply After', ''],
-    ['', '', 'Key Learnings', '']
-  ];
-  sheet.getRange(41, 1, postLabels.length, 4).setValues(postLabels);
-  sheet.getRange('A41:E45').setFontColor('#cccccc').setFontSize(11);
-
-  // ACTIVITY LOG
-  sheet.getRange('A47').setValue('ACTIVITY LOG (auto)');
-  sectionStyle(sheet.getRange('A47:E47'));
+  // Full background + font
+  sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns())
+    .setBackground('#faf9f6').setFontFamily('Google Sans').setFontColor('#555555').setFontSize(11);
 
   // Column widths
-  sheet.setColumnWidth(1, 120);
-  sheet.setColumnWidth(2, 250);
-  sheet.setColumnWidth(3, 20);
-  sheet.setColumnWidth(4, 120);
-  sheet.setColumnWidth(5, 250);
+  sheet.setColumnWidth(1, 130);  // Labels
+  sheet.setColumnWidth(2, 280);  // Values
+  sheet.setColumnWidth(3, 30);   // Gutter
+  sheet.setColumnWidth(4, 130);  // Right labels
+  sheet.setColumnWidth(5, 280);  // Right values
+  sheet.setColumnWidth(6, 30);
+
+  // ====== HEADER ======
+  sheet.getRange('A1:E1').mergeAcross().setBackground('#f0eeea');
+  sheet.getRange('A1').setValue('{Company} — {Role}')
+    .setFontSize(20).setFontWeight('bold').setFontColor('#2d2d2d');
+  sheet.setRowHeight(1, 44);
+
+  sheet.getRange('A2:E2').mergeAcross().setBackground('#f0eeea');
+  sheet.getRange('A2').setValue('{Team} · {Location} · {Source}')
+    .setFontSize(12).setFontColor('#999999');
+  sheet.setRowHeight(2, 28);
+
+  // Row 3: spacer
+  sheet.setRowHeight(3, 8);
+  sheet.getRange('A3:E3').setBackground('#faf9f6');
+
+  // ====== HELPER FUNCTIONS ======
+  var sectionHeader = function(row, startCol, endCol, text) {
+    var range = sheet.getRange(row, startCol, 1, endCol - startCol + 1);
+    range.mergeAcross();
+    sheet.getRange(row, startCol).setValue(text);
+    range.setFontSize(10).setFontColor('#b0b0b0').setFontWeight('bold')
+      .setBackground('#f5f3ef')
+      .setBorder(null, null, true, null, null, null, '#e5e2dc', SpreadsheetApp.BorderStyle.SOLID);
+    sheet.setRowHeight(row, 28);
+  };
+
+  var labelCell = function(row, col, text) {
+    sheet.getRange(row, col).setValue(text).setFontColor('#b0b0b0').setFontSize(11);
+  };
+
+  var valueCell = function(row, col) {
+    sheet.getRange(row, col).setFontColor('#2d2d2d').setFontSize(11);
+  };
+
+  var rowBorder = function(row, startCol, endCol) {
+    sheet.getRange(row, startCol, 1, endCol - startCol + 1)
+      .setBorder(null, null, true, null, null, null, '#f0eeea', SpreadsheetApp.BorderStyle.SOLID);
+  };
+
+  // ====== LEFT COLUMN: JOB INFO (rows 4-11) ======
+  sectionHeader(4, 1, 2, 'JOB INFO');
+  var jobLabels = ['Posting URL', 'Team / Org', 'Applied', 'Next Deadline', 'Tags', 'Salary Range'];
+  for (var i = 0; i < jobLabels.length; i++) {
+    labelCell(5 + i, 1, jobLabels[i]);
+    valueCell(5 + i, 2);
+    rowBorder(5 + i, 1, 2);
+    sheet.setRowHeight(5 + i, 26);
+  }
+
+  // Row 11: spacer
+  sheet.setRowHeight(11, 10);
+
+  // ====== LEFT COLUMN: PEOPLE (rows 12-16) ======
+  sectionHeader(12, 1, 2, 'PEOPLE');
+  var peopleLabels = ['Recruiter', 'Hiring Manager', 'Referral'];
+  for (var i = 0; i < peopleLabels.length; i++) {
+    labelCell(13 + i, 1, peopleLabels[i]);
+    valueCell(13 + i, 2);
+    rowBorder(13 + i, 1, 2);
+    sheet.setRowHeight(13 + i, 26);
+  }
+
+  // Row 16: spacer
+  sheet.setRowHeight(16, 10);
+
+  // ====== LEFT COLUMN: DOCUMENTS (rows 17-22) ======
+  sectionHeader(17, 1, 2, 'DOCUMENTS');
+  var docLabels = ['Resume', 'Offer Letter', 'View JD', 'Form Answers'];
+  for (var i = 0; i < docLabels.length; i++) {
+    labelCell(18 + i, 1, docLabels[i]);
+    valueCell(18 + i, 2);
+    rowBorder(18 + i, 1, 2);
+    sheet.setRowHeight(18 + i, 26);
+  }
+
+  // ====== RIGHT COLUMN: RESEARCH & PREP (rows 4-11) ======
+  sectionHeader(4, 4, 5, 'RESEARCH & PREP');
+  sheet.getRange(5, 4, 6, 2).mergeAcross();
+  sheet.getRange(5, 4).setFontColor('#555555').setFontSize(11)
+    .setVerticalAlignment('top').setWrap(true);
+  sheet.getRange(5, 4).setNote('Interview style, known questions, tech stack, green/red flags');
+
+  // ====== RIGHT COLUMN: INTERVIEW ROUNDS (row 12+) ======
+  sectionHeader(12, 4, 5, 'INTERVIEW ROUNDS');
+  // Rounds will be inserted by script starting row 14
+
+  // ====== FULL WIDTH: POST-PROCESS (row 40) ======
+  sectionHeader(40, 1, 5, 'POST-PROCESS  (unlocks when concluded)');
+  var postLabelsLeft = ['Rating', 'Review'];
+  var postLabelsRight = ['Rejection Reason', 'Rejection Stage', 'Re-apply?', 'Reapply After', 'Key Learnings'];
+  for (var i = 0; i < postLabelsLeft.length; i++) {
+    labelCell(41 + i, 1, postLabelsLeft[i]);
+    sheet.getRange(41 + i, 2).setFontColor('#cccccc');
+    sheet.setRowHeight(41 + i, 26);
+  }
+  for (var i = 0; i < postLabelsRight.length; i++) {
+    labelCell(41 + i, 4, postLabelsRight[i]);
+    sheet.getRange(41 + i, 5).setFontColor('#cccccc');
+    sheet.setRowHeight(41 + i, 26);
+  }
+  // Grey everything in post-process
+  sheet.getRange('A41:E45').setFontColor('#cccccc');
+
+  // ====== FULL WIDTH: ACTIVITY LOG (row 47) ======
+  sectionHeader(47, 1, 5, 'ACTIVITY LOG');
+  // Row 48+ filled by script
 
   sheet.hideSheet();
+}
+
+/**
+ * Applies formatting to a job detail tab (called after clone from template).
+ */
+function applyJobTabFormatting(sheet) {
+  hideEmptyRows(sheet);
 }
 
 function setupAnalyticsTab() {
@@ -486,7 +554,19 @@ function setupAnalyticsTab() {
   if (!sheet) sheet = ss.insertSheet('Analytics');
   sheet.clear();
   sheet.setTabColor('#7b9ec4');
-  sheet.getRange('A1:J50').setBackground('#faf9f6');
-  sheet.getRange('A1').setValue('Analytics').setFontSize(16).setFontWeight('bold').setFontColor('#2d2d2d');
-  sheet.getRange('A2').setValue('Refresh via JobDash menu or auto-refreshes daily').setFontSize(11).setFontColor('#aaaaaa');
+
+  sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns())
+    .setBackground('#faf9f6').setFontFamily('Google Sans');
+
+  sheet.getRange('A1:J1').mergeAcross();
+  sheet.getRange('A1').setValue('Analytics')
+    .setFontSize(20).setFontWeight('bold').setFontColor('#2d2d2d');
+  sheet.setRowHeight(1, 44);
+
+  sheet.getRange('A2:J2').mergeAcross();
+  sheet.getRange('A2').setValue('Refresh via JobDash → Refresh Stats  |  Auto-refreshes daily')
+    .setFontSize(11).setFontColor('#b0b0b0');
+  sheet.setRowHeight(2, 28);
+
+  sheet.getRange('A1:J2').setBackground('#f0eeea');
 }
