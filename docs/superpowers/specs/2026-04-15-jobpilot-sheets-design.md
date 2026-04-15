@@ -1,0 +1,434 @@
+# JobPilot — Google Sheets Job Tracker
+
+## Design Spec
+
+**Author:** Akhil Saxena
+**Date:** April 15, 2026
+**Status:** Approved
+
+---
+
+## 1. Overview
+
+A fully automated Google Sheets job application tracker that replaces scattered emails and bookmarks with a structured, clean spreadsheet. Built with Google Apps Script + HTML sidebar forms for a mini-app experience inside Sheets.
+
+**Goals:**
+- Actually usable for daily job search tracking
+- Zero cost, zero deployment, zero maintenance
+- Clean pastel aesthetic, not a cluttered spreadsheet
+- Full automation: buttons create rows, tabs, links, timestamps automatically
+
+**Non-goals:**
+- Not a portfolio piece (separate project for that)
+- Not a published add-on or shared product
+- No external services, APIs, or databases
+
+---
+
+## 2. Architecture
+
+**Platform:** Single Google Spreadsheet with bound Apps Script
+
+**Components:**
+- Google Sheets — data storage and UI
+- Apps Script (Code.gs) — automation logic, triggers, menu actions
+- HTML Service — sidebar form templates served from Apps Script
+
+**Approach:** Approach B — Apps Script + HTML Sidebar Forms. Sidebar panels slide in from the right for data entry. Dashboard stays visible while filling forms. Styled HTML forms with validation and dropdowns.
+
+---
+
+## 3. Tab Structure
+
+| Tab | Type | Visibility | Purpose |
+|-----|------|-----------|---------|
+| Dashboard | Master table | Visible | All applications at a glance |
+| {Company} - {Role} | Job detail | Visible | One per application, auto-created |
+| _Template | Template | Hidden | Blank job tab, cloned for each new application |
+| _Config | Settings | Hidden | Dropdown values, color hex codes, settings |
+
+**Tab naming:** Job tabs named as "{Company} - {Role}" (e.g. "Google - SDE2"). Tab color set to match status color via Apps Script.
+
+---
+
+## 4. Dashboard Tab
+
+### 4.1 Summary Stats Row (frozen)
+
+Top row, frozen, auto-computed:
+
+| Stat | Formula logic |
+|------|--------------|
+| Total Active | Count where status not in (Rejected, Withdrawn, Accepted) |
+| Interviews This Week | Count interview dates in current week across all job tabs |
+| Avg Days to Response | Average of (first status change date - applied date) |
+| Offer Rate % | Count(Offer + Accepted) / Count(all non-Wishlist) |
+
+### 4.2 Columns (16)
+
+| # | Column | Type | Notes |
+|---|--------|------|-------|
+| 1 | Company | Text | Bold, primary color |
+| 2 | Role | Text | Secondary color |
+| 3 | Status | Dropdown | Pastel badge via conditional formatting |
+| 4 | Priority | Dropdown | High/Medium/Low with colored dot |
+| 5 | Location | Dropdown | Remote/Hybrid/Onsite + city text |
+| 6 | Salary Range | Text | e.g. "35-50L" |
+| 7 | Source | Dropdown | LinkedIn/Referral/Naukri/Company Site/Indeed/AngelList/Other |
+| 8 | Applied Date | Date | Auto-set when status changes from Wishlist |
+| 9 | Last Updated | Date | Auto-timestamps on any edit (onEdit trigger) |
+| 10 | Next Deadline | Date | Red <3 days, yellow 3-7, green >7 |
+| 11 | Days in Status | Number | Auto-calculated. Amber at 7+, red at 14+ |
+| 12 | Next Action | Text | Free-text one-liner: "Send follow-up", "Prep for R3" |
+| 13 | Referral | Text | Name of referrer |
+| 14 | Tags | Text | Comma-separated |
+| 15 | Job URL | URL | Link to job posting |
+| 16 | Details | Hyperlink | Auto-generated link to job's detail tab |
+
+### 4.3 Dashboard Behaviors
+
+- **Conditional formatting:** Status cells get pastel background + muted text color
+- **Rejected/Withdrawn rows:** Entire row dimmed (light gray text)
+- **Auto-sort:** By status priority order, then by deadline urgency (onEdit or manual menu action)
+- **Last Updated:** Auto-timestamps via onEdit trigger when any cell in the row changes
+- **Days in Status:** Formula: `=TODAY() - [Last Updated]`, conditional formatting for amber/red
+- **Details column:** Hyperlink auto-created by Apps Script pointing to the job's tab
+
+### 4.4 Status Color Palette (pastel)
+
+| Status | Background | Text Color |
+|--------|-----------|------------|
+| Wishlist | #ececec | #888888 |
+| Applied | #e3eef8 | #5a7fa8 |
+| Screening | #ede8f5 | #7c6c9a |
+| Interviewing | #fef3e2 | #b8860b |
+| Offer | #e5f0e8 | #6a8f72 |
+| Accepted | #dff0e8 | #4a7a5a |
+| Rejected | #f5e5e5 | #a67272 |
+| Withdrawn | #eaeaea | #999999 |
+
+### 4.5 Priority Colors
+
+| Priority | Dot Color |
+|----------|-----------|
+| High | #d4887a (dusty rose) |
+| Medium | #d4b574 (warm tan) |
+| Low | #b0b0b0 (gray) |
+
+---
+
+## 5. Job Detail Tab
+
+Each job gets its own tab, cloned from _Template. Two-column layout with 8 sections. **Hide-if-empty rule:** rows with no data are hidden, not shown with dashes.
+
+### 5.1 Header
+
+Full-width top section:
+- Left: **Company — Role** (large, bold), subtitle with Team/Org, Location, Source
+- Right: Status badge (pastel pill), "Day N" pipeline counter
+
+### 5.2 Left Column
+
+**Section 1: Job Info**
+
+| Field | Type |
+|-------|------|
+| Posting URL | Clickable link |
+| Team / Org | Text |
+| Applied Date | Date |
+| Next Deadline | Date + description, red if urgent |
+| Tags | Pastel pills |
+
+**Section 2: People**
+
+Each person row: Name + LinkedIn URL + email (if known). Only show rows that have data.
+
+| Field | Type |
+|-------|------|
+| Recruiter | Name, LinkedIn link, email |
+| Hiring Manager | Name, LinkedIn link |
+| Referral | Name, LinkedIn link, "Thanked" checkbox |
+
+**Section 3: Salary**
+
+Single field:
+
+| Field | Type |
+|-------|------|
+| Salary Range | Text (e.g. "₹35L – ₹50L") |
+
+**Section 4: Documents**
+
+Only show rows that have data (hide-if-empty).
+
+| Field | Type |
+|-------|------|
+| Resume Version | Name + Google Drive PDF link |
+| Offer Letter | Google Drive link (only shown when present) |
+
+### 5.3 Right Column
+
+**Section 5: Research & Prep**
+
+Single free-form rich text area combining:
+- Company interview style
+- Known interview questions
+- Tech stack
+- Green flags / red flags
+- Any prep notes
+
+Below it: **Job Description** — collapsible section with saved JD text, labeled with capture date.
+
+**Section 6: Interview Rounds**
+
+Stacked card layout, one card per round. Each card contains:
+
+| Field | Type |
+|-------|------|
+| Round number + type | e.g. "R1 — Phone Screen" |
+| Status | Scheduled / Completed / Cancelled / No-Show |
+| Outcome | Pass / Fail / Unclear / Waiting (separate from status) |
+| Date | Date |
+| Duration | Minutes |
+| Interviewer | Name + LinkedIn link |
+| Meeting link | Clickable URL |
+| Questions asked | Rich text |
+| My answers | Rich text |
+| Notes | Rich text |
+| Feedback received | Rich text |
+| Self-rating | 1-5 stars |
+| Thank-you sent | Checkbox |
+| Questions to ask them | Rich text (for upcoming rounds) |
+
+Scheduled rounds have an amber border. Completed rounds have default border. "Add round via menu" placeholder at the bottom.
+
+### 5.4 Full-Width Bottom
+
+**Section 7: Post-Process Review**
+
+Greyed out / dimmed until status = Accepted, Rejected, or Withdrawn. When active:
+
+| Field | Type |
+|-------|------|
+| Company Rating | 1-5 stars |
+| Review | Free text |
+| Rejection Reason | Text (if shared by company) |
+| Rejection Stage | Which round eliminated at |
+| Would Re-apply? | Yes / No / Maybe |
+| Reapply After | Date (cooldown period) |
+| Key Learnings | One-liner takeaway |
+
+**Section 8: Activity Log**
+
+Auto-generated, append-only. Each entry: date + event description. Events logged:
+- Application created
+- Status changes (from → to)
+- Interview round added
+- Interview round completed
+- Deadline added
+
+---
+
+## 6. Sidebar Forms
+
+HTML forms served via Apps Script HtmlService, displayed in the right sidebar panel. Pastel/off-white styling matching the spreadsheet aesthetic.
+
+### 6.1 Add Application
+
+**Trigger:** Menu → JobPilot → Add Application
+
+**Fields:**
+- Company (required)
+- Role (required)
+- Status (dropdown, default: Wishlist)
+- Priority (dropdown, default: Medium)
+- Location (dropdown: Remote/Hybrid/Onsite)
+- Location City (text, optional)
+- Salary Range (text, optional)
+- Source (dropdown)
+- Referral Name (text, optional)
+- Job Posting URL (text, optional)
+- Tags (text, comma-separated, optional)
+- Resume Version Name (text, optional)
+- Resume Drive Link (URL, optional)
+
+**On submit:**
+1. Add row to Dashboard with all fields populated
+2. Clone _Template tab → rename to "{Company} - {Role}"
+3. Populate job info section in new tab
+4. Create hyperlink in Dashboard "Details" column
+5. Apply conditional formatting for status color
+6. Auto-set Applied Date if status is not Wishlist
+7. Auto-timestamp Last Updated
+
+### 6.2 Add Interview Round
+
+**Trigger:** Menu → JobPilot → Add Interview Round
+
+**Fields:**
+- Application (dropdown of active job tabs)
+- Round Type (dropdown: Phone Screen / Recruiter Call / Technical / System Design / Behavioral / Hiring Manager / Bar Raiser / Take-Home / Panel / Custom)
+- Custom Type Name (text, shown only if type = Custom)
+- Date (date picker)
+- Duration (number, default: 60)
+- Interviewer Name (text, optional)
+- Interviewer LinkedIn (URL, optional)
+- Meeting Link (URL, optional)
+- Status (dropdown, default: Scheduled)
+
+**On submit:**
+1. Add round card to the selected job's detail tab
+2. Auto-number the round (R1, R2, R3...)
+3. Log "Interview round added" in Activity Log
+4. If status = Scheduled, set amber border
+
+### 6.3 Update Status
+
+**Trigger:** Menu → JobPilot → Update Status
+
+**Fields:**
+- Application (dropdown of active job tabs)
+- New Status (dropdown)
+
+**On submit:**
+1. Update status in Dashboard
+2. Update status badge in job detail tab header
+3. Re-apply conditional formatting
+4. Log status change in Activity Log
+5. Update tab color to match new status
+6. If changing to Accepted/Rejected/Withdrawn, un-grey the Post-Process section
+
+### 6.4 Add Deadline
+
+**Trigger:** Menu → JobPilot → Add Deadline
+
+**Fields:**
+- Application (dropdown)
+- Deadline Date (date picker)
+- Description (text)
+
+**On submit:**
+1. Update Next Deadline column in Dashboard
+2. Update deadline field in job detail tab
+3. Apply urgency color formatting
+
+---
+
+## 7. Menu Structure
+
+Custom menu bar: **JobPilot**
+
+```
+JobPilot
+├── Add Application        → opens sidebar form
+├── Add Interview Round    → opens sidebar form
+├── Update Status          → opens sidebar form
+├── Add Deadline           → opens sidebar form
+├── ─────────────────
+├── Sort Dashboard         → re-sorts by status priority + deadline urgency
+├── Archive Rejected       → dims rejected/withdrawn rows, moves to bottom
+├── Refresh Stats          → recalculates summary stats row
+└── ─────────────────
+```
+
+---
+
+## 8. Automation (Apps Script Triggers)
+
+### 8.1 onEdit Trigger (installable)
+
+Fires on any cell edit in the spreadsheet:
+
+- **Dashboard edits:**
+  - Update "Last Updated" timestamp for the edited row
+  - Recalculate "Days in Status" for the edited row
+  - If Status column changed: log to Activity Log in the job's detail tab, update tab color
+
+### 8.2 Time-Driven Trigger (daily)
+
+Runs once per day:
+
+- Recalculate all "Days in Status" values
+- Update deadline urgency colors (red/yellow/green)
+- Recalculate summary stats row
+
+---
+
+## 9. _Config Tab
+
+Hidden tab storing configuration data:
+
+| Section | Contents |
+|---------|----------|
+| Statuses | Ordered list: Wishlist, Applied, Screening, Interviewing, Offer, Accepted, Rejected, Withdrawn |
+| Status Colors | Background hex + text hex for each status |
+| Status Sort Priority | Numeric sort order for each status (Interviewing=1, Offer=2, Screening=3, Applied=4, Wishlist=5, Accepted=6, Rejected=7, Withdrawn=8) |
+| Priorities | High, Medium, Low + dot color hex |
+| Sources | LinkedIn, Referral, Naukri, Company Site, Indeed, AngelList, Other |
+| Round Types | Phone Screen, Recruiter Call, Technical, System Design, Behavioral, Hiring Manager, Bar Raiser, Take-Home, Panel, Custom |
+| Round Statuses | Scheduled, Completed, Cancelled, No-Show |
+| Round Outcomes | Pass, Fail, Unclear, Waiting |
+
+---
+
+## 10. _Template Tab
+
+Hidden tab that gets cloned for each new application. Pre-formatted with:
+
+- Header row (Company — Role placeholder, status badge area)
+- Left column sections: Job Info, People, Salary, Documents — with field labels in column A, values in column B
+- Right column sections: Research & Prep (merged cell for free text), Interview Rounds area
+- Bottom sections: Post-Process Review (greyed out), Activity Log
+- All formatting pre-applied: section headers, borders, fonts, colors
+- Placeholder text in muted gray to guide the user
+
+---
+
+## 11. Visual Style
+
+- **Background:** Off-white (#faf9f6) for content areas, light cream (#f0eeea) for headers
+- **Borders:** Subtle (#e5e2dc), not heavy grid lines
+- **Text hierarchy:** Primary #2d2d2d, secondary #555, tertiary #888, disabled #aaa
+- **Links:** Muted blue (#7b9ec4)
+- **Status badges:** Pastel backgrounds with muted text (see Section 4.4)
+- **Tags:** Very light tinted pills (lavender, sage, peach)
+- **Empty fields:** Hidden, not shown with dashes
+- **Rejected/Withdrawn:** Entire row/section dimmed to ~45% opacity
+- **Sidebar forms:** Off-white background, clean labels, rounded inputs, green primary button (#7c9a72)
+
+---
+
+## 12. Limitations & Constraints
+
+- **Google Sheets formatting:** No true "collapsible sections" — JD snapshot will use row grouping (group/ungroup rows) as the closest equivalent
+- **Rich text in cells:** Google Sheets supports bold, italic, color, links within cells — not full markdown. Research & Prep notes and interview fields use this.
+- **Sidebar forms:** Google Apps Script sidebar is 300px wide, fixed. Forms must fit within this constraint.
+- **Hide-if-empty:** Implemented via Apps Script row hiding, not CSS. Runs on form submission and can be triggered manually from menu.
+- **Interview round cards:** In Sheets, these are row groups with merged cells and formatting to visually approximate cards. Not actual card components.
+- **onEdit trigger:** Cannot detect which user made the edit (irrelevant for single-user, but noted). Has a ~1 second execution delay.
+- **Daily trigger:** Runs at approximately the scheduled time (Google doesn't guarantee exact timing).
+
+---
+
+## 13. File Structure (Apps Script)
+
+```
+Code.gs              — Menu setup, trigger handlers, core logic
+Sidebar.html         — Add Application form
+InterviewForm.html   — Add Interview Round form
+StatusForm.html      — Update Status form
+DeadlineForm.html    — Add Deadline form
+Styles.html          — Shared CSS for all sidebar forms
+Utils.gs             — Helper functions (find row, get config, format dates)
+```
+
+---
+
+## 14. What This Spec Does NOT Cover
+
+- Chrome extension or browser integration
+- Email notifications or reminders
+- Multi-user sharing or permissions
+- Mobile-specific optimizations
+- Data import/export tooling
+- Analytics charts (summary stats row is sufficient)
