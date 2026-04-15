@@ -195,13 +195,13 @@ All charts are driven from the Dashboard table data. A hidden section at the bot
 
 Each job gets its own tab, cloned from _Template. Two-column layout with 8 sections. **Hide-if-empty rule:** rows with no data are hidden, not shown with dashes.
 
-### 5.1 Header
+### 6.1 Header
 
 Full-width top section:
 - Left: **Company — Role** (large, bold), subtitle with Team/Org, Location, Source
 - Right: Status badge (pastel pill), "Day N" pipeline counter
 
-### 5.2 Left Column
+### 6.2 Left Column
 
 **Section 1: Job Info**
 
@@ -236,7 +236,7 @@ Only show rows that have data (hide-if-empty).
 | Resume Version | Name + Google Drive PDF link |
 | Offer Letter | Google Drive link (only shown when present) |
 
-### 5.3 Right Column
+### 6.3 Right Column
 
 **Section 5: Research & Prep**
 
@@ -247,7 +247,11 @@ Single free-form rich text area combining:
 - Green flags / red flags
 - Any prep notes
 
-Below it: **Job Description** — collapsible section with saved JD text, labeled with capture date.
+Below it: **Job Description** — clickable "View JD ↗" link to a Google Doc (see Section 7: Google Drive Structure). Only shown when a JD doc exists for this job.
+
+**Section 5b: Application Form Q&A**
+
+Clickable "View Form Answers ↗" link to a Google Doc. Only shown when a Q&A doc exists. Used to save screening questions and your answers from job applications (e.g. "Why this role?", "Years of Go experience?", STAR-format answers). Stored as a Google Doc for comfortable reading and full rich text.
 
 **Section 6: Interview Rounds**
 
@@ -272,7 +276,7 @@ Stacked card layout, one card per round. Each card contains:
 
 Scheduled rounds have an amber border. Completed rounds have default border. "Add round via menu" placeholder at the bottom.
 
-### 5.4 Full-Width Bottom
+### 6.4 Full-Width Bottom
 
 **Section 7: Post-Process Review**
 
@@ -299,11 +303,50 @@ Auto-generated, append-only. Each entry: date + event description. Events logged
 
 ---
 
-## 7. Sidebar Forms
+## 7. Google Drive Structure
+
+Job descriptions and application form Q&A are stored as Google Docs in a dedicated Drive folder for comfortable reading and full rich text formatting.
+
+### 7.1 Folder Layout
+
+```
+My Drive/
+└── Job Interviews/
+    ├── Google - SDE2/
+    │   ├── Job Description
+    │   └── Form Answers
+    ├── Stripe - Backend/
+    │   └── Job Description
+    └── Razorpay - Platform Eng/
+        (empty until you save a doc)
+```
+
+### 7.2 Auto-Creation Logic
+
+- **"Job Interviews" root folder:** Created on first use (first time user saves a JD or form answers). Apps Script checks if it exists by name before creating.
+- **Per-job subfolder:** Created automatically when an application is created (or on first doc save for that job). Named to match the tab name: "{Company} - {Role}".
+- **Google Docs:** Created on demand — only when the user triggers "Save Job Description" or "Log Form Answers" from the menu. Not pre-created for every job.
+- **Links in Sheets:** After a doc is created, its URL is written back to the job detail tab as a clickable "View JD ↗" or "View Form Answers ↗" link.
+
+### 7.3 Doc Templates
+
+**Job Description doc:**
+- Title: "{Company} - {Role} — Job Description"
+- Pre-populated heading with company name, role, capture date
+- User pastes the full JD below
+
+**Form Answers doc:**
+- Title: "{Company} - {Role} — Form Answers"
+- Simple Q&A format: **Q:** followed by the question, **A:** followed by the answer
+- User adds entries as they fill applications
+
+---
+
+## 8. Sidebar Forms
 
 HTML forms served via Apps Script HtmlService, displayed in the right sidebar panel. Pastel/off-white styling matching the spreadsheet aesthetic.
 
-### 6.1 Add Application
+### 8.1 Add Application
 
 **Trigger:** Menu → JobPilot → Add Application
 
@@ -331,7 +374,7 @@ HTML forms served via Apps Script HtmlService, displayed in the right sidebar pa
 6. Auto-set Applied Date if status is not Wishlist
 7. Auto-timestamp Last Updated
 
-### 6.2 Add Interview Round
+### 8.2 Add Interview Round
 
 **Trigger:** Menu → JobPilot → Add Interview Round
 
@@ -352,7 +395,7 @@ HTML forms served via Apps Script HtmlService, displayed in the right sidebar pa
 3. Log "Interview round added" in Activity Log
 4. If status = Scheduled, set amber border
 
-### 6.3 Update Status
+### 8.3 Update Status
 
 **Trigger:** Menu → JobPilot → Update Status
 
@@ -368,7 +411,7 @@ HTML forms served via Apps Script HtmlService, displayed in the right sidebar pa
 5. Update tab color to match new status
 6. If changing to Accepted/Rejected/Withdrawn, un-grey the Post-Process section
 
-### 6.4 Add Deadline
+### 8.4 Add Deadline
 
 **Trigger:** Menu → JobPilot → Add Deadline
 
@@ -382,9 +425,41 @@ HTML forms served via Apps Script HtmlService, displayed in the right sidebar pa
 2. Update deadline field in job detail tab
 3. Apply urgency color formatting
 
+### 8.5 Save Job Description
+
+**Trigger:** Menu → JobPilot → Save Job Description
+
+**Fields:**
+- Application (dropdown of active job tabs)
+- (No other fields — form just triggers doc creation and opens it)
+
+**On submit:**
+1. Create "Job Interviews" root folder in Drive if it doesn't exist
+2. Create per-job subfolder if it doesn't exist
+3. Create Google Doc titled "{Company} - {Role} — Job Description" with heading template
+4. Write doc URL back to the job detail tab as "View JD ↗" link
+5. Open the Google Doc in a new browser tab so user can paste the JD immediately
+
+### 8.6 Log Form Answer
+
+**Trigger:** Menu → JobPilot → Log Form Answer
+
+**Fields:**
+- Application (dropdown of active job tabs)
+- Question (text, required)
+- Answer (textarea, required)
+
+**On submit:**
+1. Create "Job Interviews" root folder in Drive if it doesn't exist
+2. Create per-job subfolder if it doesn't exist
+3. If Form Answers doc doesn't exist for this job, create it with title "{Company} - {Role} — Form Answers"
+4. Append to the doc: **Q:** {question} followed by **A:** {answer} with a horizontal rule separator
+5. Write doc URL back to job detail tab as "View Form Answers ↗" link (if not already linked)
+6. Show confirmation with link to open the doc
+
 ---
 
-## 8. Menu Structure
+## 9. Menu Structure
 
 Custom menu bar: **JobPilot**
 
@@ -395,6 +470,9 @@ JobPilot
 ├── Update Status          → opens sidebar form
 ├── Add Deadline           → opens sidebar form
 ├── ─────────────────
+├── Save Job Description   → creates/opens JD doc in Drive
+├── Log Form Answer        → opens sidebar form, appends Q&A to doc
+├── ─────────────────
 ├── Sort Dashboard         → re-sorts by status priority + deadline urgency
 ├── Archive Rejected       → dims rejected/withdrawn rows, moves to bottom
 ├── Refresh Stats          → recalculates summary stats row + analytics charts
@@ -403,9 +481,9 @@ JobPilot
 
 ---
 
-## 9. Automation (Apps Script Triggers)
+## 10. Automation (Apps Script Triggers)
 
-### 9.1 onEdit Trigger (installable)
+### 10.1 onEdit Trigger (installable)
 
 Fires on any cell edit in the spreadsheet:
 
@@ -414,7 +492,7 @@ Fires on any cell edit in the spreadsheet:
   - Recalculate "Days in Status" for the edited row
   - If Status column changed: update hidden "Status Changed Date" column, log to Activity Log in the job's detail tab, update tab color
 
-### 9.2 Time-Driven Trigger (daily)
+### 10.2 Time-Driven Trigger (daily)
 
 Runs once per day:
 
@@ -425,7 +503,7 @@ Runs once per day:
 
 ---
 
-## 10. _Config Tab
+## 11. _Config Tab
 
 Hidden tab storing configuration data:
 
@@ -442,7 +520,7 @@ Hidden tab storing configuration data:
 
 ---
 
-## 11. _Template Tab
+## 12. _Template Tab
 
 Hidden tab that gets cloned for each new application. Pre-formatted with:
 
@@ -455,7 +533,7 @@ Hidden tab that gets cloned for each new application. Pre-formatted with:
 
 ---
 
-## 12. Visual Style
+## 13. Visual Style
 
 - **Background:** Off-white (#faf9f6) for content areas, light cream (#f0eeea) for headers
 - **Borders:** Subtle (#e5e2dc), not heavy grid lines
@@ -469,7 +547,7 @@ Hidden tab that gets cloned for each new application. Pre-formatted with:
 
 ---
 
-## 13. Limitations & Constraints
+## 14. Limitations & Constraints
 
 - **Google Sheets formatting:** No true "collapsible sections" — JD snapshot will use row grouping (group/ungroup rows) as the closest equivalent
 - **Rich text in cells:** Google Sheets supports bold, italic, color, links within cells — not full markdown. Research & Prep notes and interview fields use this.
@@ -483,15 +561,17 @@ Hidden tab that gets cloned for each new application. Pre-formatted with:
 
 ---
 
-## 14. File Structure (Apps Script)
+## 15. File Structure (Apps Script)
 
 ```
 Code.gs              — Menu setup, trigger handlers, core logic
 Analytics.gs         — Chart data computation, analytics refresh
+DriveHelper.gs       — Google Drive folder/doc creation and linking
 Sidebar.html         — Add Application form
 InterviewForm.html   — Add Interview Round form
 StatusForm.html      — Update Status form
 DeadlineForm.html    — Add Deadline form
+FormAnswerForm.html  — Log Form Answer sidebar form
 SankeyDialog.html    — Sankey diagram modal (Google Charts API)
 Styles.html          — Shared CSS for all sidebar/dialog forms
 Utils.gs             — Helper functions (find row, get config, format dates)
@@ -499,7 +579,7 @@ Utils.gs             — Helper functions (find row, get config, format dates)
 
 ---
 
-## 15. What This Spec Does NOT Cover
+## 16. What This Spec Does NOT Cover
 
 - Chrome extension or browser integration
 - Email notifications or reminders
