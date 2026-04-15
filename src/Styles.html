@@ -37,9 +37,23 @@
   .status-msg { padding: 10px 20px; font-size: 12px; text-align: center; margin-top: 12px; border-radius: 6px; }
   .status-msg.success { color: #6a8f72; background: #e5f0e8; }
   .status-msg.error { color: #a67272; background: #f5e5e5; }
+  .custom-input {
+    display: none; margin-top: 6px;
+  }
+  .custom-input input {
+    border: 1px solid #7c9a72; background: #f5fff5;
+  }
 </style>
 <script>
-  function populateSelect(id, options, defaultVal) {
+  /**
+   * Populates a <select> with options + a "+ Add new..." option at the end.
+   * When "+ Add new..." is selected, shows a text input next to it.
+   * @param {string} id - select element id
+   * @param {string[]} options - list of options
+   * @param {string} defaultVal - default selected value
+   * @param {string} [configKey] - if provided, enables "+ Add new..." that saves to _Config
+   */
+  function populateSelect(id, options, defaultVal, configKey) {
     var sel = document.getElementById(id);
     options.forEach(function(opt) {
       var o = document.createElement('option');
@@ -47,5 +61,52 @@
       if (opt === defaultVal) o.selected = true;
       sel.appendChild(o);
     });
+
+    if (configKey) {
+      // Add separator + "Add new" option
+      var sep = document.createElement('option');
+      sep.disabled = true; sep.text = '───────────';
+      sel.appendChild(sep);
+
+      var addNew = document.createElement('option');
+      addNew.value = '__add_new__'; addNew.text = '+ Add new...';
+      sel.appendChild(addNew);
+
+      // Create custom input below the select
+      var customDiv = document.createElement('div');
+      customDiv.className = 'custom-input';
+      customDiv.id = id + '_custom';
+      customDiv.innerHTML = '<input type="text" placeholder="Type new value..." id="' + id + '_input">';
+      sel.parentNode.appendChild(customDiv);
+
+      sel.addEventListener('change', function() {
+        var customEl = document.getElementById(id + '_custom');
+        if (this.value === '__add_new__') {
+          customEl.style.display = 'block';
+          document.getElementById(id + '_input').focus();
+        } else {
+          customEl.style.display = 'none';
+        }
+      });
+    }
+  }
+
+  /**
+   * Gets the actual value from a select that may have a custom input.
+   * If "+ Add new..." was selected and custom input has a value,
+   * saves it to _Config and returns the custom value.
+   */
+  function getSelectValue(id, configKey) {
+    var sel = document.getElementById(id);
+    if (sel.value === '__add_new__') {
+      var input = document.getElementById(id + '_input');
+      var customVal = input ? input.value.trim() : '';
+      if (customVal && configKey) {
+        // Save to _Config in background (fire and forget)
+        google.script.run.addConfigValue(configKey, customVal);
+      }
+      return customVal;
+    }
+    return sel.value;
   }
 </script>

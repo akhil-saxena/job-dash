@@ -32,9 +32,9 @@
   <script>
     google.script.run.withSuccessHandler(function(data) {
       populateSelect('statusSelect', data.statuses, 'Wishlist');
-      populateSelect('prioritySelect', data.priorities, 'Medium');
-      populateSelect('locationSelect', data.locations, 'Remote');
-      populateSelect('sourceSelect', data.sources, 'LinkedIn');
+      populateSelect('prioritySelect', data.priorities, 'Medium', 'PRIORITIES');
+      populateSelect('locationSelect', data.locations, 'Remote', 'LOCATIONS');
+      populateSelect('sourceSelect', data.sources, 'LinkedIn', 'SOURCES');
     }).getFormDropdowns();
 
     function handleSubmit(e) {
@@ -44,9 +44,11 @@
       var f = document.getElementById('appForm');
       var data = {
         company: f.company.value, role: f.role.value, status: f.status.value,
-        priority: f.priority.value, location: f.location.value,
+        priority: getSelectValue('prioritySelect', 'PRIORITIES'),
+        location: getSelectValue('locationSelect', 'LOCATIONS'),
         locationCity: f.locationCity.value, salaryRange: f.salaryRange.value,
-        source: f.source.value, referral: f.referral.value, jobUrl: f.jobUrl.value,
+        source: getSelectValue('sourceSelect', 'SOURCES'),
+        referral: f.referral.value, jobUrl: f.jobUrl.value,
         tags: f.tags.value, resumeName: f.resumeName.value, resumeLink: f.resumeLink.value
       };
       google.script.run

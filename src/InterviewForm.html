@@ -9,7 +9,6 @@
     <form id="interviewForm" onsubmit="handleSubmit(event)">
       <div class="field"><label>Application *</label><select name="application" id="appSelect" required></select></div>
       <div class="field"><label>Round Type *</label><select name="roundType" id="roundTypeSelect" required></select></div>
-      <div class="field" id="customTypeField" style="display:none;"><label>Custom Type Name</label><input type="text" name="customTypeName"></div>
       <div class="field"><label>Date</label><input type="date" name="date"></div>
       <div class="field-row">
         <div class="field"><label>Duration (min)</label><input type="number" name="duration" value="60"></div>
@@ -30,14 +29,10 @@
   <script>
     google.script.run.withSuccessHandler(function(data) {
       populateSelect('appSelect', data.jobTabs, '');
-      populateSelect('roundTypeSelect', data.roundTypes, 'Technical');
-      populateSelect('roundStatusSelect', data.roundStatuses, 'Scheduled');
-      populateSelect('outcomeSelect', [''].concat(data.roundOutcomes), '');
+      populateSelect('roundTypeSelect', data.roundTypes, 'Technical', 'ROUND_TYPES');
+      populateSelect('roundStatusSelect', data.roundStatuses, 'Scheduled', 'ROUND_STATUSES');
+      populateSelect('outcomeSelect', [''].concat(data.roundOutcomes), '', 'ROUND_OUTCOMES');
     }).getFormDropdowns();
-
-    document.getElementById('roundTypeSelect').addEventListener('change', function() {
-      document.getElementById('customTypeField').style.display = this.value === 'Custom' ? 'block' : 'none';
-    });
 
     function handleSubmit(e) {
       e.preventDefault();
@@ -45,11 +40,17 @@
       btn.disabled = true; btn.textContent = 'Adding...';
       var f = document.getElementById('interviewForm');
       var data = {
-        application: f.application.value, roundType: f.roundType.value,
-        customTypeName: f.customTypeName.value, date: f.date.value,
-        duration: f.duration.value, status: f.status.value, outcome: f.outcome.value,
-        interviewer: f.interviewer.value, interviewerLinkedin: f.interviewerLinkedin.value,
-        meetingLink: f.meetingLink.value, questionsToAsk: f.questionsToAsk.value
+        application: f.application.value,
+        roundType: getSelectValue('roundTypeSelect', 'ROUND_TYPES'),
+        customTypeName: '',
+        date: f.date.value,
+        duration: f.duration.value,
+        status: getSelectValue('roundStatusSelect', 'ROUND_STATUSES'),
+        outcome: getSelectValue('outcomeSelect', 'ROUND_OUTCOMES'),
+        interviewer: f.interviewer.value,
+        interviewerLinkedin: f.interviewerLinkedin.value,
+        meetingLink: f.meetingLink.value,
+        questionsToAsk: f.questionsToAsk.value
       };
       google.script.run
         .withSuccessHandler(function(result) {

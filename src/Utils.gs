@@ -6,6 +6,49 @@ function getConfigSheet() {
   return SpreadsheetApp.getActiveSpreadsheet().getSheetByName('_Config');
 }
 
+/**
+ * Adds a custom value to a config list in _Config.
+ * Appends right after the last item of that list.
+ * @param {string} headerLabel - e.g. "SOURCES", "ROUND_TYPES"
+ * @param {string} value - the new value to add
+ */
+function addConfigValue(headerLabel, value) {
+  if (!value || !value.trim()) return;
+  value = value.trim();
+
+  var sheet = getConfigSheet();
+  var data = sheet.getRange(1, 1, sheet.getLastRow(), 1).getValues();
+
+  // Find the header row
+  var startIdx = -1;
+  for (var i = 0; i < data.length; i++) {
+    if (data[i][0] === headerLabel) {
+      startIdx = i + 1;
+      break;
+    }
+  }
+  if (startIdx === -1) return;
+
+  // Find end of the list (first empty row after header)
+  var endIdx = startIdx;
+  for (var i = startIdx; i < data.length; i++) {
+    if (data[i][0] === '' || data[i][0] === null) {
+      endIdx = i;
+      break;
+    }
+    endIdx = i + 1;
+  }
+
+  // Check if value already exists
+  for (var i = startIdx; i < endIdx; i++) {
+    if (data[i][0] === value) return; // already exists
+  }
+
+  // Insert the new value at endIdx (shift rows down)
+  sheet.insertRowAfter(endIdx);
+  sheet.getRange(endIdx + 1, 1).setValue(value);
+}
+
 function getDashboardSheet() {
   return SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Dashboard');
 }
