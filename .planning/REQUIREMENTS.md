@@ -12,7 +12,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **AUTH-01**: User can sign up with email and password
 - [x] **AUTH-02**: User can log in with Google OAuth (one-click)
 - [x] **AUTH-03**: User session persists across browser refresh
-- [ ] **AUTH-04**: User can reset password via email link
+- [x] **AUTH-04**: User can reset password via email link
 
 ### Application Tracking
 
@@ -177,7 +177,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-01 | Phase 1 | Complete |
 | AUTH-02 | Phase 1 | Complete |
 | AUTH-03 | Phase 1 | Complete |
-| AUTH-04 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Complete |
 | TRACK-01 | Phase 2 | Pending |
 | TRACK-02 | Phase 2 | Pending |
 | TRACK-03 | Phase 2 | Pending |
