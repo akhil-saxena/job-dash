@@ -38,10 +38,10 @@ Declared values (multiples of 4):
 | md | 16px (4) | Default element spacing, card padding, sidebar item padding |
 | lg | 24px (6) | Section padding within dashboard, content area padding on mobile |
 | xl | 32px (8) | Layout gaps between dashboard sections, content area padding on desktop |
-| 2xl | 48px (12) | Not used in Phase 3 |
+| 2xl | 48px (12) | Touch target minimum (mobile sidebar items, buttons) |
 | 3xl | 64px (16) | Not used in Phase 3 |
 
-Exceptions: Sidebar width uses 256px (64 * 4) expanded, 64px collapsed (icon-only mode). Touch targets on mobile use minimum 44px (11 * 4) for tappable sidebar items and buttons.
+Exceptions: Sidebar width uses 256px (64 * 4) expanded, 64px collapsed (icon-only mode). Touch targets on mobile use minimum 48px (12 * 4) for tappable sidebar items and buttons.
 
 **Source:** Derived from existing components — Button h-8/h-10/h-12, Input px-3/py-2, AuthLayout p-6/p-8, card border rounded-xl with p-6.
 
@@ -51,18 +51,22 @@ Exceptions: Sidebar width uses 256px (64 * 4) expanded, 64px collapsed (icon-onl
 
 | Role | Size | Weight | Line Height | Tailwind Class |
 |------|------|--------|-------------|----------------|
+| Badge | 12px | 600 (semibold) | 1.3 (16px) | text-xs font-semibold |
 | Body | 14px | 400 (normal) | 1.5 (20px) | text-sm leading-5 |
-| Label | 14px | 500 (medium) | 1.4 (20px) | text-sm font-medium |
+| Label | 14px | 600 (semibold) | 1.4 (20px) | text-sm font-semibold |
 | Heading | 20px | 600 (semibold) | 1.2 (24px) | text-xl font-semibold |
-| Display | 28px | 700 (bold) | 1.2 (34px) | text-2xl font-bold |
+| Display | 28px | 600 (semibold) | 1.2 (34px) | text-2xl font-semibold |
+
+**Weights used:** 400 (normal) for body text, 600 (semibold) for labels, headings, display values, and badges. Two weights only.
 
 **Usage in Phase 3:**
+- **Badge (12px/600):** Status badges in stale apps list, dashboard card badges with count
 - **Body (14px/400):** Dashboard list items (stale apps, upcoming interviews, recent activity), sidebar nav labels, modal body text
-- **Label (14px/500):** Stat card labels, form field labels (existing Input pattern), sidebar active item, badge text
+- **Label (14px/600):** Stat card labels, form field labels (existing Input pattern), sidebar active item
 - **Heading (20px/600):** Section headings ("Stale Applications", "Upcoming Interviews", "Recent Activity"), modal title
-- **Display (28px/700):** Stat card values (e.g., "12", "3", "8.5%", "14 days"), page title "Dashboard"
+- **Display (28px/600):** Stat card values (e.g., "12", "3", "8.5%", "14 days"), page title "Dashboard"
 
-**Source:** Existing components use text-sm (14px), text-2xl for page headings, font-medium for labels, font-bold for brand. Narrowed to 4 roles for consistency.
+**Source:** Existing components use text-sm (14px), text-2xl for page headings, font-medium for labels, font-bold for brand. Collapsed to 2 weights (400/600) for consistency.
 
 ---
 
@@ -142,6 +146,16 @@ Exceptions: Sidebar width uses 256px (64 * 4) expanded, 64px collapsed (icon-onl
 
 ---
 
+## Visual Hierarchy
+
+**Primary visual anchor:** The 4-stat-card grid at the top of the dashboard. This is the first element the eye lands on after the sidebar/header chrome. Stat card values use the largest type size (28px Display) and sit inside elevated Card containers with shadow-sm, creating the strongest visual weight on the page.
+
+**Secondary anchors:** The "Needs Attention" and "Upcoming Interviews" two-column section, followed by the full-width "Recent Activity" feed.
+
+**Accessibility — collapsed sidebar icon-only mode:** When the sidebar collapses to 64px (tablet breakpoint or manual toggle), each nav icon receives both a `title` attribute and an `aria-label` attribute matching the full nav label text (e.g., `title="Dashboard" aria-label="Dashboard"`). This ensures screen readers announce the destination and sighted users see a native tooltip on hover.
+
+---
+
 ## Component Inventory
 
 Components to build in Phase 3. Each specifies exact dimensions, colors, and states.
@@ -157,7 +171,7 @@ Components to build in Phase 3. Each specifies exact dimensions, colors, and sta
 ### Badge (`components/ui/Badge.tsx`)
 - Height: 24px (h-6)
 - Padding: 4px 8px (px-2 py-0.5)
-- Font: 12px (text-xs) font-medium
+- Font: 12px (text-xs) font-semibold
 - Border radius: rounded-full
 - Colors: driven by `STATUS_COLORS` map — each status has its own bg/text pair
 - No border
@@ -174,8 +188,8 @@ Components to build in Phase 3. Each specifies exact dimensions, colors, and sta
 ### StatCard (`components/ui/StatCard.tsx`)
 - Container: Card variant default
 - Layout: vertical stack, 16px gap
-- Label: text-sm font-medium text-secondary (stone-500 / zinc-400)
-- Value: text-2xl font-bold text-primary (stone-800 / zinc-100)
+- Label: text-sm font-semibold text-secondary (stone-500 / zinc-400)
+- Value: text-2xl font-semibold text-primary (stone-800 / zinc-100)
 - Trend indicator: text-xs, green-600 for positive, red-600 for negative, stone-400 for neutral — arrow icon + percentage or absolute change
 - Icon: 20x20 lucide icon in a 36x36 rounded-lg container with subtle status-color tinted background
 - Min-width: 200px, flex-grow in grid
@@ -195,11 +209,12 @@ Components to build in Phase 3. Each specifies exact dimensions, colors, and sta
 - Collapse trigger: screen width < 1024px (lg breakpoint) auto-collapses to icon-only
 - Mobile (<768px, md): hidden by default, toggled via hamburger in header, renders as overlay with backdrop
 - Transition: width 200ms ease-in-out
-- Nav items: 44px height, 16px horizontal padding, 8px vertical gap, rounded-lg hover state (stone-100 / zinc-800)
+- Nav items: 48px height, 16px horizontal padding, 8px vertical gap, rounded-lg hover state (stone-100 / zinc-800)
 - Active item: stone-100 bg / zinc-800 bg + stone-800 text / zinc-100 text + 3px left accent border (stone-800 / zinc-100)
 - Nav links: Dashboard (LayoutDashboard), Kanban (Columns3), Table (Table), Calendar (Calendar), Analytics (BarChart3), Contacts (Users), Settings (Settings) — all from lucide-react
-- Logo area: top of sidebar, 64px height, "JobDash" text-lg font-bold, collapses to "J" monogram in icon-only mode
+- Logo area: top of sidebar, 64px height, "JobDash" text-lg font-semibold, collapses to "J" monogram in icon-only mode
 - User section: bottom of sidebar, avatar placeholder (32x32 circle, stone-300 bg), user name (truncated), sign-out action
+- Collapsed icon-only mode: each nav icon receives `title` and `aria-label` matching the full nav label text
 
 ### Header (`components/layout/Header.tsx`)
 - Height: 64px (h-16)
@@ -243,7 +258,7 @@ Components to build in Phase 3. Each specifies exact dimensions, colors, and sta
 - **Stale Applications** (left column):
   - Card container, heading "Needs Attention", badge with count
   - List: max 5 items, sorted by staleness (most stale first)
-  - Each item: company name (font-medium), role (text-secondary), status badge, "X days ago" timestamp
+  - Each item: company name (font-semibold), role (text-secondary), status badge, "X days ago" timestamp
   - Warning icon (AlertTriangle, amber-500) per item
   - "View all" link at bottom if more than 5
 - **Upcoming Interviews** (right column):
@@ -265,7 +280,7 @@ Components to build in Phase 3. Each specifies exact dimensions, colors, and sta
 - Optional fields section: collapsed by default, "More options" expand toggle
 - Optional fields: Priority (select), Location type (select), Salary min/max (number inputs), Source (select), Job URL (Input), Applied date (date input), Notes (textarea)
 - Submit CTA: "Add Application" (primary Button)
-- Cancel: "Cancel" (outline Button) or backdrop click/Escape
+- Cancel: "Discard" (outline Button) or backdrop click/Escape
 - Success: close modal, invalidate applications query (TanStack Query), show success toast
 - Error: show error message inline below form, keep modal open
 
@@ -293,7 +308,7 @@ Components to build in Phase 3. Each specifies exact dimensions, colors, and sta
 | Empty state — recent activity | "No activity yet. Add an application to get started." |
 | Quick-add modal title | "Add Application" |
 | Quick-add submit | "Add Application" |
-| Quick-add cancel | "Cancel" |
+| Quick-add cancel | "Discard" |
 | Quick-add success toast | "Application added" |
 | Quick-add error (generic) | "Could not add application. Check your connection and try again." |
 | Quick-add validation — company required | "Company name is required" |
@@ -303,7 +318,7 @@ Components to build in Phase 3. Each specifies exact dimensions, colors, and sta
 | Placeholder page CTA | "Go to Dashboard" |
 | Error state — API fetch failed heading | "Something went wrong" |
 | Error state — API fetch failed body | "We could not load your data. Check your connection and try again." |
-| Error state — API fetch failed CTA | "Retry" |
+| Error state — API fetch failed CTA | "Try again" |
 | Dark mode toggle tooltip — light | "Switch to light mode" |
 | Dark mode toggle tooltip — dark | "Switch to dark mode" |
 | Dark mode toggle tooltip — system | "Use system preference" |
@@ -320,7 +335,7 @@ Components to build in Phase 3. Each specifies exact dimensions, colors, and sta
 - **Quick-add form submitting:** Submit button enters `loading` state (existing Button loading prop with spinner)
 
 ### Error States
-- **API fetch failure:** Error card replaces section content with AlertCircle icon (red-500), heading, body copy, and retry button
+- **API fetch failure:** Error card replaces section content with AlertCircle icon (red-500), heading, body copy, and "Try again" button
 - **Quick-add validation:** Inline red error text below each field (existing Input error pattern)
 - **Quick-add API failure:** Toast notification with error message, modal stays open
 
