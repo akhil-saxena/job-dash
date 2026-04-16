@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-04-16T20:16:48.490Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-04-16T20:22:47.852Z"
 last_activity: 2026-04-16
 progress:
   total_phases: 10
@@ -57,6 +57,7 @@ Progress: [..........] 0%
 | Phase 01 P03 | 3min | 2 tasks | 14 files |
 | Phase 01 P04 | 8min | 2 tasks | 9 files |
 | Phase 02 P01 | 2min | 2 tasks | 7 files |
+| Phase 02 P02 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,8 @@ Recent decisions affecting current work:
 - [Phase 01]: Inlined migration SQL in tests/setup.ts; readD1Migrations fails inside Workers runtime due to node-side imports
 - [Phase 02]: Used standard composite indexes (not partial) for Drizzle v0.45 SQLite compatibility
 - [Phase 02]: Stored company_name as TEXT column directly (no FK) since companies entity is Phase 6
+- [Phase 02]: Added getTimeline service function for dedicated timeline endpoint not in original plan spec
+- [Phase 02]: Routes use onError handler at module level for centralized AppError formatting per D-03
 
 ### Pending Todos
 
@@ -90,6 +93,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-16T20:16:48.486Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-04-16T20:22:47.848Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

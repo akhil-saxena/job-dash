@@ -201,7 +201,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5/6/7/8 (5-8 can partially 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Authentication & Foundation | 0/4 | Planning complete | - |
-| 2. Application Tracking API | 0/3 | Planning complete | - |
+| 2. Application Tracking API | 1/3 | In Progress|  |
 | 3. Frontend Shell & Dashboard | 0/0 | Not started | - |
 | 4. Kanban, Table & Detail Views | 0/0 | Not started | - |
 | 5. Interview Tracking & Notes | 0/0 | Not started | - |
