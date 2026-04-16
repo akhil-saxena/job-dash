@@ -1,0 +1,5 @@
+BETTER_AUTH_URL=http://localhost:5173
+BETTER_AUTH_SECRET=generate-a-random-string-at-least-32-chars
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+RESEND_API_KEY=re_your_resend_api_key
