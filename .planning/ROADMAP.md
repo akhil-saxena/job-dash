@@ -35,11 +35,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User session survives browser refresh without re-login
   4. User can trigger a password reset email and set a new password
   5. Unauthenticated requests to API endpoints return 401
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — Project scaffold: Vite 8 + React 19 + Hono + Cloudflare Worker + D1 + Tailwind + Biome
+- [ ] 01-02-PLAN.md — Server-side auth: Drizzle schema, better-auth factory, auth routes, middleware, email helper
+- [ ] 01-03-PLAN.md — Client-side auth: React auth pages (login, signup, reset), auth client, placeholder dashboard
+- [ ] 01-04-PLAN.md — Test infrastructure: vitest + integration tests + end-to-end verification checkpoint
 
 ### Phase 2: Application Tracking API
 **Goal**: Users can create, read, update, and delete job applications through a complete REST API with status pipeline enforcement and automatic timeline event generation
@@ -197,7 +199,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5/6/7/8 (5-8 can partially 
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Authentication & Foundation | 0/0 | Not started | - |
+| 1. Authentication & Foundation | 0/4 | Planning complete | - |
 | 2. Application Tracking API | 0/0 | Not started | - |
 | 3. Frontend Shell & Dashboard | 0/0 | Not started | - |
 | 4. Kanban, Table & Detail Views | 0/0 | Not started | - |
