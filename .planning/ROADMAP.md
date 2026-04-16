@@ -38,7 +38,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 4 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Project scaffold: Vite 8 + React 19 + Hono + Cloudflare Worker + D1 + Tailwind + Biome
+- [x] 01-01-PLAN.md — Project scaffold: Vite 8 + React 19 + Hono + Cloudflare Worker + D1 + Tailwind + Biome
 - [ ] 01-02-PLAN.md — Server-side auth: Drizzle schema, better-auth factory, auth routes, middleware, email helper
 - [ ] 01-03-PLAN.md — Client-side auth: React auth pages (login, signup, reset), auth client, placeholder dashboard
 - [ ] 01-04-PLAN.md — Test infrastructure: vitest + integration tests + end-to-end verification checkpoint
