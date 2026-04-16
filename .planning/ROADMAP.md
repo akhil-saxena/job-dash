@@ -57,8 +57,8 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md — Data foundation: Drizzle schema (application + timeline_event tables), shared constants, Zod validators, response/error helpers, slug utility
-- [ ] 02-02-PLAN.md — Service layer + REST routes: application CRUD, status pipeline, pin/archive/soft-delete with timeline events, worker mounting
-- [ ] 02-03-PLAN.md — Integration tests: CRUD, status changes, soft-delete/restore, archive/pin, tenant isolation, timeline event verification
+- [x] 02-02-PLAN.md — Service layer + REST routes: application CRUD, status pipeline, pin/archive/soft-delete with timeline events, worker mounting
+- [x] 02-03-PLAN.md — Integration tests: CRUD, status changes, soft-delete/restore, archive/pin, tenant isolation, timeline event verification
 
 ### Phase 3: Frontend Shell & Dashboard
 **Goal**: Users see a polished React SPA with the smart dashboard as their landing view, giving at-a-glance pipeline clarity with summary cards, warnings, and quick actions
