@@ -1,1 +1,20 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Cloudflare
+.wrangler/
+.dev.vars
+.mf/
+
+# Local
+*.local
+.DS_Store
+
+# Legacy
 .superpowers/
+
+# IDE
+.clasp.json
