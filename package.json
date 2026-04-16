@@ -16,10 +16,10 @@
     "format": "biome format --write ."
   },
   "dependencies": {
+    "@hono/zod-validator": "^0.5.0",
     "better-auth": "^1.6.5",
     "drizzle-orm": "^0.45.2",
     "hono": "^4.12.14",
-    "@hono/zod-validator": "^0.5.0",
     "nanoid": "^5.1.9",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
