@@ -17,12 +17,12 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Application Tracking
 
 - [x] **TRACK-01**: User can create a job application with company, role, status, priority, location type, location city, salary min/max, currency, source, job posting URL, applied date, and markdown notes
-- [ ] **TRACK-02**: User can edit any application field inline from the detail panel
-- [ ] **TRACK-03**: User can soft-delete applications (recoverable)
-- [ ] **TRACK-04**: User can archive applications to declutter the active pipeline
-- [ ] **TRACK-05**: User can pin/star high-priority applications
+- [x] **TRACK-02**: User can edit any application field inline from the detail panel
+- [x] **TRACK-03**: User can soft-delete applications (recoverable)
+- [x] **TRACK-04**: User can archive applications to declutter the active pipeline
+- [x] **TRACK-05**: User can pin/star high-priority applications
 - [x] **TRACK-06**: Application status follows the pipeline: Wishlist, Applied, Screening, Interviewing, Offer, Accepted, Rejected, Withdrawn
-- [ ] **TRACK-07**: User can change application status via drag-and-drop on kanban or from the detail panel
+- [x] **TRACK-07**: User can change application status via drag-and-drop on kanban or from the detail panel
 - [x] **TRACK-08**: Status changes auto-generate timeline events with timestamp and description
 
 ### Views
@@ -179,12 +179,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-03 | Phase 1 | Complete |
 | AUTH-04 | Phase 1 | Complete |
 | TRACK-01 | Phase 2 | Complete |
-| TRACK-02 | Phase 2 | Pending |
-| TRACK-03 | Phase 2 | Pending |
-| TRACK-04 | Phase 2 | Pending |
-| TRACK-05 | Phase 2 | Pending |
+| TRACK-02 | Phase 2 | Complete |
+| TRACK-03 | Phase 2 | Complete |
+| TRACK-04 | Phase 2 | Complete |
+| TRACK-05 | Phase 2 | Complete |
 | TRACK-06 | Phase 2 | Complete |
-| TRACK-07 | Phase 2 | Pending |
+| TRACK-07 | Phase 2 | Complete |
 | TRACK-08 | Phase 2 | Complete |
 | VIEW-01 | Phase 3 | Pending |
 | VIEW-02 | Phase 3 | Pending |

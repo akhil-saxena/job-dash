@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import type { AppEnv } from "../src/shared/types";
 import { authRoutes } from "../src/server/routes/auth";
+import { applicationRoutes } from "../src/server/routes/applications";
 import { requireAuth } from "../src/server/middleware/auth";
 
 const app = new Hono<AppEnv>();
@@ -16,9 +17,7 @@ app.route("/", authRoutes);
 // Protected routes -- all other /api/* routes require auth
 app.use("/api/*", requireAuth);
 
-// Example protected endpoint
-app.get("/api/me", (c) => {
-	return c.json({ userId: c.get("userId") });
-});
+// Application routes (protected by middleware above)
+app.route("/", applicationRoutes);
 
 export default app;
