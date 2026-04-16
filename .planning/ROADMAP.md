@@ -41,7 +41,7 @@ Plans:
 - [x] 01-01-PLAN.md — Project scaffold: Vite 8 + React 19 + Hono + Cloudflare Worker + D1 + Tailwind + Biome
 - [x] 01-02-PLAN.md — Server-side auth: Drizzle schema, better-auth factory, auth routes, middleware, email helper
 - [x] 01-03-PLAN.md — Client-side auth: React auth pages (login, signup, reset), auth client, placeholder dashboard
-- [ ] 01-04-PLAN.md — Test infrastructure: vitest + integration tests + end-to-end verification checkpoint
+- [x] 01-04-PLAN.md — Test infrastructure: vitest + integration tests + end-to-end verification checkpoint
 
 ### Phase 2: Application Tracking API
 **Goal**: Users can create, read, update, and delete job applications through a complete REST API with status pipeline enforcement and automatic timeline event generation
