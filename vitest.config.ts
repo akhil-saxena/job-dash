@@ -1,10 +1,16 @@
 import { defineConfig } from "vitest/config";
 import { cloudflareTest } from "@cloudflare/vitest-pool-workers";
+import { resolve } from "node:path";
 
 export default defineConfig({
 	test: {
 		globals: true,
 		setupFiles: ["./tests/setup.ts"],
+	},
+	resolve: {
+		alias: {
+			"@": resolve(__dirname, "./src"),
+		},
 	},
 	plugins: [
 		cloudflareTest({
