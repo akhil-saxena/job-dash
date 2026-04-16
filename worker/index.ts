@@ -1,20 +1,24 @@
 import { Hono } from "hono";
+import type { AppEnv } from "../src/shared/types";
+import { authRoutes } from "../src/server/routes/auth";
+import { requireAuth } from "../src/server/middleware/auth";
 
-type Env = {
-	Bindings: {
-		DB: D1Database;
-		BETTER_AUTH_URL: string;
-		BETTER_AUTH_SECRET: string;
-		GOOGLE_CLIENT_ID: string;
-		GOOGLE_CLIENT_SECRET: string;
-		RESEND_API_KEY: string;
-	};
-};
+const app = new Hono<AppEnv>();
 
-const app = new Hono<Env>();
-
+// Health check (public)
 app.get("/api/health", (c) => {
 	return c.json({ ok: true, timestamp: Date.now() });
+});
+
+// Auth routes (public -- better-auth handles internally)
+app.route("/", authRoutes);
+
+// Protected routes -- all other /api/* routes require auth
+app.use("/api/*", requireAuth);
+
+// Example protected endpoint
+app.get("/api/me", (c) => {
+	return c.json({ userId: c.get("userId") });
 });
 
 export default app;
