@@ -174,13 +174,79 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated by roadmapper) | | |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| TRACK-01 | Phase 2 | Pending |
+| TRACK-02 | Phase 2 | Pending |
+| TRACK-03 | Phase 2 | Pending |
+| TRACK-04 | Phase 2 | Pending |
+| TRACK-05 | Phase 2 | Pending |
+| TRACK-06 | Phase 2 | Pending |
+| TRACK-07 | Phase 2 | Pending |
+| TRACK-08 | Phase 2 | Pending |
+| VIEW-01 | Phase 3 | Pending |
+| VIEW-02 | Phase 3 | Pending |
+| VIEW-03 | Phase 3 | Pending |
+| VIEW-04 | Phase 4 | Pending |
+| VIEW-05 | Phase 4 | Pending |
+| VIEW-06 | Phase 4 | Pending |
+| VIEW-07 | Phase 4 | Pending |
+| INTV-01 | Phase 5 | Pending |
+| INTV-02 | Phase 5 | Pending |
+| INTV-03 | Phase 5 | Pending |
+| INTV-04 | Phase 5 | Pending |
+| COMP-01 | Phase 6 | Pending |
+| COMP-02 | Phase 6 | Pending |
+| COMP-03 | Phase 6 | Pending |
+| COMP-04 | Phase 6 | Pending |
+| COMP-05 | Phase 6 | Pending |
+| CONT-01 | Phase 6 | Pending |
+| CONT-02 | Phase 6 | Pending |
+| CONT-03 | Phase 6 | Pending |
+| TAG-01 | Phase 7 | Pending |
+| TAG-02 | Phase 7 | Pending |
+| TAG-03 | Phase 7 | Pending |
+| DEAD-01 | Phase 7 | Pending |
+| DEAD-02 | Phase 7 | Pending |
+| DEAD-03 | Phase 7 | Pending |
+| DEAD-04 | Phase 7 | Pending |
+| SAL-01 | Phase 7 | Pending |
+| SAL-02 | Phase 7 | Pending |
+| SAL-03 | Phase 7 | Pending |
+| SNAP-01 | Phase 8 | Pending |
+| SNAP-02 | Phase 8 | Pending |
+| SNAP-03 | Phase 8 | Pending |
+| SNAP-04 | Phase 8 | Pending |
+| BULK-01 | Phase 8 | Pending |
+| BULK-02 | Phase 8 | Pending |
+| ANLY-01 | Phase 9 | Pending |
+| ANLY-02 | Phase 9 | Pending |
+| ANLY-03 | Phase 9 | Pending |
+| ANLY-04 | Phase 9 | Pending |
+| ANLY-05 | Phase 9 | Pending |
+| NOTF-01 | Phase 10 | Pending |
+| NOTF-02 | Phase 10 | Pending |
+| NOTF-03 | Phase 10 | Pending |
+| NOTF-04 | Phase 10 | Pending |
+| CMD-01 | Phase 10 | Pending |
+| CMD-02 | Phase 10 | Pending |
+| CMD-03 | Phase 10 | Pending |
+| CMD-04 | Phase 10 | Pending |
+| NOTE-01 | Phase 5 | Pending |
+| NOTE-02 | Phase 5 | Pending |
+| UI-01 | Phase 3 | Pending |
+| UI-02 | Phase 3 | Pending |
+| UI-03 | Phase 3 | Pending |
+| UI-04 | Phase 3 | Pending |
+| UI-05 | Phase 4 | Pending |
 
 **Coverage:**
-- v1 requirements: 55 total
-- Mapped to phases: 0
-- Unmapped: 55
+- v1 requirements: 67 total
+- Mapped to phases: 67
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-16*
-*Last updated: 2026-04-16 after initial definition*
+*Last updated: 2026-04-16 after roadmap creation*
