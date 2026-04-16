@@ -38,10 +38,13 @@ created: 2026-04-16
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 01-01-01 | 01 | 1 | AUTH-01 | integration | `npx vitest run` | ❌ W0 | ⬜ pending |
-| 01-01-02 | 01 | 1 | AUTH-02 | integration | `npx vitest run` | ❌ W0 | ⬜ pending |
-| 01-01-03 | 01 | 1 | AUTH-03 | integration | `npx vitest run` | ❌ W0 | ⬜ pending |
-| 01-01-04 | 01 | 1 | AUTH-04 | integration | `npx vitest run` | ❌ W0 | ⬜ pending |
+| 01-01-01 | 01 | 1 | AUTH-01, AUTH-02, AUTH-03 | scaffold | N/A (scaffold only) | N/A | ⬜ pending |
+| 01-02-01 | 02 | 2 | AUTH-01, AUTH-02, AUTH-03, AUTH-04 | integration | `npx vitest run` | ❌ W0 | ⬜ pending |
+| 01-03-01 | 03 | 3 | AUTH-01, AUTH-02, AUTH-03, AUTH-04 | manual | Browser test | N/A | ⬜ pending |
+| 01-04-01 | 04 | 4 | AUTH-01 | integration | `npx vitest run tests/auth/signup.test.ts` | ❌ W0 | ⬜ pending |
+| 01-04-02 | 04 | 4 | AUTH-02 | integration | `npx vitest run tests/auth/oauth.test.ts` | ❌ W0 | ⬜ pending |
+| 01-04-03 | 04 | 4 | AUTH-03 | integration | `npx vitest run tests/auth/session.test.ts` | ❌ W0 | ⬜ pending |
+| 01-04-04 | 04 | 4 | AUTH-01, AUTH-02, AUTH-03, AUTH-04 | unit | `npx vitest run tests/auth/hash.test.ts tests/auth/middleware.test.ts` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -50,8 +53,12 @@ created: 2026-04-16
 ## Wave 0 Requirements
 
 - [ ] `vitest` + `@cloudflare/vitest-pool-workers` — test framework for Workers
-- [ ] `test/setup.ts` — test environment configuration
-- [ ] `test/auth.test.ts` — stubs for AUTH-01 through AUTH-04
+- [ ] `tests/setup.ts` — test environment configuration with D1 migration
+- [ ] `tests/auth/signup.test.ts` — AUTH-01 email/password signup test
+- [ ] `tests/auth/oauth.test.ts` — AUTH-02 Google OAuth initiation test
+- [ ] `tests/auth/session.test.ts` — AUTH-03 session persistence test
+- [ ] `tests/auth/middleware.test.ts` — 401 unauthorized test
+- [ ] `tests/auth/hash.test.ts` — scryptSync performance test
 
 *If none: "Existing infrastructure covers all phase requirements."*
 
