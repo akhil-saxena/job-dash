@@ -53,11 +53,12 @@ Plans:
   3. User can soft-delete an application and recover it; user can archive an application to remove it from active pipeline
   4. Application status transitions follow the defined pipeline (Wishlist through Withdrawn) and every status change auto-generates a timestamped timeline event
   5. User can pin/star applications and the flag persists across sessions
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — Data foundation: Drizzle schema (application + timeline_event tables), shared constants, Zod validators, response/error helpers, slug utility
+- [ ] 02-02-PLAN.md — Service layer + REST routes: application CRUD, status pipeline, pin/archive/soft-delete with timeline events, worker mounting
+- [ ] 02-03-PLAN.md — Integration tests: CRUD, status changes, soft-delete/restore, archive/pin, tenant isolation, timeline event verification
 
 ### Phase 3: Frontend Shell & Dashboard
 **Goal**: Users see a polished React SPA with the smart dashboard as their landing view, giving at-a-glance pipeline clarity with summary cards, warnings, and quick actions
@@ -200,7 +201,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5/6/7/8 (5-8 can partially 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Authentication & Foundation | 0/4 | Planning complete | - |
-| 2. Application Tracking API | 0/0 | Not started | - |
+| 2. Application Tracking API | 0/3 | Planning complete | - |
 | 3. Frontend Shell & Dashboard | 0/0 | Not started | - |
 | 4. Kanban, Table & Detail Views | 0/0 | Not started | - |
 | 5. Interview Tracking & Notes | 0/0 | Not started | - |
