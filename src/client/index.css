@@ -1,1 +1,87 @@
 @import "tailwindcss";
+
+/* Dark mode: class-based with system preference fallback */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+  --font-mono: "SF Mono", "Menlo", "Monaco", monospace;
+
+  /* Status colors */
+  --color-status-wishlist: #6b7280;
+  --color-status-applied: #3b82f6;
+  --color-status-screening: #8b5cf6;
+  --color-status-interviewing: #f59e0b;
+  --color-status-offer: #22c55e;
+  --color-status-accepted: #10b981;
+  --color-status-rejected: #ef4444;
+  --color-status-withdrawn: #64748b;
+
+  /* Surface colors */
+  --color-surface-accent: #292524;
+
+  /* Text colors */
+  --color-text-primary: #1c1917;
+  --color-text-secondary: #78716c;
+  --color-text-muted: #a8a29e;
+
+  /* Star rating */
+  --color-star-filled: #f59e0b;
+  --color-star-empty: #d6d3d1;
+
+  /* Dark mode surfaces */
+  --color-dark-dominant: #18181b;
+  --color-dark-card: #27272a;
+  --color-dark-accent: #f4f4f5;
+
+  /* Radius scale */
+  --radius-btn: 6px;
+  --radius-card: 8px;
+  --radius-input: 10px;
+  --radius-card-mobile: 12px;
+  --radius-modal: 14px;
+  --radius-pill: 99px;
+}
+
+/* Glass effect utility classes */
+@layer components {
+  .glass {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .glass-hover:hover {
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  }
+
+  .dark .glass {
+    background: rgba(39, 39, 42, 0.65);
+    border-color: rgba(63, 63, 70, 0.5);
+  }
+
+  .dark .glass-hover:hover {
+    background: rgba(39, 39, 42, 0.85);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Warm gradient body background */
+body {
+  background: linear-gradient(145deg, #f5f3f0, #ece8e3, #e8e4df);
+  min-height: 100vh;
+}
+
+.dark body,
+body:where(.dark *) {
+  background: #18181b;
+}
+
+/* Global Lucide icon stroke width */
+.lucide {
+  stroke-width: 1.8px;
+}
