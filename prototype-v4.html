@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow-x:hidden;}
+:root{--font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',system-ui,sans-serif;--mono:'SF Mono','Menlo','Monaco',monospace;}
+body{font-family:var(--font);background:linear-gradient(145deg,#f5f3f0 0%,#ece8e3 50%,#e8e4df 100%);min-height:100vh;font-size:14px;color:#1c1917;-webkit-font-smoothing:antialiased;}
+
+/* SIDEBAR */
+.sb{width:72px;position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;align-items:center;padding:20px 0;gap:6px;z-index:30;}
+.sb .logo{width:38px;height:38px;background:rgba(0,0,0,.07);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;backdrop-filter:blur(8px);cursor:pointer;}
+.sb .logo span{width:10px;height:10px;background:#292524;border-radius:4px;}
+.sb .ni{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;position:relative;}
+.sb .ni:hover{background:rgba(0,0,0,.05);}
+.sb .ni.act{background:rgba(255,255,255,.75);box-shadow:0 1px 6px rgba(0,0,0,.06);}
+.sb .ni svg{width:20px;height:20px;color:#a8a29e;stroke-width:1.8;}
+.sb .ni.act svg{color:#44403c;}
+.sb .ni .tip{position:absolute;left:54px;background:#292524;color:#fff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:20;}
+.sb .ni:hover .tip{opacity:1;}
+.sb .spacer{flex:1;}
+
+/* MAIN */
+.main{margin-left:72px;min-height:100vh;display:flex;flex-direction:column;flex:1;width:calc(100% - 72px);}
+.hdr{padding:16px 28px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.hdr h1{font-size:20px;font-weight:700;letter-spacing:-.3px;}
+.hdr .date{font-size:12px;color:#a8a29e;font-weight:500;margin-left:10px;}
+.hdr-r{display:flex;gap:8px;align-items:center;}
+.search-bar{height:34px;padding:0 12px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.5);backdrop-filter:blur(8px);font-size:12px;color:#78716c;display:flex;align-items:center;gap:6px;cursor:pointer;width:180px;transition:all .15s;}
+.search-bar:hover{background:rgba(255,255,255,.7);}
+.search-bar .k{font-size:9px;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:3px;color:#a8a29e;font-family:var(--mono);margin-left:auto;}
+.add-btn{height:34px;padding:0 14px;background:#292524;color:#fff;border-radius:10px;font-size:12px;font-weight:600;border:none;cursor:pointer;display:flex;align-items:center;gap:4px;}
+.add-btn:hover{opacity:.9;}
+.ib{width:34px;height:34px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.5);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+.ib:hover{background:rgba(255,255,255,.7);}
+.ib svg{width:16px;height:16px;color:#78716c;}
+.av{width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#78716c;cursor:pointer;}
+.content{padding:16px 28px 28px;flex:1;}
+.pg{display:none;}.pg.act{display:block;}
+
+/* GLASS CARD */
+.gc{background:rgba(255,255,255,.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.6);border-radius:14px;padding:18px;transition:all .2s;}
+.gc:hover{background:rgba(255,255,255,.7);box-shadow:0 4px 16px rgba(0,0,0,.04);}
+.gc.accent{background:rgba(255,255,255,.75);}
+.gc-label{font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap;}
+
+/* List items */
+.bi{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.04);}
+.bi:last-child{border-bottom:none;}
+.bi .bar{width:3px;height:24px;border-radius:2px;flex-shrink:0;}
+.bi h4{font-size:13px;font-weight:600;color:#292524;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bi p{font-size:11px;color:#a8a29e;margin-top:1px;}
+.bi .info{flex:1;min-width:0;}.bi .rt{font-size:11px;font-weight:600;white-space:nowrap;flex-shrink:0;}
+
+/* STATS STRIP */
+.stats-strip{display:flex;gap:10px;padding:0 28px 0;margin-bottom:4px;overflow-x:auto;scrollbar-width:none;}
+.stats-strip::-webkit-scrollbar{display:none;}
+.stat-chip{display:flex;align-items:baseline;gap:6px;padding:8px 14px;background:rgba(255,255,255,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.5);border-radius:10px;white-space:nowrap;flex-shrink:0;}
+.stat-chip .v{font-size:18px;font-weight:700;color:#1c1917;font-variant-numeric:tabular-nums;}
+.stat-chip .l{font-size:11px;color:#a8a29e;font-weight:500;}
+.strip-toggle{padding:8px 12px;background:none;border:1px dashed rgba(0,0,0,.1);border-radius:10px;font-size:11px;color:#a8a29e;cursor:pointer;flex-shrink:0;font-family:var(--font);font-weight:600;}
+.strip-toggle:hover{border-color:rgba(0,0,0,.2);color:#78716c;}
+.stats-strip.collapsed .stat-chip{display:none;}
+.stats-strip.collapsed .strip-toggle{border-style:solid;background:rgba(255,255,255,.4);}
+
+/* KANBAN */
+.kb{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;min-height:calc(100vh - 180px);}
+.kb-col{display:flex;flex-direction:column;min-width:0;}
+.kb-hdr{display:flex;align-items:center;gap:6px;padding:6px 4px;margin-bottom:6px;font-size:12px;font-weight:600;color:#57534e;}
+.kb-hdr .dot{width:8px;height:8px;border-radius:50%;}
+.kb-hdr .cnt{margin-left:auto;font-size:10px;font-weight:600;color:#a8a29e;background:rgba(0,0,0,.04);padding:1px 6px;border-radius:8px;}
+.kb-cards{display:flex;flex-direction:column;gap:8px;flex:1;}
+.kb-card{background:rgba(255,255,255,.6);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.5);border-radius:12px;padding:12px;cursor:pointer;transition:all .15s;}
+.kb-card:hover{background:rgba(255,255,255,.8);box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.kb-card h4{font-size:13px;font-weight:600;margin-bottom:1px;}
+.kb-card .role{font-size:11px;color:#78716c;margin-bottom:6px;}
+.kb-card .meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.kb-card .pri{width:6px;height:6px;border-radius:50%;}
+.kb-card .days{font-size:10px;color:#a8a29e;}
+.kb-card .tag{font-size:9px;padding:1px 5px;border-radius:4px;background:rgba(0,0,0,.04);color:#78716c;}
+.kb-card .stale{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:600;}
+.kb-col.dimmed{opacity:.5;}
+
+/* TABLE */
+.tbl-ctrl{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.chip{height:28px;padding:0 10px;border:1px solid rgba(0,0,0,.06);border-radius:99px;background:rgba(255,255,255,.5);backdrop-filter:blur(8px);color:#78716c;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;}
+.chip:hover{background:rgba(255,255,255,.7);}
+.chip.on{background:#292524;color:#fff;border-color:#292524;}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;background:rgba(255,255,255,.55);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.6);border-radius:14px;overflow:hidden;}
+.tbl th{text-align:left;padding:10px 14px;font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid rgba(0,0,0,.06);background:rgba(255,255,255,.3);}
+.tbl td{padding:10px 14px;font-size:13px;border-bottom:1px solid rgba(0,0,0,.03);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(255,255,255,.3);}
+.tbl .co{display:flex;align-items:center;gap:8px;}
+.tbl .co .a{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0;}
+
+/* MOBILE CARD LIST */
+.card-list{display:none;}
+.app-card{background:rgba(255,255,255,.6);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.5);border-radius:14px;padding:14px;margin-bottom:8px;cursor:pointer;transition:all .15s;}
+.app-card:hover{background:rgba(255,255,255,.8);}
+.app-card:active{transform:scale(.99);}
+.app-card-top{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.app-card-top .a{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0;}
+.app-card-info{flex:1;min-width:0;}
+.app-card-name{font-size:14px;font-weight:600;}
+.app-card-role{font-size:12px;color:#78716c;}
+.app-card-bottom{display:flex;gap:10px;font-size:10px;color:#a8a29e;padding-top:6px;border-top:1px solid rgba(0,0,0,.04);}
+
+/* DETAIL PAGE */
+.det-hero{background:rgba(255,255,255,.5);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.4);padding:16px 28px 0;}
+.det-back{font-size:12px;color:#a8a29e;cursor:pointer;margin-bottom:10px;display:inline-block;}
+.det-back:hover{color:#78716c;}
+.det-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px;}
+.det-top h1{font-size:24px;font-weight:700;letter-spacing:-.3px;}
+.det-top .sub{font-size:13px;color:#78716c;margin-top:2px;}
+.det-acts{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.det-acts select{height:30px;padding:0 8px;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-size:11px;font-weight:600;background:rgba(255,255,255,.6);color:#292524;cursor:pointer;font-family:var(--font);}
+.sm-btn{height:30px;padding:0 10px;border:1px solid rgba(0,0,0,.08);border-radius:8px;background:rgba(255,255,255,.5);font-size:11px;font-weight:600;color:#57534e;cursor:pointer;font-family:var(--font);}
+.det-meta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px;font-size:12px;color:#78716c;}
+.det-meta strong{color:#292524;font-weight:600;}
+.dtabs{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.dtabs::-webkit-scrollbar{display:none;}
+.dtab{padding:10px 16px;font-size:12px;font-weight:600;color:#a8a29e;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;flex-shrink:0;}
+.dtab:hover{color:#57534e;}
+.dtab.act{color:#292524;border-bottom-color:#292524;}
+.det-body{padding:20px 28px;}
+.dtab-p{display:none;}.dtab-p.act{display:block;}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.fi{margin-bottom:16px;}
+.fi label{font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:block;}
+.fi input,.fi select,.fi textarea{width:100%;padding:8px 12px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.5);backdrop-filter:blur(8px);font-size:13px;color:#292524;outline:none;font-family:var(--font);transition:border-color .15s;}
+.fi input:focus,.fi select:focus,.fi textarea:focus{border-color:rgba(0,0,0,.2);background:rgba(255,255,255,.7);}
+.fi textarea{min-height:100px;resize:vertical;line-height:1.6;}
+.md-hint{font-size:10px;color:#a8a29e;margin-top:3px;display:flex;align-items:center;gap:4px;}
+.md-hint code{font-family:var(--mono);font-size:9px;background:rgba(0,0,0,.04);padding:1px 4px;border-radius:3px;}
+
+/* Q&A PAIRS */
+.qa-pair{border:1px solid rgba(0,0,0,.06);border-radius:12px;padding:12px;margin-bottom:8px;background:rgba(255,255,255,.3);}
+.qa-pair .qa-q label,.qa-pair .qa-a label{font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block;}
+.qa-pair .qa-q{margin-bottom:8px;}
+.qa-pair textarea{width:100%;padding:8px 10px;border:1px solid rgba(0,0,0,.06);border-radius:8px;background:rgba(255,255,255,.4);font-size:12px;color:#292524;font-family:var(--font);resize:vertical;min-height:40px;outline:none;line-height:1.5;}
+.qa-pair textarea:focus{border-color:rgba(0,0,0,.15);background:rgba(255,255,255,.6);}
+.qa-remove{font-size:10px;color:#a8a29e;cursor:pointer;margin-left:auto;padding:2px 6px;border-radius:4px;}
+.qa-remove:hover{color:#ef4444;background:rgba(239,68,68,.08);}
+.qa-add{display:flex;align-items:center;gap:6px;padding:10px;border:1px dashed rgba(0,0,0,.1);border-radius:10px;color:#a8a29e;font-size:11px;font-weight:600;cursor:pointer;justify-content:center;transition:all .15s;}
+.qa-add:hover{border-color:rgba(0,0,0,.2);color:#78716c;background:rgba(255,255,255,.3);}
+
+/* ROUND CARDS */
+.rnd{border:1px solid rgba(0,0,0,.06);border-radius:14px;margin-bottom:10px;overflow:hidden;background:rgba(255,255,255,.4);backdrop-filter:blur(8px);}
+.rnd-h{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .1s;flex-wrap:wrap;}
+.rnd-h:hover{background:rgba(255,255,255,.3);}
+.rnd-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;}
+.rnd-info{flex:1;min-width:0;}.rnd-info h4{font-size:13px;font-weight:600;}.rnd-info p{font-size:11px;color:#a8a29e;}
+.rnd-stars{font-size:12px;}
+.rnd-body{padding:16px;border-top:1px solid rgba(0,0,0,.04);background:rgba(255,255,255,.2);display:none;}
+.rnd-body.open{display:block;}
+
+/* TIMELINE */
+.tl-i{position:relative;padding-left:22px;margin-bottom:18px;}
+.tl-line{position:absolute;left:3px;top:0;bottom:-18px;width:2px;background:rgba(0,0,0,.06);}
+.tl-i:last-child .tl-line{display:none;}
+.tl-dot{position:absolute;left:0;top:5px;width:8px;height:8px;border-radius:50%;z-index:1;}
+.tl-text{font-size:13px;font-weight:600;}.tl-time{font-size:11px;color:#a8a29e;margin-top:2px;}
+
+/* DOC ITEMS */
+.doc-i{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(0,0,0,.04);cursor:pointer;transition:background .1s;}
+.doc-i:last-child{border-bottom:none;}
+.doc-i:hover{background:rgba(255,255,255,.3);}
+.doc-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.doc-i .info{flex:1;}.doc-i .info h4{font-size:13px;font-weight:600;}.doc-i .info p{font-size:11px;color:#a8a29e;}
+.upload-z{margin-top:12px;padding:24px;border:2px dashed rgba(0,0,0,.1);border-radius:14px;text-align:center;color:#a8a29e;cursor:pointer;}
+.upload-z:hover{border-color:rgba(0,0,0,.2);}
+
+/* MOBILE */
+.mobile-bar{display:none;}
+@media(max-width:768px){
+  .sb{display:none;}
+  .main{margin-left:0;width:100%;}
+  .hdr,.content,.det-hero,.det-body{padding-left:14px;padding-right:14px;}
+  .hdr{flex-direction:column;align-items:flex-start;gap:6px;padding-top:12px;}
+  .hdr-r{width:100%;justify-content:space-between;}
+  .search-bar{flex:1;width:auto;}
+  .stats-strip{padding:0 14px;}
+  .kb{grid-template-columns:1fr 1fr;gap:8px;min-height:auto;}
+  .kb-card{padding:10px;}
+  .kb-card h4{font-size:12px;}
+  .tbl-desktop{display:none;}
+  .card-list{display:block;}
+  .fg{grid-template-columns:1fr;}
+  .det-hero{padding:12px 14px 0;}
+  .det-top{flex-direction:column;}
+  .det-body{padding:14px;}
+  .mobile-bar{display:flex;position:fixed;bottom:0;left:0;right:0;height:58px;background:rgba(255,255,255,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.06);z-index:30;justify-content:space-around;align-items:center;padding-bottom:env(safe-area-inset-bottom);}
+  .mobile-bar .mb-i{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px 12px;border-radius:10px;}
+  .mobile-bar .mb-i:active{background:rgba(0,0,0,.04);}
+  .mobile-bar .mb-i svg{width:22px;height:22px;color:#a8a29e;}
+  .mobile-bar .mb-i.act svg{color:#292524;}
+  .mobile-bar .mb-i span{font-size:9px;font-weight:600;color:#a8a29e;}
+  .mobile-bar .mb-i.act span{color:#292524;}
+  .content{padding-bottom:72px;}
+}
+@media(max-width:480px){
+  .kb{grid-template-columns:1fr;}
+  .hdr-r .search-bar{display:none;}
+  .det-meta{flex-direction:column;gap:6px;}
+  .stat-chip .v{font-size:16px;}
+}
+</style>
+</head>
+<body>
+<div style="display:flex;min-height:100vh;width:100%;">
+
+<!-- SIDEBAR (5 items) -->
+<nav class="sb">
+  <div class="logo"><span></span></div>
+  <div class="ni act" onclick="go('kanban')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg><span class="tip">Board</span></div>
+  <div class="ni" onclick="go('table')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span class="tip">List</span></div>
+  <div class="ni" onclick="go('cal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="tip">Calendar</span></div>
+  <div class="ni" onclick="go('analytics')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg><span class="tip">Analytics</span></div>
+  <div class="spacer"></div>
+  <div class="ni" onclick="go('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="tip">Settings</span></div>
+</nav>
+
+<div class="main">
+  <div class="hdr" id="hdr">
+    <div style="display:flex;align-items:baseline;"><h1 id="pgTitle">Board</h1><span class="date">Wed, Apr 16</span></div>
+    <div class="hdr-r">
+      <div class="search-bar"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search<span class="k">&#8984;K</span></div>
+      <button class="add-btn">+ Add</button>
+      <div class="ib" onclick="document.body.classList.toggle('dark')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+      <div class="av">AS</div>
+    </div>
+  </div>
+
+  <!-- STATS STRIP (collapsible) -->
+  <div class="stats-strip" id="statsStrip">
+    <div class="stat-chip"><span class="v">24</span><span class="l">active</span></div>
+    <div class="stat-chip"><span class="v">3</span><span class="l">interviews</span></div>
+    <div class="stat-chip"><span class="v">42%</span><span class="l">response</span></div>
+    <div class="stat-chip"><span class="v">18d</span><span class="l">avg pipeline</span></div>
+    <button class="strip-toggle" onclick="document.getElementById('statsStrip').classList.toggle('collapsed')">collapse</button>
+  </div>
+
+  <div class="content">
+
+    <!-- KANBAN (home) -->
+    <div class="pg act" id="pg-kanban">
+      <div class="kb">
+        <div class="kb-col"><div class="kb-hdr"><div class="dot" style="background:#6b7280"></div>Wishlist<span class="cnt">2</span></div><div class="kb-cards">
+          <div class="kb-card" onclick="go('detail')"><h4>Notion</h4><div class="role">Product Engineer</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">3d</span><span class="tag">remote</span></div></div>
+          <div class="kb-card" onclick="go('detail')"><h4>Linear</h4><div class="role">Full Stack</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">1d</span><span class="tag">startup</span></div></div>
+        </div></div>
+        <div class="kb-col"><div class="kb-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div><div class="kb-cards">
+          <div class="kb-card" onclick="go('detail')"><h4>Stripe</h4><div class="role">Senior Frontend</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div>
+          <div class="kb-card" onclick="go('detail')"><h4>Cloudflare</h4><div class="role">Systems Engineer</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">1d</span><span class="tag">referral</span></div></div>
+          <div class="kb-card" onclick="go('detail')"><h4>Meta</h4><div class="role">Product Engineer</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">8d</span><span class="stale" style="background:rgba(245,158,11,.1);color:#92400e;">stale</span></div></div>
+        </div></div>
+        <div class="kb-col"><div class="kb-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span></div><div class="kb-cards">
+          <div class="kb-card" onclick="go('detail')"><h4>Airbnb</h4><div class="role">Staff Engineer</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">9d</span></div></div>
+          <div class="kb-card" onclick="go('detail')"><h4>Shopify</h4><div class="role">Senior SWE</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">4d</span></div></div>
+        </div></div>
+        <div class="kb-col"><div class="kb-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div><div class="kb-cards">
+          <div class="kb-card" onclick="go('detail')"><h4>Google</h4><div class="role">SDE III</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">6d</span><span class="stale" style="background:rgba(245,158,11,.1);color:#92400e;">today</span></div></div>
+          <div class="kb-card" onclick="go('detail')"><h4>Netflix</h4><div class="role">Senior SWE</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">14d</span></div></div>
+          <div class="kb-card" onclick="go('detail')"><h4>Vercel</h4><div class="role">Frontend Lead</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">10d</span></div></div>
+        </div></div>
+        <div class="kb-col"><div class="kb-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div><div class="kb-cards">
+          <div class="kb-card" onclick="go('detail')"><h4>Figma</h4><div class="role">Senior Frontend</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">2d</span></div></div>
+        </div></div>
+        <div class="kb-col dimmed"><div class="kb-hdr"><div class="dot" style="background:#ef4444"></div>Rejected<span class="cnt">3</span></div><div class="kb-cards">
+          <div class="kb-card"><h4>Coinbase</h4><div class="role">Backend Lead</div><div class="meta"><span class="days">After screening</span></div></div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="pg" id="pg-table">
+      <div class="tbl-ctrl">
+        <div class="search-bar" style="width:220px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search...</div>
+        <span class="chip on">All (24)</span><span class="chip">Applied</span><span class="chip">Interviewing</span><span class="chip">Offer</span>
+      </div>
+      <table class="tbl tbl-desktop">
+        <thead><tr><th>Company</th><th>Role</th><th>Status</th><th>Priority</th><th>Source</th><th>Applied</th><th>Days</th></tr></thead>
+        <tbody>
+          <tr onclick="go('detail')" style="cursor:pointer"><td><div class="co"><div class="a" style="background:#22c55e">F</div>Figma</div></td><td>Senior Frontend</td><td><span class="badge" style="background:rgba(34,197,94,.12);color:#15803d;">Offer</span></td><td style="font-weight:600;">High</td><td>Referral</td><td>Apr 2</td><td>14</td></tr>
+          <tr onclick="go('detail')" style="cursor:pointer"><td><div class="co"><div class="a" style="background:#f59e0b">G</div>Google</div></td><td>SDE III</td><td><span class="badge" style="background:rgba(245,158,11,.12);color:#92400e;">Interviewing</span></td><td style="font-weight:600;">High</td><td>LinkedIn</td><td>Apr 5</td><td>11</td></tr>
+          <tr onclick="go('detail')" style="cursor:pointer"><td><div class="co"><div class="a" style="background:#3b82f6">S</div>Stripe</div></td><td>Senior Frontend</td><td><span class="badge" style="background:rgba(59,130,246,.12);color:#2563eb;">Applied</span></td><td style="font-weight:600;">High</td><td>Referral</td><td>Apr 4</td><td>12</td></tr>
+          <tr onclick="go('detail')" style="cursor:pointer"><td><div class="co"><div class="a" style="background:#8b5cf6">A</div>Airbnb</div></td><td>Staff Engineer</td><td><span class="badge" style="background:rgba(139,92,246,.12);color:#7c3aed;">Screening</span></td><td style="font-weight:600;">High</td><td>LinkedIn</td><td>Apr 7</td><td>9</td></tr>
+          <tr onclick="go('detail')" style="cursor:pointer"><td><div class="co"><div class="a" style="background:#f59e0b">N</div>Netflix</div></td><td>Senior SWE</td><td><span class="badge" style="background:rgba(245,158,11,.12);color:#92400e;">Interviewing</span></td><td style="font-weight:600;">High</td><td>Company Site</td><td>Apr 1</td><td>15</td></tr>
+        </tbody>
+      </table>
+      <div class="card-list">
+        <div class="app-card" onclick="go('detail')"><div class="app-card-top"><div class="a" style="background:#22c55e">F</div><div class="app-card-info"><div class="app-card-name">Figma</div><div class="app-card-role">Senior Frontend</div></div><span class="badge" style="background:rgba(34,197,94,.12);color:#15803d;">Offer</span></div><div class="app-card-bottom"><span>High</span><span>Referral</span><span>14d</span></div></div>
+        <div class="app-card" onclick="go('detail')"><div class="app-card-top"><div class="a" style="background:#f59e0b">G</div><div class="app-card-info"><div class="app-card-name">Google</div><div class="app-card-role">SDE III</div></div><span class="badge" style="background:rgba(245,158,11,.12);color:#92400e;">Interviewing</span></div><div class="app-card-bottom"><span>High</span><span>LinkedIn</span><span>11d</span></div></div>
+        <div class="app-card" onclick="go('detail')"><div class="app-card-top"><div class="a" style="background:#3b82f6">S</div><div class="app-card-info"><div class="app-card-name">Stripe</div><div class="app-card-role">Senior Frontend</div></div><span class="badge" style="background:rgba(59,130,246,.12);color:#2563eb;">Applied</span></div><div class="app-card-bottom"><span>High</span><span>Referral</span><span style="color:#ef4444;font-weight:600;">12d</span></div></div>
+        <div class="app-card" onclick="go('detail')"><div class="app-card-top"><div class="a" style="background:#8b5cf6">A</div><div class="app-card-info"><div class="app-card-name">Airbnb</div><div class="app-card-role">Staff Engineer</div></div><span class="badge" style="background:rgba(139,92,246,.12);color:#7c3aed;">Screening</span></div><div class="app-card-bottom"><span>High</span><span>LinkedIn</span><span>9d</span></div></div>
+      </div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="pg" id="pg-cal">
+      <div class="gc accent" style="margin-bottom:12px;padding:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div style="font-size:16px;font-weight:700;">April 2026</div>
+          <div style="display:flex;gap:4px;"><span class="chip on" style="height:26px;">Month</span><span class="chip" style="height:26px;">Week</span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;">
+          <div style="font-size:10px;font-weight:600;color:#a8a29e;padding:4px;">Mo</div><div style="font-size:10px;font-weight:600;color:#a8a29e;padding:4px;">Tu</div><div style="font-size:10px;font-weight:600;color:#a8a29e;padding:4px;">We</div><div style="font-size:10px;font-weight:600;color:#a8a29e;padding:4px;">Th</div><div style="font-size:10px;font-weight:600;color:#a8a29e;padding:4px;">Fr</div><div style="font-size:10px;font-weight:600;color:#a8a29e;padding:4px;">Sa</div><div style="font-size:10px;font-weight:600;color:#a8a29e;padding:4px;">Su</div>
+          <div style="padding:6px;color:#d4d4d4;font-size:11px;">30</div><div style="padding:6px;color:#d4d4d4;font-size:11px;">31</div><div style="padding:6px;font-size:11px;">1</div><div style="padding:6px;font-size:11px;">2</div><div style="padding:6px;font-size:11px;">3</div><div style="padding:6px;font-size:11px;color:#a8a29e;">4</div><div style="padding:6px;font-size:11px;color:#a8a29e;">5</div>
+          <div style="padding:6px;font-size:11px;">6</div><div style="padding:6px;font-size:11px;">7</div><div style="padding:6px;font-size:11px;">8</div><div style="padding:6px;font-size:11px;">9</div><div style="padding:6px;font-size:11px;">10</div><div style="padding:6px;font-size:11px;color:#a8a29e;">11</div><div style="padding:6px;font-size:11px;color:#a8a29e;">12</div>
+          <div style="padding:6px;font-size:11px;">13</div><div style="padding:6px;font-size:11px;">14</div><div style="padding:6px;font-size:11px;">15</div><div style="padding:4px;font-size:11px;font-weight:700;background:rgba(59,130,246,.15);border-radius:8px;color:#2563eb;">16</div><div style="padding:4px;font-size:11px;"><div style="font-size:8px;background:rgba(245,158,11,.12);color:#92400e;border-radius:3px;padding:1px 2px;margin-top:1px;">NFL</div>17</div><div style="padding:4px;font-size:11px;color:#a8a29e;"><div style="font-size:8px;background:rgba(245,158,11,.12);color:#92400e;border-radius:3px;padding:1px 2px;margin-top:1px;">VCL</div>18</div><div style="padding:6px;font-size:11px;color:#a8a29e;">19</div>
+          <div style="padding:6px;font-size:11px;">20</div><div style="padding:4px;font-size:11px;"><div style="font-size:8px;background:rgba(34,197,94,.12);color:#15803d;border-radius:3px;padding:1px 2px;margin-top:1px;">FGM!</div>21</div><div style="padding:4px;font-size:11px;"><div style="font-size:8px;background:rgba(245,158,11,.12);color:#92400e;border-radius:3px;padding:1px 2px;margin-top:1px;">GGL</div>22</div><div style="padding:6px;font-size:11px;">23</div><div style="padding:6px;font-size:11px;">24</div><div style="padding:6px;font-size:11px;color:#a8a29e;">25</div><div style="padding:6px;font-size:11px;color:#a8a29e;">26</div>
+        </div>
+      </div>
+      <div class="gc"><div class="gc-label">This Week</div>
+        <div class="bi"><div class="bar" style="background:#f59e0b"></div><div class="info"><h4>Google — Technical</h4><p>Today 2:00 PM · 60 min</p></div><div class="rt" style="color:#f59e0b;">Today</div></div>
+        <div class="bi"><div class="bar" style="background:#f59e0b"></div><div class="info"><h4>Netflix — System Design</h4><p>Thu 10:30 AM · 90 min</p></div><div class="rt" style="color:#78716c;">Thu</div></div>
+        <div class="bi"><div class="bar" style="background:#f59e0b"></div><div class="info"><h4>Vercel — Hiring Manager</h4><p>Fri 4:00 PM · 45 min</p></div><div class="rt" style="color:#78716c;">Fri</div></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="pg" id="pg-analytics">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="gc">
+          <div class="gc-label">Pipeline Funnel</div>
+          <div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px;"><span>Applied</span><span>42</span></div><div style="height:16px;background:rgba(0,0,0,.04);border-radius:4px;overflow:hidden;"><div style="height:100%;width:100%;background:#3b82f6;border-radius:4px;"></div></div></div>
+          <div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px;"><span>Screening</span><span>18</span></div><div style="height:16px;background:rgba(0,0,0,.04);border-radius:4px;overflow:hidden;"><div style="height:100%;width:43%;background:#8b5cf6;border-radius:4px;"></div></div></div>
+          <div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px;"><span>Interviewing</span><span>10</span></div><div style="height:16px;background:rgba(0,0,0,.04);border-radius:4px;overflow:hidden;"><div style="height:100%;width:24%;background:#f59e0b;border-radius:4px;"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px;"><span>Offer</span><span>3</span></div><div style="height:16px;background:rgba(0,0,0,.04);border-radius:4px;overflow:hidden;"><div style="height:100%;width:7%;background:#22c55e;border-radius:4px;"></div></div></div>
+        </div>
+        <div class="gc">
+          <div class="gc-label">Source Effectiveness</div>
+          <div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px;"><span>Referral</span><span style="color:#22c55e;">67%</span></div><div style="height:10px;background:rgba(0,0,0,.04);border-radius:3px;overflow:hidden;"><div style="height:100%;width:67%;background:#22c55e;border-radius:3px;"></div></div></div>
+          <div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px;"><span>LinkedIn</span><span style="color:#f59e0b;">45%</span></div><div style="height:10px;background:rgba(0,0,0,.04);border-radius:3px;overflow:hidden;"><div style="height:100%;width:45%;background:#f59e0b;border-radius:3px;"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px;"><span>Company Site</span><span style="color:#3b82f6;">30%</span></div><div style="height:10px;background:rgba(0,0,0,.04);border-radius:3px;overflow:hidden;"><div style="height:100%;width:30%;background:#3b82f6;border-radius:3px;"></div></div></div>
+        </div>
+      </div>
+      <div class="gc"><div class="gc-label">Summary</div>
+        <div style="display:flex;gap:32px;flex-wrap:wrap;">
+          <div><div style="font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;">42</div><div style="font-size:11px;color:#a8a29e;">total apps</div></div>
+          <div><div style="font-size:24px;font-weight:700;">42%</div><div style="font-size:11px;color:#a8a29e;">response</div></div>
+          <div><div style="font-size:24px;font-weight:700;">6.2d</div><div style="font-size:11px;color:#a8a29e;">avg response</div></div>
+          <div><div style="font-size:24px;font-weight:700;">24%</div><div style="font-size:11px;color:#a8a29e;">to interview</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="pg" id="pg-settings">
+      <div style="max-width:560px;">
+        <div class="gc" style="margin-bottom:12px;"><div class="gc-label">Profile</div><div class="fi"><label>Name</label><input value="Akhil Saxena"/></div><div class="fi"><label>Email</label><input value="akhil.saxena@brevo.com" disabled style="opacity:.6;"/></div></div>
+        <div class="gc" style="margin-bottom:12px;"><div class="gc-label">Tags</div><div style="display:flex;flex-wrap:wrap;gap:6px;"><span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;background:rgba(59,130,246,.1);color:#2563eb;">remote <span style="cursor:pointer;opacity:.5;">✕</span></span><span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;background:rgba(34,197,94,.1);color:#15803d;">FAANG <span style="cursor:pointer;opacity:.5;">✕</span></span><span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;background:rgba(245,158,11,.1);color:#92400e;">startup <span style="cursor:pointer;opacity:.5;">✕</span></span><button class="sm-btn" style="border-radius:99px;font-size:11px;">+ Add</button></div></div>
+        <div class="gc"><div class="gc-label">Data</div><div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="sm-btn">Export CSV</button><button class="sm-btn">Export JSON</button><button class="sm-btn" style="color:#ef4444;">Delete Account</button></div></div>
+      </div>
+    </div>
+
+    <!-- DETAIL PAGE -->
+    <div class="pg" id="pg-detail">
+      <div class="det-hero">
+        <div class="det-back" onclick="go(prevPg)">← Back</div>
+        <div class="det-top">
+          <div><h1>Google</h1><div class="sub">SDE III · Mountain View, CA (Hybrid)</div></div>
+          <div class="det-acts">
+            <select style="background:rgba(245,158,11,.12);color:#92400e;"><option selected>Interviewing</option><option>Applied</option><option>Screening</option><option>Offer</option><option>Rejected</option></select>
+            <button class="sm-btn">★ Pinned</button>
+            <button class="sm-btn" style="color:#ef4444;">Archive</button>
+          </div>
+        </div>
+        <div class="det-meta">
+          <span><strong>Priority:</strong> High</span><span><strong>Source:</strong> LinkedIn</span><span><strong>Applied:</strong> Apr 5</span><span><strong>Salary:</strong> $180K–$240K</span><span><strong>11d</strong> in pipeline</span>
+          <span style="display:flex;gap:3px;"><span class="tag" style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(0,0,0,.04);color:#78716c;">FAANG</span><span class="tag" style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(0,0,0,.04);color:#78716c;">hybrid</span></span>
+        </div>
+        <div class="dtabs">
+          <div class="dtab act" onclick="dtab('ov',this)">Overview</div>
+          <div class="dtab" onclick="dtab('int',this)">Interviews (3)</div>
+          <div class="dtab" onclick="dtab('jd',this)">JD Snapshot</div>
+          <div class="dtab" onclick="dtab('doc',this)">Docs (2)</div>
+          <div class="dtab" onclick="dtab('tl',this)">Timeline</div>
+        </div>
+      </div>
+      <div class="det-body">
+        <!-- Overview -->
+        <div class="dtab-p act" id="dt-ov">
+          <div class="fg">
+            <div>
+              <div class="fi"><label>Posting URL</label><input value="https://careers.google.com/jobs/123456" style="color:#3b82f6;"/></div>
+              <div class="fi"><label>Location</label><div style="display:flex;gap:6px;"><select style="flex:1;padding:8px 10px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.5);font-size:12px;font-family:var(--font);"><option selected>Hybrid</option><option>Remote</option><option>Onsite</option></select><input value="Mountain View, CA" style="flex:2;"/></div></div>
+              <div class="fi"><label>Salary</label><div style="display:flex;gap:6px;align-items:center;"><input value="180000" type="number" style="width:90px;"/><span style="color:#a8a29e;">–</span><input value="240000" type="number" style="width:90px;"/><select style="width:60px;padding:8px 4px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.5);font-size:11px;font-family:var(--font);"><option selected>USD</option><option>INR</option></select></div></div>
+            </div>
+            <div>
+              <div class="fi"><label>Notes <span style="color:#22c55e;font-weight:400;text-transform:none;letter-spacing:0;">Saved</span></label><textarea>Referred by **James Chen** from Cloud Networking.
+
+Prep:
+- Distributed systems design
+- API design (REST, gRPC)
+- Google-scale infra
+
+TC: ~$350-400K with RSUs</textarea><div class="md-hint"><code>**bold**</code> <code>- lists</code> <code>`code`</code> — markdown</div></div>
+            </div>
+          </div>
+          <div class="gc" style="margin-bottom:14px;"><div class="gc-label">Company Research — Google</div><textarea style="width:100%;min-height:70px;padding:10px;border:1px solid rgba(0,0,0,.06);border-radius:10px;background:rgba(255,255,255,.4);font-size:12px;font-family:var(--font);resize:vertical;line-height:1.5;color:#292524;outline:none;">**Glassdoor:** 4.4/5. Cloud division growing.
+🔴 2024 layoffs still affecting morale
+🟢 Networking team well-funded</textarea><div class="md-hint"><code>**bold**</code> <code>### headings</code> — markdown</div></div>
+        </div>
+        <!-- Interviews -->
+        <div class="dtab-p" id="dt-int">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><span style="font-weight:600;">3 rounds</span><button class="add-btn" style="height:30px;font-size:11px;">+ Add Round</button></div>
+          <div class="rnd"><div class="rnd-h" onclick="this.parentElement.querySelector('.rnd-body').classList.toggle('open')"><div class="rnd-num" style="background:rgba(34,197,94,.12);color:#15803d;">1</div><div class="rnd-info"><h4>Phone Screen</h4><p>Apr 8 · 30 min · James Chen</p></div><span class="badge" style="background:rgba(34,197,94,.12);color:#15803d;">Done</span><div class="rnd-stars"><span style="color:#f59e0b;">★★★★</span><span style="color:#d4d4d4;">★</span></div></div>
+            <div class="rnd-body">
+              <div style="font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Questions & Answers</div>
+              <div class="qa-pair"><div style="display:flex;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;color:#78716c;">Q1</span><span class="qa-remove">✕</span></div><div class="qa-q"><label>Question</label><textarea>Tell me about a complex project you led</textarea></div><div class="qa-a"><label>Answer</label><textarea style="min-height:56px;">Led **cloud migration** of payments — 4 teams, 6 months, zero downtime, 40% cost reduction.</textarea></div><div class="md-hint"><code>**bold**</code> <code>- lists</code> — markdown</div></div>
+              <div class="qa-pair"><div style="display:flex;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;color:#78716c;">Q2</span><span class="qa-remove">✕</span></div><div class="qa-q"><label>Question</label><textarea>How do you handle stakeholder disagreements?</textarea></div><div class="qa-a"><label>Answer</label><textarea>API redesign conflict — got usage data, ran prototype of both approaches, let metrics decide.</textarea></div></div>
+              <div class="qa-add" onclick="addQA(this)">+ Add Question & Answer</div>
+              <div style="margin-top:12px;border-top:1px solid rgba(0,0,0,.06);padding-top:10px;"><div class="fi"><label>Notes <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#a8a29e;">markdown</span></label><textarea style="min-height:48px;">Positive vibe. Team hiring 3 more this quarter. *"Strong culture fit"*</textarea></div></div>
+            </div></div>
+          <div class="rnd"><div class="rnd-h" onclick="this.parentElement.querySelector('.rnd-body').classList.toggle('open')"><div class="rnd-num" style="background:rgba(34,197,94,.12);color:#15803d;">2</div><div class="rnd-info"><h4>Technical</h4><p>Apr 12 · 60 min · Sarah Kim</p></div><span class="badge" style="background:rgba(34,197,94,.12);color:#15803d;">Done</span><div class="rnd-stars"><span style="color:#f59e0b;">★★★</span><span style="color:#d4d4d4;">★★</span></div></div>
+            <div class="rnd-body">
+              <div style="font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Questions & Answers</div>
+              <div class="qa-pair"><div style="display:flex;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;color:#78716c;">Q1</span><span class="qa-remove">✕</span></div><div class="qa-q"><label>Question</label><textarea>Design a URL shortener</textarea></div><div class="qa-a"><label>Answer</label><textarea style="min-height:56px;">Base62 hashing, range sharding, Redis LRU cache, async analytics with Kafka</textarea></div></div>
+              <div class="qa-pair"><div style="display:flex;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;color:#78716c;">Q2</span><span class="qa-remove">✕</span></div><div class="qa-q"><label>Question</label><textarea>Implement LRU cache</textarea></div><div class="qa-a"><label>Answer</label><textarea>HashMap + doubly linked list, O(1). Ran slightly over on thread safety follow-up.</textarea></div></div>
+              <div class="qa-add" onclick="addQA(this)">+ Add Question & Answer</div>
+            </div></div>
+          <div class="rnd" style="border-color:rgba(245,158,11,.3);"><div class="rnd-h"><div class="rnd-num" style="background:rgba(245,158,11,.12);color:#92400e;">3</div><div class="rnd-info"><h4>Bar Raiser</h4><p>Apr 22 · 45 min · TBD</p></div><span class="badge" style="background:rgba(245,158,11,.12);color:#92400e;">Scheduled</span></div></div>
+        </div>
+        <!-- JD -->
+        <div class="dtab-p" id="dt-jd">
+          <div style="display:flex;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;"><div><div style="font-weight:600;">Saved Apr 5</div><div style="font-size:11px;color:#a8a29e;">Version 1</div></div><div style="display:flex;gap:6px;"><button class="sm-btn">Re-scrape</button><button class="sm-btn">Edit</button></div></div>
+          <div class="gc accent" style="line-height:1.7;font-size:13px;">
+            <h3 style="font-size:16px;font-weight:700;margin-bottom:3px;">Software Engineer III, Cloud Networking</h3>
+            <p style="color:#78716c;margin-bottom:14px;">Google · Mountain View, CA</p>
+            <p style="margin-bottom:10px;"><strong>About:</strong> Build infrastructure powering Google Cloud's networking stack at global scale.</p>
+            <p style="margin-bottom:3px;"><strong>Requirements:</strong></p>
+            <ul style="padding-left:18px;margin-bottom:10px;"><li>5+ years SWE</li><li>Distributed systems or cloud infra</li><li>Go, C++, or Java</li></ul>
+          </div>
+        </div>
+        <!-- Docs -->
+        <div class="dtab-p" id="dt-doc">
+          <div style="display:flex;justify-content:space-between;margin-bottom:12px;"><span style="font-weight:600;">2 documents</span><button class="add-btn" style="height:30px;font-size:11px;">+ Upload</button></div>
+          <div class="gc" style="padding:0;overflow:hidden;">
+            <div class="doc-i"><div class="doc-icon" style="background:rgba(59,130,246,.1);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="info"><h4>Resume_Akhil_SDE_2026.pdf</h4><p>Resume · 142 KB</p></div></div>
+            <div class="doc-i"><div class="doc-icon" style="background:rgba(139,92,246,.1);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="info"><h4>Cover_Letter_Google.pdf</h4><p>Cover Letter · 89 KB</p></div></div>
+          </div>
+          <div class="upload-z"><div style="font-size:20px;margin-bottom:4px;opacity:.3;">+</div><div style="font-size:12px;font-weight:600;">Drop files or click to upload</div></div>
+        </div>
+        <!-- Timeline -->
+        <div class="dtab-p" id="dt-tl">
+          <div class="tl-i"><div class="tl-line"></div><div class="tl-dot" style="background:#f59e0b;"></div><div class="tl-text">Bar Raiser scheduled</div><div class="tl-time">Apr 16</div></div>
+          <div class="tl-i"><div class="tl-line"></div><div class="tl-dot" style="background:#f59e0b;"></div><div class="tl-text">→ Interviewing</div><div class="tl-time">Apr 12</div></div>
+          <div class="tl-i"><div class="tl-line"></div><div class="tl-dot" style="background:#8b5cf6;"></div><div class="tl-text">→ Screening</div><div class="tl-time">Apr 8</div></div>
+          <div class="tl-i"><div class="tl-line"></div><div class="tl-dot" style="background:#3b82f6;"></div><div class="tl-text">Pinned</div><div class="tl-time">Apr 5</div></div>
+          <div class="tl-i"><div class="tl-dot" style="background:#22c55e;"></div><div class="tl-text">Created</div><div class="tl-time">Apr 5 · via LinkedIn</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-bar">
+  <div class="mb-i act" onclick="go('kanban')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg><span>Board</span></div>
+  <div class="mb-i" onclick="go('table')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span>List</span></div>
+  <div class="mb-i" onclick="go('cal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Cal</span></div>
+  <div class="mb-i" onclick="go('analytics')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg><span>Stats</span></div>
+  <div class="mb-i" onclick="go('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>More</span></div>
+</div>
+
+<script>
+function addQA(btn){var n=btn.parentElement.querySelectorAll('.qa-pair').length+1;var p=document.createElement('div');p.className='qa-pair';p.innerHTML='<div style="display:flex;align-items:center;margin-bottom:4px;"><span style="font-size:10px;font-weight:600;color:#78716c;">Q'+n+'</span><span class="qa-remove" onclick="this.closest(\'.qa-pair\').remove()">✕</span></div><div class="qa-q"><label>Question</label><textarea placeholder="What were you asked?"></textarea></div><div class="qa-a"><label>Answer</label><textarea placeholder="Your response... **markdown** supported" style="min-height:56px;"></textarea></div><div class="md-hint"><code>**bold**</code> <code>- lists</code> — markdown</div>';btn.before(p);p.querySelector('textarea').focus();}
+let prevPg='kanban';
+const titles={kanban:'Board',table:'List',cal:'Calendar',analytics:'Analytics',settings:'Settings',detail:'Google — SDE III'};
+function go(pg){if(pg!=='detail')prevPg=pg;document.querySelectorAll('.pg').forEach(p=>p.classList.remove('act'));document.getElementById('pg-'+pg).classList.add('act');document.getElementById('pgTitle').textContent=titles[pg]||'Board';document.querySelectorAll('.sb .ni').forEach(n=>n.classList.remove('act'));document.querySelectorAll('.mobile-bar .mb-i').forEach(n=>n.classList.remove('act'));var idx={kanban:0,table:1,cal:2,analytics:3,settings:4};if(idx[pg]!==undefined){document.querySelectorAll('.sb .ni')[idx[pg]]?.classList.add('act');document.querySelectorAll('.mobile-bar .mb-i')[idx[pg]]?.classList.add('act');}document.getElementById('statsStrip').style.display=pg==='kanban'?'flex':'none';window.scrollTo(0,0);}
+function dtab(id,el){document.querySelectorAll('.dtab-p').forEach(p=>p.classList.remove('act'));document.getElementById('dt-'+id).classList.add('act');document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('act'));el.classList.add('act');}
+</script>
+</body>
+</html>

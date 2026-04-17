@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — Shell Direction: Classic Sidebar Variants</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#0a0a0a;color:#fff;overflow-x:hidden;}
+
+  .picker{position:fixed;top:0;left:0;right:0;z-index:100;background:#111;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;gap:16px;}
+  .picker h2{font-size:15px;font-weight:600;white-space:nowrap;color:#888;}
+  .picker-opts{display:flex;gap:8px;}
+  .pick-btn{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid #333;background:#1a1a1a;color:#888;cursor:pointer;transition:all 0.15s;}
+  .pick-btn:hover{border-color:#555;color:#ccc;}
+  .pick-btn.active{background:#fff;color:#000;border-color:#fff;}
+
+  .preview{margin-top:64px;padding:32px;display:flex;justify-content:center;}
+  .frame{width:1280px;height:760px;border-radius:12px;overflow:hidden;border:1px solid #2a2a2a;position:relative;background:#fafaf9;box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+  .frame>div{display:none;position:absolute;inset:0;}
+  .frame>div.active{display:block;}
+
+  /* Annotations */
+  .ann{position:absolute;z-index:10;pointer-events:none;}
+  .ann-dot{width:20px;height:20px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;box-shadow:0 0 0 3px rgba(59,130,246,0.3);pointer-events:auto;cursor:pointer;}
+  .ann-label{position:absolute;left:28px;top:-4px;background:#1a1a1a;color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px;white-space:nowrap;opacity:0;transition:opacity 0.15s;pointer-events:none;border:1px solid #333;}
+  .ann:hover .ann-label{opacity:1;}
+
+  /* Common shell elements */
+  .s-logo{font-size:17px;font-weight:700;color:#292524;display:flex;align-items:center;gap:6px;}
+  .s-dot{width:7px;height:7px;background:#3b82f6;border-radius:50%;}
+  .s-nav{display:flex;flex-direction:column;gap:2px;flex:1;}
+  .s-ni{display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border-radius:8px;font-size:13px;color:#78716c;}
+  .s-ni.act{background:#f5f5f4;color:#292524;font-weight:600;}
+  .s-ni .ico{width:16px;height:16px;background:#d4d4d4;border-radius:3px;flex-shrink:0;}
+  .s-ni.act .ico{background:#78716c;}
+  .s-ni .cnt{margin-left:auto;font-size:11px;font-weight:600;background:#e7e5e4;color:#78716c;padding:0 6px;border-radius:9px;height:18px;display:flex;align-items:center;}
+  .s-ni .cnt.alert{background:#fee2e2;color:#ef4444;}
+  .s-ni .shortcut{margin-left:auto;font-size:10px;color:#a8a29e;font-family:monospace;background:#f5f5f4;padding:1px 5px;border-radius:3px;}
+  .s-head{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:52px;background:#fff;border-bottom:1px solid #e5e5e4;}
+  .s-title{font-size:17px;font-weight:600;color:#292524;}
+  .s-actions{display:flex;gap:8px;align-items:center;}
+  .s-btn{height:30px;padding:0 12px;background:#292524;color:#fff;border-radius:7px;font-size:12px;font-weight:600;border:none;display:flex;align-items:center;gap:4px;}
+  .s-ibtn{width:30px;height:30px;border:1px solid #e5e5e4;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center;}
+  .s-ibtn .dot{width:12px;height:12px;background:#d4d4d4;border-radius:50%;}
+  .s-avatar{width:26px;height:26px;border-radius:50%;background:#e5e5e4;}
+  .s-search{height:30px;border:1px solid #e5e5e4;border-radius:7px;padding:0 10px;font-size:12px;color:#a8a29e;background:#fafaf9;width:200px;display:flex;align-items:center;gap:6px;}
+  .s-search .key{font-size:10px;background:#e7e5e4;padding:1px 4px;border-radius:3px;color:#78716c;font-family:monospace;}
+
+  /* Content placeholders */
+  .s-body{position:absolute;overflow:hidden;background:#fafaf9;}
+  .ph-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+  .ph-card{height:72px;background:#fff;border:1px solid #e5e5e4;border-radius:8px;}
+  .ph-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+  .ph-block{height:160px;background:#fff;border:1px solid #e5e5e4;border-radius:8px;}
+  .ph-wide{height:100px;background:#fff;border:1px solid #e5e5e4;border-radius:8px;}
+
+  /* Pipeline mini bar */
+  .pipeline-mini{display:flex;height:6px;border-radius:3px;overflow:hidden;gap:1px;margin-top:4px;}
+  .pipeline-mini div{flex:none;height:100%;border-radius:2px;}
+
+  /* Pinned section */
+  .pinned-section{padding:0 12px;margin-bottom:12px;}
+  .pinned-label{font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;padding:0 4px;}
+  .pinned-item{display:flex;align-items:center;gap:8px;height:30px;padding:0 8px;border-radius:6px;font-size:12px;color:#57534e;cursor:default;}
+  .pinned-item:hover{background:#f5f5f4;}
+  .pinned-item .pin-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .pinned-item .pin-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  .frame-label{position:absolute;bottom:10px;right:14px;font-size:10px;color:#a8a29e;font-weight:600;letter-spacing:0.3px;}
+
+  /* Description */
+  .desc-area{max-width:1280px;margin:0 auto;padding:16px 32px 64px;}
+  .desc-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .desc-card{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:24px;transition:border-color 0.15s;}
+  .desc-card.active{border-color:#3b82f6;}
+  .desc-card h3{font-size:15px;font-weight:600;margin-bottom:6px;}
+  .desc-card p{font-size:13px;color:#777;line-height:1.6;}
+  .desc-card ul{margin-top:12px;font-size:13px;color:#999;line-height:1.8;}
+  .desc-card ul li{list-style:none;padding-left:16px;position:relative;}
+  .desc-card ul li::before{content:"→";position:absolute;left:0;color:#555;}
+  .desc-card .tag-row{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;}
+  .desc-card .tag{font-size:11px;padding:2px 8px;border-radius:4px;background:#222;color:#888;}
+</style>
+</head>
+<body>
+
+<div class="picker">
+  <h2>Classic Sidebar —</h2>
+  <div class="picker-opts">
+    <button class="pick-btn active" onclick="pick('basic',this)">A1: Basic</button>
+    <button class="pick-btn" onclick="pick('enhanced',this)">A2: Enhanced UX</button>
+  </div>
+</div>
+
+<div class="preview">
+  <div class="frame" id="frame">
+
+    <!-- A1: BASIC -->
+    <div class="active" id="opt-basic">
+      <div style="position:absolute;left:0;top:0;bottom:0;width:240px;background:#fff;border-right:1px solid #e5e5e4;padding:18px 14px;display:flex;flex-direction:column;">
+        <div class="s-logo" style="padding:0 8px 18px;"><span class="s-dot"></span> JobDash</div>
+        <div class="s-nav">
+          <div class="s-ni act"><div class="ico"></div> Dashboard</div>
+          <div class="s-ni"><div class="ico"></div> Kanban</div>
+          <div class="s-ni"><div class="ico"></div> Table</div>
+          <div class="s-ni"><div class="ico"></div> Calendar</div>
+          <div class="s-ni"><div class="ico"></div> Analytics</div>
+          <div class="s-ni"><div class="ico"></div> Contacts</div>
+        </div>
+        <div style="border-top:1px solid #e5e5e4;padding-top:10px;margin-top:auto;">
+          <div class="s-ni"><div class="ico"></div> Settings</div>
+        </div>
+      </div>
+      <div class="s-head" style="position:absolute;left:240px;top:0;right:0;">
+        <div class="s-title">Dashboard</div>
+        <div class="s-actions"><button class="s-btn">+ Add Application</button><div class="s-ibtn"><div class="dot"></div></div><div class="s-ibtn"><div class="dot"></div></div><div class="s-avatar"></div></div>
+      </div>
+      <div class="s-body" style="left:240px;top:52px;right:0;bottom:0;padding:20px;">
+        <div class="ph-grid"><div class="ph-card"></div><div class="ph-card"></div><div class="ph-card"></div><div class="ph-card"></div></div>
+        <div class="ph-cols"><div class="ph-block"></div><div class="ph-block"></div></div>
+        <div class="ph-wide"></div>
+      </div>
+      <div class="frame-label">A1 — Basic Classic Sidebar</div>
+    </div>
+
+    <!-- A2: ENHANCED -->
+    <div id="opt-enhanced">
+      <div style="position:absolute;left:0;top:0;bottom:0;width:248px;background:#fff;border-right:1px solid #e5e5e4;padding:16px 12px;display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0 8px 14px;">
+          <div class="s-logo"><span class="s-dot"></span> JobDash</div>
+          <div style="width:22px;height:22px;border:1px solid #e5e5e4;border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer;" title="Collapse sidebar">
+            <div style="width:10px;height:2px;background:#a8a29e;"></div>
+          </div>
+        </div>
+
+        <!-- Search in sidebar -->
+        <div style="margin:0 4px 14px;padding:6px 10px;border:1px solid #e5e5e4;border-radius:7px;font-size:12px;color:#a8a29e;display:flex;align-items:center;gap:6px;background:#fafaf9;">
+          <span style="opacity:0.5;">&#128269;</span> Search...
+          <span style="margin-left:auto;font-size:10px;background:#e7e5e4;padding:1px 5px;border-radius:3px;color:#78716c;font-family:monospace;">&#8984;K</span>
+        </div>
+
+        <!-- Pinned apps -->
+        <div class="pinned-section">
+          <div class="pinned-label">Pinned</div>
+          <div class="pinned-item"><div class="pin-dot" style="background:#f59e0b;"></div><div class="pin-text">Google — SDE III</div></div>
+          <div class="pinned-item"><div class="pin-dot" style="background:#22c55e;"></div><div class="pin-text">Figma — Sr Frontend</div></div>
+          <div class="pinned-item"><div class="pin-dot" style="background:#8b5cf6;"></div><div class="pin-text">Airbnb — Staff Eng</div></div>
+        </div>
+
+        <div class="s-nav">
+          <div class="s-ni act"><div class="ico"></div> Dashboard</div>
+          <div class="s-ni"><div class="ico"></div> Kanban <span class="cnt">24</span></div>
+          <div class="s-ni"><div class="ico"></div> Table</div>
+          <div class="s-ni"><div class="ico"></div> Calendar <span class="cnt">3</span></div>
+          <div class="s-ni"><div class="ico"></div> Analytics</div>
+          <div class="s-ni"><div class="ico"></div> Contacts <span class="cnt">8</span></div>
+        </div>
+
+        <!-- Pipeline mini summary -->
+        <div style="border-top:1px solid #e5e5e4;padding:12px 8px 8px;">
+          <div style="font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Pipeline</div>
+          <div class="pipeline-mini">
+            <div style="width:8%;background:#6b7280;" title="Wishlist: 2"></div>
+            <div style="width:21%;background:#3b82f6;" title="Applied: 5"></div>
+            <div style="width:8%;background:#8b5cf6;" title="Screening: 2"></div>
+            <div style="width:13%;background:#f59e0b;" title="Interviewing: 3"></div>
+            <div style="width:4%;background:#22c55e;" title="Offer: 1"></div>
+            <div style="width:13%;background:#ef4444;opacity:0.4;" title="Rejected: 3"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:#a8a29e;">
+            <span>24 active</span><span>3 rejected</span>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid #e5e5e4;padding-top:8px;margin-top:8px;">
+          <div class="s-ni"><div class="ico"></div> Settings <span class="shortcut">&#8984;,</span></div>
+        </div>
+      </div>
+
+      <!-- Header with global search -->
+      <div class="s-head" style="position:absolute;left:248px;top:0;right:0;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="s-title">Dashboard</div>
+          <span style="font-size:11px;color:#a8a29e;background:#f5f5f4;padding:2px 8px;border-radius:4px;">Apr 16, 2026</span>
+        </div>
+        <div class="s-actions">
+          <button class="s-btn">+ Add Application</button>
+          <div class="s-ibtn" title="Notifications" style="position:relative;">
+            <div class="dot"></div>
+            <div style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:1.5px solid #fff;"></div>
+          </div>
+          <div class="s-ibtn" title="Dark mode"><div class="dot"></div></div>
+          <div class="s-avatar"></div>
+        </div>
+      </div>
+
+      <div class="s-body" style="left:248px;top:52px;right:0;bottom:0;padding:20px;">
+        <div class="ph-grid"><div class="ph-card"></div><div class="ph-card"></div><div class="ph-card"></div><div class="ph-card"></div></div>
+        <div class="ph-cols"><div class="ph-block"></div><div class="ph-block"></div></div>
+        <div class="ph-wide"></div>
+      </div>
+
+      <!-- Annotations -->
+      <div class="ann" style="left:134px;top:58px;"><div class="ann-dot">1</div><div class="ann-label">Search + Cmd+K shortcut always visible in sidebar</div></div>
+      <div class="ann" style="left:134px;top:102px;"><div class="ann-dot">2</div><div class="ann-label">Pinned apps — one-click access to your focus applications</div></div>
+      <div class="ann" style="left:215px;top:260px;"><div class="ann-dot">3</div><div class="ann-label">Contextual counts — Calendar shows 3 upcoming, Kanban shows 24 total</div></div>
+      <div class="ann" style="left:176px;top:528px;"><div class="ann-dot">4</div><div class="ann-label">Pipeline mini-bar — see status distribution without clicking Dashboard</div></div>
+      <div class="ann" style="left:224px;top:14px;"><div class="ann-dot">5</div><div class="ann-label">Sidebar collapse toggle — icon-only mode for more content space</div></div>
+      <div class="ann" style="left:600px;top:20px;"><div class="ann-dot">6</div><div class="ann-label">Today's date in header — temporal awareness</div></div>
+
+      <div class="frame-label">A2 — Enhanced Classic Sidebar</div>
+    </div>
+  </div>
+</div>
+
+<div class="desc-area">
+  <div class="desc-grid">
+    <div class="desc-card active" id="desc-basic">
+      <h3>A1 — Basic Classic Sidebar</h3>
+      <p>Clean and simple. Logo, nav items, header with actions. No extra information in the sidebar — just navigation. This is the starting point.</p>
+      <ul>
+        <li>7 nav items, no counts or badges</li>
+        <li>Fixed sidebar, no collapse</li>
+        <li>Search only in header or Cmd+K</li>
+        <li>No pipeline summary visible</li>
+        <li>No quick access to pinned apps</li>
+      </ul>
+      <div class="tag-row"><span class="tag">clean</span><span class="tag">simple</span><span class="tag">fewer distractions</span></div>
+    </div>
+    <div class="desc-card" id="desc-enhanced">
+      <h3>A2 — Enhanced Classic Sidebar</h3>
+      <p>Same classic layout but the sidebar earns its screen space. Every pixel adds awareness without adding clutter. 6 improvements over basic:</p>
+      <ul>
+        <li><strong>Search + Cmd+K</strong> always visible in sidebar — find anything instantly</li>
+        <li><strong>Pinned apps</strong> section — your 3-5 focus applications one click away</li>
+        <li><strong>Contextual counts</strong> on nav items — Calendar: 3, Kanban: 24</li>
+        <li><strong>Pipeline mini-bar</strong> in footer — see status distribution at a glance</li>
+        <li><strong>Collapse toggle</strong> — shrink to icon-only when you need content space</li>
+        <li><strong>Today's date</strong> in header — temporal context for deadline awareness</li>
+      </ul>
+      <div class="tag-row"><span class="tag">information-rich</span><span class="tag">keyboard-first</span><span class="tag">Linear-inspired</span><span class="tag">progressive disclosure</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function pick(opt, btn) {
+  document.querySelectorAll('.pick-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#frame > div').forEach(d => d.classList.remove('active'));
+  document.getElementById('opt-' + opt).classList.add('active');
+  document.querySelectorAll('.desc-card').forEach(d => d.classList.remove('active'));
+  document.getElementById('desc-' + opt).classList.add('active');
+}
+</script>
+</body>
+</html>

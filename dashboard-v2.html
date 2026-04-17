@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — Dashboard: Solving the Sidebar Squeeze</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#0a0a0a;color:#fff;}
+
+  .picker{position:fixed;top:0;left:0;right:0;z-index:100;background:#111;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;gap:16px;}
+  .picker h2{font-size:15px;font-weight:600;color:#888;white-space:nowrap;}
+  .pick-btn{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid #333;background:#1a1a1a;color:#888;cursor:pointer;transition:all 0.15s;}
+  .pick-btn:hover{border-color:#555;color:#ccc;}
+  .pick-btn.active{background:#fff;color:#000;border-color:#fff;}
+
+  .preview{margin-top:64px;padding:24px;display:flex;justify-content:center;}
+  .frame{width:1280px;height:780px;border-radius:12px;overflow:hidden;border:1px solid #2a2a2a;position:relative;background:#fafaf9;box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+  .frame>div{display:none;position:absolute;inset:0;}
+  .frame>div.active{display:block;}
+
+  /* Shared sidebar full */
+  .sbf{position:absolute;left:0;top:0;bottom:0;width:248px;background:#fff;border-right:1px solid #e5e5e4;padding:16px 12px;display:flex;flex-direction:column;font-size:13px;z-index:2;}
+  /* Shared sidebar collapsed */
+  .sbc{position:absolute;left:0;top:0;bottom:0;width:64px;background:#fff;border-right:1px solid #e5e5e4;padding:12px 8px;display:flex;flex-direction:column;align-items:center;font-size:13px;z-index:2;}
+  .sbc .logo-mini{width:28px;height:28px;background:#3b82f6;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+  .sbc .logo-mini .d{width:7px;height:7px;background:#fff;border-radius:50%;}
+  .sbc .ni-mini{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:2px;cursor:default;}
+  .sbc .ni-mini.act{background:#f5f5f4;}
+  .sbc .ni-mini .ic{width:16px;height:16px;background:#d4d4d4;border-radius:3px;}
+  .sbc .ni-mini.act .ic{background:#78716c;}
+
+  .s-logo{font-size:17px;font-weight:700;color:#292524;display:flex;align-items:center;gap:6px;padding:0 8px 14px;}
+  .s-dot{width:7px;height:7px;background:#3b82f6;border-radius:50%;}
+  .s-search{margin:0 4px 12px;padding:6px 10px;border:1px solid #e5e5e4;border-radius:7px;color:#a8a29e;background:#fafaf9;display:flex;align-items:center;gap:6px;font-size:12px;}
+  .s-search .k{font-size:10px;background:#e7e5e4;padding:1px 4px;border-radius:3px;color:#78716c;font-family:monospace;margin-left:auto;}
+  .pin-lbl{font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:0.5px;padding:0 16px;margin-bottom:4px;}
+  .pin-i{display:flex;align-items:center;gap:8px;height:28px;padding:0 12px;font-size:12px;color:#57534e;}
+  .pin-i .pd{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .s-ni{display:flex;align-items:center;gap:10px;height:38px;padding:0 12px;border-radius:7px;color:#78716c;}
+  .s-ni.act{background:#f5f5f4;color:#292524;font-weight:600;}
+  .s-ni .ic{width:15px;height:15px;background:#d4d4d4;border-radius:3px;flex-shrink:0;}
+  .s-ni.act .ic{background:#78716c;}
+  .s-ni .ct{margin-left:auto;font-size:11px;background:#e7e5e4;color:#78716c;padding:0 5px;border-radius:8px;height:16px;display:flex;align-items:center;}
+  .s-foot{border-top:1px solid #e5e5e4;padding:10px 4px 0;margin-top:auto;}
+  .s-pipe{display:flex;height:5px;border-radius:3px;overflow:hidden;gap:1px;margin:4px 0 8px;}
+  .s-pipe div{flex:none;height:100%;border-radius:2px;}
+
+  .hd{position:absolute;top:0;right:0;height:52px;background:#fff;border-bottom:1px solid #e5e5e4;display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:1;}
+  .hd .tt{font-size:17px;font-weight:600;color:#292524;display:flex;align-items:center;gap:10px;}
+  .hd .tt .date{font-size:11px;color:#a8a29e;background:#f5f5f4;padding:2px 8px;border-radius:4px;font-weight:400;}
+  .hd .acts{display:flex;gap:8px;align-items:center;}
+  .hd .ab{height:30px;padding:0 12px;background:#292524;color:#fff;border-radius:7px;font-size:12px;font-weight:600;border:none;}
+  .hd .ib{width:30px;height:30px;border:1px solid #e5e5e4;border-radius:7px;background:#fff;}
+  .hd .av{width:26px;height:26px;border-radius:50%;background:#e5e5e4;}
+
+  .bd{position:absolute;top:52px;bottom:0;overflow-y:auto;}
+
+  /* Cards */
+  .sc{background:#fff;border:1px solid #e5e5e4;border-radius:10px;padding:14px 16px;}
+  .sc .sl{font-size:11px;font-weight:600;color:#78716c;margin-bottom:2px;}
+  .sc .sv{font-size:20px;font-weight:600;color:#292524;}
+  .sc .st{font-size:10px;font-weight:600;margin-top:2px;}
+  .st-up{color:#22c55e;}.st-dn{color:#ef4444;}.st-mu{color:#a8a29e;}
+
+  .sec{background:#fff;border:1px solid #e5e5e4;border-radius:10px;overflow:hidden;margin-bottom:14px;}
+  .sec-h{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #e5e5e4;font-size:12px;font-weight:600;color:#292524;}
+  .sec-h a{font-size:11px;color:#78716c;font-weight:600;cursor:pointer;}
+  .li{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid #f5f5f4;font-size:13px;}
+  .li:last-child{border-bottom:none;}
+  .li .av{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0;}
+  .li .tx{flex:1;min-width:0;}
+  .li .tx .t1{font-weight:600;color:#292524;font-size:12px;}
+  .li .tx .t2{color:#78716c;font-size:11px;margin-top:1px;}
+  .li .bg{font-size:10px;font-weight:600;padding:2px 6px;border-radius:99px;white-space:nowrap;}
+  .act-i{display:flex;gap:12px;padding:11px 16px;border-bottom:1px solid #f5f5f4;font-size:13px;}
+  .act-i:last-child{border-bottom:none;}
+  .act-i .dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+  .act-i .at{font-size:10px;color:#a8a29e;margin-top:2px;}
+
+  /* Alert strips */
+  .alert-strip{display:flex;gap:10px;margin-bottom:16px;overflow-x:auto;}
+  .alert-card{flex:none;display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
+
+  /* Mixed feed card types */
+  .feed-alert{background:#fff;border:1px solid #e5e5e4;border-radius:10px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;}
+  .feed-alert .fa-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;}
+  .feed-alert .fa-text{flex:1;}
+  .feed-alert .fa-text h4{font-size:13px;font-weight:600;color:#292524;}
+  .feed-alert .fa-text p{font-size:12px;color:#78716c;margin-top:2px;}
+  .feed-alert .fa-action{font-size:12px;font-weight:600;padding:6px 12px;border-radius:6px;border:1px solid #e5e5e4;background:#fff;color:#292524;cursor:pointer;white-space:nowrap;}
+
+  /* Right panel for D3-fixed */
+  .rp{position:absolute;right:0;top:52px;bottom:0;width:280px;background:#fff;border-left:1px solid #e5e5e4;overflow-y:auto;padding:16px 14px;}
+  .rp-lbl{font-size:11px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:0.5px;margin:12px 0 8px;padding:0 4px;}
+  .rp-lbl:first-child{margin-top:0;}
+
+  .frame-label{position:absolute;bottom:10px;right:14px;font-size:10px;color:#a8a29e;font-weight:600;letter-spacing:0.3px;z-index:5;}
+
+  .desc-area{max-width:1280px;margin:0 auto;padding:16px 24px 64px;}
+  .desc-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;}
+  .dc{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:20px;transition:border-color 0.15s;}
+  .dc.active{border-color:#3b82f6;}
+  .dc h3{font-size:14px;font-weight:600;margin-bottom:6px;}
+  .dc p{font-size:12px;color:#777;line-height:1.6;}
+  .dc .good{margin-top:10px;font-size:11px;color:#22c55e;font-weight:600;}
+  .dc .tags{margin-top:10px;display:flex;gap:4px;flex-wrap:wrap;}
+  .dc .tag{font-size:10px;padding:2px 6px;border-radius:4px;background:#222;color:#888;}
+</style>
+</head>
+<body>
+
+<div class="picker">
+  <h2>Dashboard —</h2>
+  <div style="display:flex;gap:8px;">
+    <button class="pick-btn active" onclick="pick('e1',this)">E1: Auto-Collapse</button>
+    <button class="pick-btn" onclick="pick('e2',this)">E2: Top Alerts + Feed</button>
+    <button class="pick-btn" onclick="pick('e3',this)">E3: Mixed Stream</button>
+    <button class="pick-btn" onclick="pick('e4',this)">E4: Stacked Zones</button>
+  </div>
+</div>
+
+<div class="preview">
+  <div class="frame" id="frame">
+
+    <!-- E1: AUTO-COLLAPSE — sidebar shrinks to icons on dashboard -->
+    <div class="active" id="opt-e1">
+      <div class="sbc">
+        <div class="logo-mini"><div class="d"></div></div>
+        <div class="ni-mini act"><div class="ic"></div></div>
+        <div class="ni-mini"><div class="ic"></div></div>
+        <div class="ni-mini"><div class="ic"></div></div>
+        <div class="ni-mini"><div class="ic"></div></div>
+        <div class="ni-mini"><div class="ic"></div></div>
+        <div class="ni-mini"><div class="ic"></div></div>
+        <div style="margin-top:auto;border-top:1px solid #e5e5e4;padding-top:8px;">
+          <div class="ni-mini"><div class="ic"></div></div>
+        </div>
+      </div>
+      <div class="hd" style="left:64px;"><div class="tt">Dashboard <span class="date">Apr 16, 2026</span></div><div class="acts"><button class="ab">+ Add Application</button><div class="ib"></div><div class="ib"></div><div class="av"></div></div></div>
+      <!-- Feed area — wide because sidebar collapsed -->
+      <div class="bd" style="left:64px;right:280px;padding:16px 20px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div class="sc"><div class="sl">Active</div><div class="sv">24</div><div class="st st-up">+3</div></div>
+          <div class="sc"><div class="sl">Interviews</div><div class="sv">3</div><div class="st st-up">+1</div></div>
+          <div class="sc"><div class="sl">Response</div><div class="sv">42%</div><div class="st st-up">+5%</div></div>
+          <div class="sc"><div class="sl">Avg Days</div><div class="sv">18</div><div class="st st-up">-2d</div></div>
+        </div>
+        <div class="sec">
+          <div class="sec-h">Activity <a>View all</a></div>
+          <div class="act-i"><div class="dot" style="background:#f59e0b;"></div><div><div style="font-size:13px;"><strong>Google — SDE III</strong> moved to <span class="bg" style="background:#fef3c7;color:#92400e;">Interviewing</span></div><div class="at">2 hours ago</div></div></div>
+          <div class="act-i"><div class="dot" style="background:#3b82f6;"></div><div><div style="font-size:13px;"><strong>Cloudflare — Systems Eng</strong> created</div><div class="at">5 hours ago</div></div></div>
+          <div class="act-i"><div class="dot" style="background:#ef4444;"></div><div><div style="font-size:13px;"><strong>Coinbase — Backend Lead</strong> → <span class="bg" style="background:#fee2e2;color:#ef4444;">Rejected</span></div><div class="at">Yesterday</div></div></div>
+          <div class="act-i"><div class="dot" style="background:#22c55e;"></div><div><div style="font-size:13px;"><strong>Figma — Sr Frontend</strong> → <span class="bg" style="background:#dcfce7;color:#15803d;">Offer</span></div><div class="at">Yesterday</div></div></div>
+          <div class="act-i"><div class="dot" style="background:#8b5cf6;"></div><div><div style="font-size:13px;"><strong>Airbnb — Staff Eng</strong> → <span class="bg" style="background:#ede9fe;color:#8b5cf6;">Screening</span></div><div class="at">2 days ago</div></div></div>
+        </div>
+      </div>
+      <div class="rp" style="width:280px;">
+        <div class="rp-lbl">Today</div>
+        <div class="sec"><div class="li"><div style="width:3px;height:26px;border-radius:2px;background:#f59e0b;flex-shrink:0;"></div><div class="tx"><div class="t1">Google — Technical</div><div class="t2">2:00 PM · 60 min</div></div></div></div>
+        <div class="rp-lbl">Needs Attention</div>
+        <div class="sec">
+          <div class="li"><div class="av" style="background:#3b82f6;">S</div><div class="tx"><div class="t1">Stripe</div><div class="t2">12d stale</div></div><div class="bg" style="background:#fee2e2;color:#ef4444;">12d</div></div>
+          <div class="li"><div class="av" style="background:#8b5cf6;">A</div><div class="tx"><div class="t1">Airbnb</div><div class="t2">9d stale</div></div><div class="bg" style="background:#fef3c7;color:#92400e;">9d</div></div>
+          <div class="li"><div class="av" style="background:#3b82f6;">M</div><div class="tx"><div class="t1">Meta</div><div class="t2">8d stale</div></div><div class="bg" style="background:#fef3c7;color:#92400e;">8d</div></div>
+        </div>
+        <div class="rp-lbl">Deadlines</div>
+        <div class="sec">
+          <div class="li"><div style="width:3px;height:26px;border-radius:2px;background:#22c55e;flex-shrink:0;"></div><div class="tx"><div class="t1">Figma offer</div><div class="t2">Expires Apr 21</div></div></div>
+          <div class="li"><div style="width:3px;height:26px;border-radius:2px;background:#ef4444;flex-shrink:0;"></div><div class="tx"><div class="t1">Stripe follow-up</div><div class="t2">Overdue</div></div></div>
+        </div>
+      </div>
+      <div class="frame-label">E1 — Auto-Collapse Sidebar + Right Panel</div>
+    </div>
+
+    <!-- E2: TOP ALERTS + FULL FEED -->
+    <div id="opt-e2">
+      <div class="sbf">
+        <div class="s-logo"><span class="s-dot"></span>JobDash</div>
+        <div class="s-search"><span style="opacity:0.5">&#128269;</span>Search...<span class="k">&#8984;K</span></div>
+        <div class="pin-lbl">Pinned</div>
+        <div class="pin-i"><div class="pd" style="background:#f59e0b"></div>Google — SDE III</div>
+        <div class="pin-i"><div class="pd" style="background:#22c55e"></div>Figma — Sr Frontend</div>
+        <div style="height:6px;"></div>
+        <div class="s-ni act"><div class="ic"></div>Dashboard</div>
+        <div class="s-ni"><div class="ic"></div>Kanban<span class="ct">24</span></div>
+        <div class="s-ni"><div class="ic"></div>Table</div>
+        <div class="s-ni"><div class="ic"></div>Calendar<span class="ct">3</span></div>
+        <div class="s-ni"><div class="ic"></div>Analytics</div>
+        <div class="s-ni"><div class="ic"></div>Contacts</div>
+        <div class="s-foot">
+          <div style="font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:0.5px;padding:0 4px;margin-bottom:3px;">Pipeline</div>
+          <div class="s-pipe"><div style="width:8%;background:#6b7280;"></div><div style="width:21%;background:#3b82f6;"></div><div style="width:8%;background:#8b5cf6;"></div><div style="width:13%;background:#f59e0b;"></div><div style="width:4%;background:#22c55e;"></div><div style="width:13%;background:#ef4444;opacity:0.4;"></div></div>
+          <div class="s-ni"><div class="ic"></div>Settings</div>
+        </div>
+      </div>
+      <div class="hd" style="left:248px;"><div class="tt">Dashboard <span class="date">Apr 16, 2026</span></div><div class="acts"><button class="ab">+ Add Application</button><div class="ib"></div><div class="ib"></div><div class="av"></div></div></div>
+      <div class="bd" style="left:248px;right:0;padding:16px 20px;">
+        <!-- Alert strip at top -->
+        <div class="alert-strip">
+          <div class="alert-card" style="background:#fef3c7;color:#92400e;">&#128197; Google Technical — Today 2:00 PM</div>
+          <div class="alert-card" style="background:#fee2e2;color:#ef4444;">&#9888; 3 apps need follow-up</div>
+          <div class="alert-card" style="background:#dcfce7;color:#15803d;">&#127881; Figma offer — 5 days left</div>
+          <div class="alert-card" style="background:#dbeafe;color:#3b82f6;">&#128197; Netflix Sys Design — Thu</div>
+        </div>
+        <!-- Stats -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div class="sc"><div class="sl">Active</div><div class="sv">24</div><div class="st st-up">+3</div></div>
+          <div class="sc"><div class="sl">Interviews</div><div class="sv">3</div><div class="st st-up">+1</div></div>
+          <div class="sc"><div class="sl">Response</div><div class="sv">42%</div><div class="st st-up">+5%</div></div>
+          <div class="sc"><div class="sl">Avg Days</div><div class="sv">18</div><div class="st st-up">-2d</div></div>
+        </div>
+        <!-- Two col: stale + interviews -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div class="sec">
+            <div class="sec-h">Stale Applications <a>View all</a></div>
+            <div class="li"><div class="av" style="background:#3b82f6;">S</div><div class="tx"><div class="t1">Stripe — Sr Frontend</div><div class="t2">Applied · 12d ago</div></div><div class="bg" style="background:#fee2e2;color:#ef4444;">12d</div></div>
+            <div class="li"><div class="av" style="background:#8b5cf6;">A</div><div class="tx"><div class="t1">Airbnb — Staff Eng</div><div class="t2">Screening · 9d ago</div></div><div class="bg" style="background:#fef3c7;color:#92400e;">9d</div></div>
+          </div>
+          <div class="sec">
+            <div class="sec-h">This Week <a>View all</a></div>
+            <div class="li"><div style="width:3px;height:26px;border-radius:2px;background:#f59e0b;flex-shrink:0;"></div><div class="tx"><div class="t1">Google — Technical</div><div class="t2">Today 2:00 PM</div></div></div>
+            <div class="li"><div style="width:3px;height:26px;border-radius:2px;background:#f59e0b;flex-shrink:0;"></div><div class="tx"><div class="t1">Netflix — Sys Design</div><div class="t2">Thu 10:30 AM</div></div></div>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="sec-h">Recent Activity <a>View all</a></div>
+          <div class="act-i"><div class="dot" style="background:#f59e0b;"></div><div><div style="font-size:13px;"><strong>Google</strong> → <span class="bg" style="background:#fef3c7;color:#92400e;">Interviewing</span></div><div class="at">2h ago</div></div></div>
+          <div class="act-i"><div class="dot" style="background:#3b82f6;"></div><div><div style="font-size:13px;"><strong>Cloudflare</strong> created</div><div class="at">5h ago</div></div></div>
+          <div class="act-i"><div class="dot" style="background:#ef4444;"></div><div><div style="font-size:13px;"><strong>Coinbase</strong> → <span class="bg" style="background:#fee2e2;color:#ef4444;">Rejected</span></div><div class="at">Yesterday</div></div></div>
+        </div>
+      </div>
+      <div class="frame-label">E2 — Top Alerts + Full-Width Feed</div>
+    </div>
+
+    <!-- E3: MIXED STREAM -->
+    <div id="opt-e3">
+      <div class="sbf">
+        <div class="s-logo"><span class="s-dot"></span>JobDash</div>
+        <div class="s-search"><span style="opacity:0.5">&#128269;</span>Search...<span class="k">&#8984;K</span></div>
+        <div class="pin-lbl">Pinned</div>
+        <div class="pin-i"><div class="pd" style="background:#f59e0b"></div>Google — SDE III</div>
+        <div class="pin-i"><div class="pd" style="background:#22c55e"></div>Figma — Sr Frontend</div>
+        <div style="height:6px;"></div>
+        <div class="s-ni act"><div class="ic"></div>Dashboard</div>
+        <div class="s-ni"><div class="ic"></div>Kanban<span class="ct">24</span></div>
+        <div class="s-ni"><div class="ic"></div>Table</div>
+        <div class="s-ni"><div class="ic"></div>Calendar<span class="ct">3</span></div>
+        <div class="s-ni"><div class="ic"></div>Analytics</div>
+        <div class="s-ni"><div class="ic"></div>Contacts</div>
+        <div class="s-foot">
+          <div style="font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:0.5px;padding:0 4px;margin-bottom:3px;">Pipeline</div>
+          <div class="s-pipe"><div style="width:8%;background:#6b7280;"></div><div style="width:21%;background:#3b82f6;"></div><div style="width:8%;background:#8b5cf6;"></div><div style="width:13%;background:#f59e0b;"></div><div style="width:4%;background:#22c55e;"></div><div style="width:13%;background:#ef4444;opacity:0.4;"></div></div>
+          <div class="s-ni"><div class="ic"></div>Settings</div>
+        </div>
+      </div>
+      <div class="hd" style="left:248px;"><div class="tt">Dashboard <span class="date">Apr 16, 2026</span></div><div class="acts"><button class="ab">+ Add Application</button><div class="ib"></div><div class="ib"></div><div class="av"></div></div></div>
+      <div class="bd" style="left:248px;right:0;padding:16px 20px;max-width:calc(100% - 248px);">
+        <div style="max-width:720px;">
+          <!-- Stats inline -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
+            <div class="sc"><div class="sl">Active</div><div class="sv">24</div></div>
+            <div class="sc"><div class="sl">Interviews</div><div class="sv">3</div></div>
+            <div class="sc"><div class="sl">Response</div><div class="sv">42%</div></div>
+            <div class="sc"><div class="sl">Avg Days</div><div class="sv">18</div></div>
+          </div>
+          <!-- Mixed feed: alerts interspersed with activity -->
+          <div class="feed-alert" style="border-left:3px solid #f59e0b;">
+            <div class="fa-icon" style="background:#fef3c7;">&#128197;</div>
+            <div class="fa-text"><h4>Google — Technical Interview</h4><p>Today at 2:00 PM · 60 min · Google Meet</p></div>
+            <div class="fa-action">Prep notes</div>
+          </div>
+          <div class="feed-alert" style="border-left:3px solid #ef4444;">
+            <div class="fa-icon" style="background:#fee2e2;">&#9888;</div>
+            <div class="fa-text"><h4>3 applications need follow-up</h4><p>Stripe (12d), Airbnb (9d), Meta (8d) — no response</p></div>
+            <div class="fa-action">View stale</div>
+          </div>
+          <div class="feed-alert" style="border-left:3px solid #22c55e;">
+            <div class="fa-icon" style="background:#dcfce7;">&#127881;</div>
+            <div class="fa-text"><h4>Figma — Offer expires in 5 days</h4><p>$185K base + RSUs · Expires Apr 21</p></div>
+            <div class="fa-action">View offer</div>
+          </div>
+          <div style="font-size:11px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:0.5px;margin:20px 0 10px;">Recent Activity</div>
+          <div class="sec">
+            <div class="act-i"><div class="dot" style="background:#f59e0b;"></div><div><div style="font-size:13px;"><strong>Google — SDE III</strong> moved to <span class="bg" style="background:#fef3c7;color:#92400e;">Interviewing</span></div><div class="at">2 hours ago</div></div></div>
+            <div class="act-i"><div class="dot" style="background:#3b82f6;"></div><div><div style="font-size:13px;"><strong>Cloudflare — Systems Eng</strong> created</div><div class="at">5 hours ago</div></div></div>
+            <div class="act-i"><div class="dot" style="background:#ef4444;"></div><div><div style="font-size:13px;"><strong>Coinbase — Backend Lead</strong> → <span class="bg" style="background:#fee2e2;color:#ef4444;">Rejected</span></div><div class="at">Yesterday</div></div></div>
+            <div class="act-i"><div class="dot" style="background:#22c55e;"></div><div><div style="font-size:13px;"><strong>Figma — Sr Frontend</strong> → <span class="bg" style="background:#dcfce7;color:#15803d;">Offer</span></div><div class="at">Yesterday</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="frame-label">E3 — Mixed Stream (single column)</div>
+    </div>
+
+    <!-- E4: STACKED ZONES -->
+    <div id="opt-e4">
+      <div class="sbf">
+        <div class="s-logo"><span class="s-dot"></span>JobDash</div>
+        <div class="s-search"><span style="opacity:0.5">&#128269;</span>Search...<span class="k">&#8984;K</span></div>
+        <div class="pin-lbl">Pinned</div>
+        <div class="pin-i"><div class="pd" style="background:#f59e0b"></div>Google — SDE III</div>
+        <div class="pin-i"><div class="pd" style="background:#22c55e"></div>Figma — Sr Frontend</div>
+        <div style="height:6px;"></div>
+        <div class="s-ni act"><div class="ic"></div>Dashboard</div>
+        <div class="s-ni"><div class="ic"></div>Kanban<span class="ct">24</span></div>
+        <div class="s-ni"><div class="ic"></div>Table</div>
+        <div class="s-ni"><div class="ic"></div>Calendar<span class="ct">3</span></div>
+        <div class="s-ni"><div class="ic"></div>Analytics</div>
+        <div class="s-ni"><div class="ic"></div>Contacts</div>
+        <div class="s-foot">
+          <div style="font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:0.5px;padding:0 4px;margin-bottom:3px;">Pipeline</div>
+          <div class="s-pipe"><div style="width:8%;background:#6b7280;"></div><div style="width:21%;background:#3b82f6;"></div><div style="width:8%;background:#8b5cf6;"></div><div style="width:13%;background:#f59e0b;"></div><div style="width:4%;background:#22c55e;"></div><div style="width:13%;background:#ef4444;opacity:0.4;"></div></div>
+          <div class="s-ni"><div class="ic"></div>Settings</div>
+        </div>
+      </div>
+      <div class="hd" style="left:248px;"><div class="tt">Dashboard <span class="date">Apr 16, 2026</span></div><div class="acts"><button class="ab">+ Add Application</button><div class="ib"></div><div class="ib"></div><div class="av"></div></div></div>
+      <div class="bd" style="left:248px;right:0;padding:16px 20px;">
+        <!-- Zone 1: Urgency strip (horizontal scroll) -->
+        <div class="alert-strip">
+          <div class="alert-card" style="background:#fef3c7;color:#92400e;">&#128197; Google Technical — Today 2:00 PM</div>
+          <div class="alert-card" style="background:#fee2e2;color:#ef4444;">&#9888; 3 stale apps</div>
+          <div class="alert-card" style="background:#dcfce7;color:#15803d;">&#127881; Figma offer — 5d left</div>
+          <div class="alert-card" style="background:#dbeafe;color:#3b82f6;">&#128197; Netflix — Thu</div>
+          <div class="alert-card" style="background:#dbeafe;color:#3b82f6;">&#128197; Vercel — Fri</div>
+        </div>
+        <!-- Zone 2: Stats + schedule side by side -->
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:14px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div class="sc"><div class="sl">Active Applications</div><div class="sv">24</div><div class="st st-up">+3 this week</div></div>
+            <div class="sc"><div class="sl">Interviews This Week</div><div class="sv">3</div><div class="st st-up">+1 from last week</div></div>
+            <div class="sc"><div class="sl">Response Rate</div><div class="sv">42%</div><div class="st st-up">+5% from last month</div></div>
+            <div class="sc"><div class="sl">Avg. Days in Pipeline</div><div class="sv">18</div><div class="st st-up">-2d improvement</div></div>
+          </div>
+          <div class="sec" style="margin-bottom:0;">
+            <div class="sec-h" style="padding:10px 14px;font-size:11px;">Schedule</div>
+            <div class="li" style="padding:8px 14px;"><div style="width:3px;height:22px;border-radius:2px;background:#f59e0b;flex-shrink:0;"></div><div class="tx"><div class="t1" style="font-size:11px;">Google Technical</div><div class="t2" style="font-size:10px;">Today 2:00 PM</div></div></div>
+            <div class="li" style="padding:8px 14px;"><div style="width:3px;height:22px;border-radius:2px;background:#f59e0b;flex-shrink:0;"></div><div class="tx"><div class="t1" style="font-size:11px;">Netflix Sys Design</div><div class="t2" style="font-size:10px;">Thu 10:30 AM</div></div></div>
+            <div class="li" style="padding:8px 14px;"><div style="width:3px;height:22px;border-radius:2px;background:#f59e0b;flex-shrink:0;"></div><div class="tx"><div class="t1" style="font-size:11px;">Vercel HM</div><div class="t2" style="font-size:10px;">Fri 4:00 PM</div></div></div>
+          </div>
+        </div>
+        <!-- Zone 3: Two-col stale + activity -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="sec">
+            <div class="sec-h">Needs Attention <a>View all</a></div>
+            <div class="li"><div class="av" style="background:#3b82f6;">S</div><div class="tx"><div class="t1">Stripe — Sr Frontend</div><div class="t2">Applied · 12d no response</div></div><div class="bg" style="background:#fee2e2;color:#ef4444;">12d</div></div>
+            <div class="li"><div class="av" style="background:#8b5cf6;">A</div><div class="tx"><div class="t1">Airbnb — Staff Eng</div><div class="t2">Screening · 9d</div></div><div class="bg" style="background:#fef3c7;color:#92400e;">9d</div></div>
+            <div class="li"><div class="av" style="background:#3b82f6;">M</div><div class="tx"><div class="t1">Meta — Product Eng</div><div class="t2">Applied · 8d</div></div><div class="bg" style="background:#fef3c7;color:#92400e;">8d</div></div>
+          </div>
+          <div class="sec">
+            <div class="sec-h">Recent Activity <a>View all</a></div>
+            <div class="act-i"><div class="dot" style="background:#f59e0b;"></div><div><div style="font-size:12px;"><strong>Google</strong> → Interviewing</div><div class="at">2h ago</div></div></div>
+            <div class="act-i"><div class="dot" style="background:#3b82f6;"></div><div><div style="font-size:12px;"><strong>Cloudflare</strong> created</div><div class="at">5h ago</div></div></div>
+            <div class="act-i"><div class="dot" style="background:#ef4444;"></div><div><div style="font-size:12px;"><strong>Coinbase</strong> → Rejected</div><div class="at">Yesterday</div></div></div>
+            <div class="act-i"><div class="dot" style="background:#22c55e;"></div><div><div style="font-size:12px;"><strong>Figma</strong> → Offer</div><div class="at">Yesterday</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="frame-label">E4 — Stacked Zones (no right panel)</div>
+    </div>
+  </div>
+</div>
+
+<div class="desc-area">
+  <div class="desc-grid">
+    <div class="dc active" id="desc-e1">
+      <h3>E1 — Auto-Collapse</h3>
+      <p>Sidebar shrinks to 64px icons on Dashboard. Gives room for right panel without squeeze. Sidebar expands on other pages (Kanban, Table, etc.).</p>
+      <div class="good">Solves: Sidebar squeeze. Keeps D3's right panel.</div>
+      <div class="tags"><span class="tag">smart collapse</span><span class="tag">feed + panel</span><span class="tag">context-aware</span></div>
+    </div>
+    <div class="dc" id="desc-e2">
+      <h3>E2 — Top Alerts</h3>
+      <p>Scrollable alert chips at top surface urgency. Full sidebar stays. No right panel — everything flows vertically below alerts.</p>
+      <div class="good">Solves: No double-sidebar. Urgency visible without a panel.</div>
+      <div class="tags"><span class="tag">horizontal alerts</span><span class="tag">full width</span><span class="tag">simple</span></div>
+    </div>
+    <div class="dc" id="desc-e3">
+      <h3>E3 — Mixed Stream</h3>
+      <p>Single column feed. Alerts are rich cards woven into the stream with action buttons. No panels, no columns — just a prioritized list.</p>
+      <div class="good">Solves: Maximum simplicity. Alerts have inline actions.</div>
+      <div class="tags"><span class="tag">inbox-like</span><span class="tag">single column</span><span class="tag">action buttons</span></div>
+    </div>
+    <div class="dc" id="desc-e4">
+      <h3>E4 — Stacked Zones</h3>
+      <p>Three horizontal zones: alert strip → stats + schedule → stale + activity. Everything flows top-to-bottom. No right panel. Full sidebar.</p>
+      <div class="good">Solves: Dense info without panels. Each zone has a clear purpose.</div>
+      <div class="tags"><span class="tag">information-dense</span><span class="tag">zoned layout</span><span class="tag">no panels</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function pick(id,btn){
+  document.querySelectorAll('.pick-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#frame>div').forEach(d=>d.classList.remove('active'));
+  document.getElementById('opt-'+id).classList.add('active');
+  document.querySelectorAll('.dc').forEach(d=>d.classList.remove('active'));
+  document.getElementById('desc-'+id).classList.add('active');
+}
+</script>
+</body>
+</html>

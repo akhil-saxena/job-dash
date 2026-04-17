@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — Dashboard Personality</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;}
+  .picker{position:fixed;top:0;left:0;right:0;z-index:100;background:#111;border-bottom:1px solid #222;padding:12px 32px;display:flex;align-items:center;gap:12px;}
+  .picker h2{font-size:14px;font-weight:600;color:#666;white-space:nowrap;}
+  .pick-btn{padding:7px 16px;border-radius:6px;font-size:12px;font-weight:600;border:1px solid #2a2a2a;background:transparent;color:#666;cursor:pointer;transition:all 0.15s;}
+  .pick-btn:hover{color:#aaa;border-color:#444;}
+  .pick-btn.active{background:#fff;color:#000;border-color:#fff;}
+  .preview{margin-top:56px;padding:24px;display:flex;justify-content:center;}
+  .frame{width:1280px;height:800px;border-radius:16px;overflow:hidden;border:1px solid #222;position:relative;box-shadow:0 24px 80px rgba(0,0,0,0.6);}
+  .frame>div{display:none;position:absolute;inset:0;}
+  .frame>div.active{display:block;}
+  .frame-label{position:absolute;bottom:12px;right:16px;font-size:10px;font-weight:600;letter-spacing:0.3px;z-index:5;}
+
+  /* Desc */
+  .desc-area{max-width:1280px;margin:0 auto;padding:16px 24px 80px;}
+  .desc-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+  .dc{background:#111;border:1px solid #222;border-radius:10px;padding:18px;transition:border-color 0.15s;}
+  .dc.active{border-color:#fff;}
+  .dc h3{font-size:13px;font-weight:600;margin-bottom:4px;}
+  .dc p{font-size:11px;color:#666;line-height:1.5;}
+  .dc .vibe{margin-top:8px;font-size:10px;color:#444;font-style:italic;}
+
+  /* ============ F1: TODAY BRIEFING ============ */
+  .f1{background:#fafaf9;}
+  .f1 .sb{position:absolute;left:0;top:0;bottom:0;width:64px;background:#fff;border-right:1px solid #eee;display:flex;flex-direction:column;align-items:center;padding:20px 0;gap:4px;}
+  .f1 .sb .logo{width:32px;height:32px;background:#1a1a1a;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+  .f1 .sb .logo span{width:6px;height:6px;background:#fff;border-radius:50%;}
+  .f1 .sb .ni{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:default;}
+  .f1 .sb .ni.act{background:#f5f5f4;}
+  .f1 .sb .ni .d{width:14px;height:14px;background:#d4d4d4;border-radius:4px;}
+  .f1 .sb .ni.act .d{background:#888;}
+  .f1 .main-area{position:absolute;left:64px;top:0;right:0;bottom:0;overflow-y:auto;display:flex;justify-content:center;}
+  .f1 .brief{max-width:640px;width:100%;padding:48px 32px;}
+  .f1 .date-line{font-size:13px;color:#a8a29e;font-weight:500;margin-bottom:4px;letter-spacing:0.3px;}
+  .f1 .greeting{font-size:32px;font-weight:700;color:#1c1917;margin-bottom:32px;line-height:1.2;}
+  .f1 .greeting span{color:#a8a29e;font-weight:400;}
+  .f1 .section-label{font-size:11px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .f1 .section-label::after{content:'';flex:1;height:1px;background:#e7e5e4;}
+  .f1 .brief-card{background:#fff;border-radius:12px;padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:box-shadow 0.15s;border:1px solid transparent;}
+  .f1 .brief-card:hover{box-shadow:0 2px 8px rgba(0,0,0,0.06);border-color:#e7e5e4;}
+  .f1 .brief-card .indicator{width:4px;height:36px;border-radius:2px;flex-shrink:0;}
+  .f1 .brief-card .info{flex:1;}
+  .f1 .brief-card .info h3{font-size:14px;font-weight:600;color:#292524;}
+  .f1 .brief-card .info p{font-size:12px;color:#78716c;margin-top:2px;}
+  .f1 .brief-card .meta{font-size:12px;font-weight:600;white-space:nowrap;}
+  .f1 .num-row{display:flex;gap:32px;margin:8px 0 32px;padding:16px 0;border-bottom:1px solid #e7e5e4;}
+  .f1 .num-row .num{text-align:left;}
+  .f1 .num-row .num .v{font-size:28px;font-weight:700;color:#292524;font-variant-numeric:tabular-nums;}
+  .f1 .num-row .num .l{font-size:11px;color:#a8a29e;margin-top:2px;}
+
+  /* ============ F2: BENTO ============ */
+  .f2{background:#f8f8f7;}
+  .f2 .sb{position:absolute;left:0;top:0;bottom:0;width:240px;background:#fff;border-right:1px solid #e8e8e6;padding:20px 14px;display:flex;flex-direction:column;font-size:13px;}
+  .f2 .sb .logo{font-size:18px;font-weight:700;color:#1a1a1a;padding:0 8px 20px;display:flex;align-items:center;gap:7px;}
+  .f2 .sb .logo .d{width:8px;height:8px;background:#000;border-radius:3px;}
+  .f2 .sb .ni{display:flex;align-items:center;gap:10px;height:36px;padding:0 10px;border-radius:8px;color:#999;font-size:13px;}
+  .f2 .sb .ni.act{color:#1a1a1a;font-weight:600;background:#f3f3f2;}
+  .f2 .sb .ni .ic{width:14px;height:14px;background:#ddd;border-radius:3px;flex-shrink:0;}
+  .f2 .sb .ni.act .ic{background:#888;}
+  .f2 .hd{position:absolute;left:240px;top:0;right:0;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:#fff;border-bottom:1px solid #e8e8e6;}
+  .f2 .hd h1{font-size:16px;font-weight:600;color:#1a1a1a;}
+  .f2 .hd .ab{height:30px;padding:0 14px;background:#1a1a1a;color:#fff;border-radius:8px;font-size:12px;font-weight:600;border:none;}
+  .f2 .hd .ib{width:28px;height:28px;border:1px solid #e8e8e6;border-radius:7px;background:#fff;}
+  .f2 .hd .av{width:26px;height:26px;border-radius:50%;background:#e8e8e6;}
+  .f2 .grid{position:absolute;left:240px;top:52px;right:0;bottom:0;padding:16px;overflow-y:auto;}
+  .f2 .bento{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:auto auto auto;gap:12px;}
+  .f2 .b-card{background:#fff;border-radius:14px;padding:20px;border:1px solid #eee;transition:border-color 0.15s;}
+  .f2 .b-card:hover{border-color:#ddd;}
+  .f2 .b-card.big{grid-column:span 2;grid-row:span 2;}
+  .f2 .b-card.wide{grid-column:span 2;}
+  .f2 .b-card .label{font-size:11px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;}
+  .f2 .b-card .big-num{font-size:42px;font-weight:700;color:#1a1a1a;line-height:1;margin-bottom:4px;font-variant-numeric:tabular-nums;}
+  .f2 .b-card .sub{font-size:12px;color:#999;}
+  .f2 .b-li{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f4;font-size:12px;}
+  .f2 .b-li:last-child{border-bottom:none;}
+  .f2 .b-li .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .f2 .b-li .name{font-weight:600;color:#1a1a1a;flex:1;}
+  .f2 .b-li .det{color:#999;font-size:11px;}
+
+  /* ============ F3: MONO TERMINAL ============ */
+  .f3{background:#fafaf9;}
+  .f3 .sb{position:absolute;left:0;top:0;bottom:0;width:200px;background:#1c1917;padding:16px 10px;display:flex;flex-direction:column;}
+  .f3 .sb .logo{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;color:#fafaf9;padding:0 10px 16px;display:flex;align-items:center;gap:6px;}
+  .f3 .sb .logo .d{width:6px;height:6px;background:#22c55e;border-radius:50%;}
+  .f3 .sb .ni{display:flex;align-items:center;gap:8px;height:32px;padding:0 10px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#78716c;}
+  .f3 .sb .ni.act{color:#fafaf9;background:rgba(255,255,255,0.06);}
+  .f3 .sb .ni .k{margin-left:auto;font-size:10px;color:#44403c;background:rgba(255,255,255,0.05);padding:1px 5px;border-radius:3px;}
+  .f3 .bd{position:absolute;left:200px;top:0;right:0;bottom:0;overflow-y:auto;padding:24px 32px;}
+  .f3 .top-bar{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;}
+  .f3 .top-bar h1{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:#a8a29e;}
+  .f3 .top-bar h1 span{color:#292524;}
+  .f3 .top-bar .ab{font-family:'JetBrains Mono',monospace;height:28px;padding:0 12px;background:#292524;color:#fafaf9;border-radius:6px;font-size:11px;font-weight:500;border:none;cursor:pointer;}
+  .f3 .metrics{display:flex;gap:40px;padding:20px 0;border-top:1px solid #e7e5e4;border-bottom:1px solid #e7e5e4;margin-bottom:24px;}
+  .f3 .metrics .m .v{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:#292524;line-height:1;}
+  .f3 .metrics .m .l{font-family:'JetBrains Mono',monospace;font-size:10px;color:#a8a29e;margin-top:4px;text-transform:uppercase;letter-spacing:1px;}
+  .f3 .sec-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:#a8a29e;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+  .f3 .row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0efed;}
+  .f3 .row:last-child{border-bottom:none;}
+  .f3 .row .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .f3 .row .name{font-size:13px;font-weight:600;color:#292524;flex:1;}
+  .f3 .row .tag{font-family:'JetBrains Mono',monospace;font-size:10px;color:#78716c;padding:2px 6px;border:1px solid #e7e5e4;border-radius:4px;}
+  .f3 .row .time{font-family:'JetBrains Mono',monospace;font-size:11px;color:#a8a29e;}
+  .f3 .two{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:24px;}
+
+  /* ============ F4: SOFT EDITORIAL ============ */
+  .f4{background:#fff;}
+  .f4 .sb{position:absolute;left:0;top:0;bottom:0;width:220px;background:#fafaf9;border-right:1px solid #f0eeec;padding:24px 16px;display:flex;flex-direction:column;}
+  .f4 .sb .logo{font-size:18px;font-weight:700;color:#44403c;padding:0 6px 24px;letter-spacing:-0.3px;}
+  .f4 .sb .ni{display:flex;align-items:center;gap:10px;height:36px;padding:0 10px;border-radius:10px;color:#a8a29e;font-size:13px;font-weight:500;}
+  .f4 .sb .ni.act{color:#44403c;font-weight:600;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+  .f4 .sb .ni .ic{width:14px;height:14px;background:#d6d3d1;border-radius:50%;flex-shrink:0;}
+  .f4 .sb .ni.act .ic{background:#a8a29e;}
+  .f4 .bd{position:absolute;left:220px;top:0;right:0;bottom:0;overflow-y:auto;padding:40px 48px;}
+  .f4 .masthead{margin-bottom:36px;}
+  .f4 .masthead .date{font-size:12px;font-weight:500;color:#a8a29e;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+  .f4 .masthead h1{font-size:26px;font-weight:700;color:#292524;line-height:1.3;}
+  .f4 .masthead h1 em{font-style:normal;color:#78716c;font-weight:400;}
+  .f4 .divider{height:1px;background:#e7e5e4;margin:0 0 28px;}
+  .f4 .cols{display:grid;grid-template-columns:3fr 2fr;gap:40px;}
+  .f4 .col-label{font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid #292524;display:inline-block;}
+  .f4 .ed-card{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #f0eeec;}
+  .f4 .ed-card:last-child{border-bottom:none;}
+  .f4 .ed-card h3{font-size:15px;font-weight:600;color:#292524;margin-bottom:3px;}
+  .f4 .ed-card p{font-size:13px;color:#78716c;line-height:1.5;}
+  .f4 .ed-card .tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;margin-top:6px;}
+  .f4 .side-stat{margin-bottom:24px;}
+  .f4 .side-stat .v{font-size:36px;font-weight:700;color:#292524;line-height:1;font-variant-numeric:tabular-nums;}
+  .f4 .side-stat .l{font-size:12px;color:#a8a29e;margin-top:4px;}
+  .f4 .side-item{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:13px;}
+  .f4 .side-item .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .f4 .side-item .name{font-weight:600;color:#292524;flex:1;}
+  .f4 .side-item .det{font-size:11px;color:#a8a29e;}
+
+  /* ============ F5: GLASS MINIMAL ============ */
+  .f5{background:linear-gradient(135deg,#f5f3f0 0%,#ece9e4 100%);}
+  .f5 .sb{position:absolute;left:0;top:0;bottom:0;width:72px;display:flex;flex-direction:column;align-items:center;padding:20px 0;gap:6px;}
+  .f5 .sb .logo{width:36px;height:36px;background:rgba(0,0,0,0.06);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;backdrop-filter:blur(8px);}
+  .f5 .sb .logo span{width:8px;height:8px;background:#292524;border-radius:3px;}
+  .f5 .sb .ni{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:default;transition:background 0.15s;}
+  .f5 .sb .ni:hover{background:rgba(0,0,0,0.04);}
+  .f5 .sb .ni.act{background:rgba(255,255,255,0.7);box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+  .f5 .sb .ni .d{width:16px;height:16px;background:rgba(0,0,0,0.12);border-radius:5px;}
+  .f5 .sb .ni.act .d{background:rgba(0,0,0,0.35);}
+  .f5 .bd{position:absolute;left:72px;top:0;right:0;bottom:0;overflow-y:auto;padding:32px 40px;display:flex;justify-content:center;}
+  .f5 .inner{max-width:880px;width:100%;}
+  .f5 .top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;}
+  .f5 .top-row h1{font-size:22px;font-weight:700;color:#1c1917;}
+  .f5 .top-row .ab{height:34px;padding:0 16px;background:#292524;color:#fff;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;}
+  .f5 .glass-card{background:rgba(255,255,255,0.6);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.5);border-radius:16px;padding:24px;margin-bottom:16px;}
+  .f5 .glass-card.accent{background:rgba(255,255,255,0.8);}
+  .f5 .glass-nums{display:flex;gap:48px;margin-bottom:4px;}
+  .f5 .glass-nums .gn .v{font-size:32px;font-weight:700;color:#1c1917;font-variant-numeric:tabular-nums;}
+  .f5 .glass-nums .gn .l{font-size:11px;color:#a8a29e;margin-top:2px;}
+  .f5 .glass-li{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.04);}
+  .f5 .glass-li:last-child{border-bottom:none;}
+  .f5 .glass-li .bar{width:3px;height:28px;border-radius:2px;flex-shrink:0;}
+  .f5 .glass-li .info h4{font-size:14px;font-weight:600;color:#292524;}
+  .f5 .glass-li .info p{font-size:12px;color:#78716c;margin-top:1px;}
+  .f5 .glass-li .right{margin-left:auto;font-size:12px;font-weight:600;white-space:nowrap;}
+  .f5 .two-glass{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+</style>
+</head>
+<body>
+
+<div class="picker">
+  <h2>Dashboard —</h2>
+  <div style="display:flex;gap:6px;">
+    <button class="pick-btn active" onclick="pick('f1',this)">Today Briefing</button>
+    <button class="pick-btn" onclick="pick('f2',this)">Bento Grid</button>
+    <button class="pick-btn" onclick="pick('f3',this)">Developer</button>
+    <button class="pick-btn" onclick="pick('f4',this)">Editorial</button>
+    <button class="pick-btn" onclick="pick('f5',this)">Glass Minimal</button>
+  </div>
+</div>
+
+<div class="preview">
+<div class="frame" id="frame">
+
+<!-- F1: TODAY BRIEFING -->
+<div class="f1 active" id="opt-f1">
+  <div class="sb">
+    <div class="logo"><span></span></div>
+    <div class="ni act"><div class="d"></div></div>
+    <div class="ni"><div class="d"></div></div>
+    <div class="ni"><div class="d"></div></div>
+    <div class="ni"><div class="d"></div></div>
+    <div class="ni"><div class="d"></div></div>
+    <div class="ni"><div class="d"></div></div>
+    <div style="margin-top:auto;"><div class="ni"><div class="d"></div></div></div>
+  </div>
+  <div class="main-area">
+    <div class="brief">
+      <div class="date-line">Wednesday, April 16</div>
+      <div class="greeting">Good afternoon. <span>Here's where you stand.</span></div>
+
+      <div class="num-row">
+        <div class="num"><div class="v">24</div><div class="l">active</div></div>
+        <div class="num"><div class="v">3</div><div class="l">interviews</div></div>
+        <div class="num"><div class="v">42%</div><div class="l">response rate</div></div>
+        <div class="num"><div class="v">18d</div><div class="l">avg pipeline</div></div>
+      </div>
+
+      <div class="section-label">Coming up</div>
+      <div class="brief-card">
+        <div class="indicator" style="background:#f59e0b;"></div>
+        <div class="info"><h3>Google — Technical Interview</h3><p>Today at 2:00 PM · 60 min · Google Meet</p></div>
+        <div class="meta" style="color:#f59e0b;">2:00 PM</div>
+      </div>
+      <div class="brief-card">
+        <div class="indicator" style="background:#f59e0b;"></div>
+        <div class="info"><h3>Netflix — System Design</h3><p>Thursday at 10:30 AM · 90 min</p></div>
+        <div class="meta" style="color:#78716c;">Thu</div>
+      </div>
+      <div class="brief-card">
+        <div class="indicator" style="background:#f59e0b;"></div>
+        <div class="info"><h3>Vercel — Hiring Manager</h3><p>Friday at 4:00 PM · 45 min</p></div>
+        <div class="meta" style="color:#78716c;">Fri</div>
+      </div>
+
+      <div style="height:24px;"></div>
+      <div class="section-label">Needs attention</div>
+      <div class="brief-card">
+        <div class="indicator" style="background:#ef4444;"></div>
+        <div class="info"><h3>Stripe — Senior Frontend</h3><p>Applied 12 days ago · no response</p></div>
+        <div class="meta" style="color:#ef4444;">12d</div>
+      </div>
+      <div class="brief-card">
+        <div class="indicator" style="background:#f59e0b;"></div>
+        <div class="info"><h3>Airbnb — Staff Engineer</h3><p>Screening · 9 days since last update</p></div>
+        <div class="meta" style="color:#f59e0b;">9d</div>
+      </div>
+      <div class="brief-card">
+        <div class="indicator" style="background:#22c55e;"></div>
+        <div class="info"><h3>Figma — Offer expires Apr 21</h3><p>$185K + RSUs · 5 days to decide</p></div>
+        <div class="meta" style="color:#22c55e;">5d left</div>
+      </div>
+    </div>
+  </div>
+  <div class="frame-label" style="color:#a8a29e;">Today Briefing</div>
+</div>
+
+<!-- F2: BENTO -->
+<div class="f2" id="opt-f2">
+  <div class="sb">
+    <div class="logo"><span class="d"></span>JobDash</div>
+    <div class="ni act"><div class="ic"></div>Dashboard</div>
+    <div class="ni"><div class="ic"></div>Kanban</div>
+    <div class="ni"><div class="ic"></div>Table</div>
+    <div class="ni"><div class="ic"></div>Calendar</div>
+    <div class="ni"><div class="ic"></div>Analytics</div>
+  </div>
+  <div class="hd"><h1>Dashboard</h1><div style="display:flex;gap:8px;align-items:center;"><button class="ab">+ Add Application</button><div class="ib"></div><div class="av"></div></div></div>
+  <div class="grid">
+    <div class="bento">
+      <div class="b-card big">
+        <div class="label">Pipeline</div>
+        <div class="big-num">24</div>
+        <div class="sub">active applications</div>
+        <div style="margin-top:20px;">
+          <div class="b-li"><div class="dot" style="background:#3b82f6;"></div><div class="name">Applied</div><div class="det">5</div></div>
+          <div class="b-li"><div class="dot" style="background:#8b5cf6;"></div><div class="name">Screening</div><div class="det">2</div></div>
+          <div class="b-li"><div class="dot" style="background:#f59e0b;"></div><div class="name">Interviewing</div><div class="det">3</div></div>
+          <div class="b-li"><div class="dot" style="background:#22c55e;"></div><div class="name">Offer</div><div class="det">1</div></div>
+          <div class="b-li"><div class="dot" style="background:#6b7280;"></div><div class="name">Wishlist</div><div class="det">2</div></div>
+        </div>
+      </div>
+      <div class="b-card"><div class="label">Interviews</div><div class="big-num">3</div><div class="sub">this week</div></div>
+      <div class="b-card"><div class="label">Response</div><div class="big-num">42%</div><div class="sub">+5% from last month</div></div>
+      <div class="b-card wide">
+        <div class="label">Coming Up Today</div>
+        <div class="b-li"><div class="dot" style="background:#f59e0b;"></div><div class="name">Google — Technical</div><div class="det">2:00 PM · 60 min</div></div>
+      </div>
+      <div class="b-card wide">
+        <div class="label">Needs Follow-up</div>
+        <div class="b-li"><div class="dot" style="background:#ef4444;"></div><div class="name">Stripe</div><div class="det">12d stale</div></div>
+        <div class="b-li"><div class="dot" style="background:#f59e0b;"></div><div class="name">Airbnb</div><div class="det">9d stale</div></div>
+        <div class="b-li"><div class="dot" style="background:#f59e0b;"></div><div class="name">Meta</div><div class="det">8d stale</div></div>
+      </div>
+      <div class="b-card wide">
+        <div class="label">Latest</div>
+        <div class="b-li"><div class="dot" style="background:#f59e0b;"></div><div class="name">Google → Interviewing</div><div class="det">2h ago</div></div>
+        <div class="b-li"><div class="dot" style="background:#3b82f6;"></div><div class="name">Cloudflare — created</div><div class="det">5h ago</div></div>
+        <div class="b-li"><div class="dot" style="background:#ef4444;"></div><div class="name">Coinbase → Rejected</div><div class="det">yesterday</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="frame-label" style="color:#999;">Bento Grid</div>
+</div>
+
+<!-- F3: DEVELOPER / MONO -->
+<div class="f3" id="opt-f3">
+  <div class="sb">
+    <div class="logo"><span class="d"></span>jobdash</div>
+    <div class="ni act">dashboard <span class="k">1</span></div>
+    <div class="ni">kanban <span class="k">2</span></div>
+    <div class="ni">table <span class="k">3</span></div>
+    <div class="ni">calendar <span class="k">4</span></div>
+    <div class="ni">analytics <span class="k">5</span></div>
+    <div class="ni">contacts <span class="k">6</span></div>
+    <div style="margin-top:auto;border-top:1px solid #292524;padding-top:8px;"><div class="ni">settings <span class="k">,</span></div></div>
+  </div>
+  <div class="bd">
+    <div class="top-bar">
+      <h1><span>dashboard</span> · apr 16, 2026</h1>
+      <button class="ab">+ add</button>
+    </div>
+    <div class="metrics">
+      <div class="m"><div class="v">24</div><div class="l">active</div></div>
+      <div class="m"><div class="v">3</div><div class="l">interviews</div></div>
+      <div class="m"><div class="v">42%</div><div class="l">response</div></div>
+      <div class="m"><div class="v">18d</div><div class="l">avg days</div></div>
+    </div>
+    <div class="two">
+      <div>
+        <div class="sec-lbl">upcoming</div>
+        <div class="row"><div class="dot" style="background:#f59e0b;"></div><div class="name">Google — Technical</div><div class="tag">today</div><div class="time">14:00</div></div>
+        <div class="row"><div class="dot" style="background:#f59e0b;"></div><div class="name">Netflix — System Design</div><div class="tag">thu</div><div class="time">10:30</div></div>
+        <div class="row"><div class="dot" style="background:#f59e0b;"></div><div class="name">Vercel — HM Call</div><div class="tag">fri</div><div class="time">16:00</div></div>
+        <div style="height:24px;"></div>
+        <div class="sec-lbl">stale</div>
+        <div class="row"><div class="dot" style="background:#ef4444;"></div><div class="name">Stripe</div><div class="tag">applied</div><div class="time">12d</div></div>
+        <div class="row"><div class="dot" style="background:#f59e0b;"></div><div class="name">Airbnb</div><div class="tag">screen</div><div class="time">9d</div></div>
+        <div class="row"><div class="dot" style="background:#f59e0b;"></div><div class="name">Meta</div><div class="tag">applied</div><div class="time">8d</div></div>
+      </div>
+      <div>
+        <div class="sec-lbl">recent</div>
+        <div class="row"><div class="dot" style="background:#f59e0b;"></div><div class="name">Google → interviewing</div><div class="time">2h</div></div>
+        <div class="row"><div class="dot" style="background:#3b82f6;"></div><div class="name">Cloudflare — new</div><div class="time">5h</div></div>
+        <div class="row"><div class="dot" style="background:#ef4444;"></div><div class="name">Coinbase → rejected</div><div class="time">1d</div></div>
+        <div class="row"><div class="dot" style="background:#22c55e;"></div><div class="name">Figma → offer</div><div class="time">1d</div></div>
+        <div class="row"><div class="dot" style="background:#8b5cf6;"></div><div class="name">Airbnb → screening</div><div class="time">2d</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="frame-label" style="color:#44403c;">Developer</div>
+</div>
+
+<!-- F4: EDITORIAL -->
+<div class="f4" id="opt-f4">
+  <div class="sb">
+    <div class="logo">JobDash</div>
+    <div class="ni act"><div class="ic"></div>Dashboard</div>
+    <div class="ni"><div class="ic"></div>Kanban</div>
+    <div class="ni"><div class="ic"></div>Table</div>
+    <div class="ni"><div class="ic"></div>Calendar</div>
+    <div class="ni"><div class="ic"></div>Analytics</div>
+    <div class="ni"><div class="ic"></div>Contacts</div>
+    <div style="margin-top:auto;"><div class="ni"><div class="ic"></div>Settings</div></div>
+  </div>
+  <div class="bd">
+    <div class="masthead">
+      <div class="date">Wednesday, April 16, 2026</div>
+      <h1>3 interviews this week. <em>Figma offer expires in 5 days.</em></h1>
+    </div>
+    <div class="divider"></div>
+    <div class="cols">
+      <div>
+        <div class="col-label">What's happening</div>
+        <div class="ed-card">
+          <h3>Google — Technical Interview Today</h3>
+          <p>2:00 PM, 60 minutes via Google Meet. Focus: distributed systems, API design. Interviewer TBD. This is round 3 after passing phone screen and technical.</p>
+          <span class="tag" style="background:#fef3c7;color:#92400e;">Today at 2:00 PM</span>
+        </div>
+        <div class="ed-card">
+          <h3>Figma — Offer Decision Needed</h3>
+          <p>$185K base + RSUs. Expires April 21 — 5 days remaining. Review comp details and compare against other pipeline positions before deciding.</p>
+          <span class="tag" style="background:#dcfce7;color:#15803d;">5 days left</span>
+        </div>
+        <div class="ed-card">
+          <h3>3 Applications Need Follow-Up</h3>
+          <p>Stripe (12d), Airbnb (9d), and Meta (8d) haven't responded. Consider sending a polite check-in email to each.</p>
+          <span class="tag" style="background:#fee2e2;color:#ef4444;">Action needed</span>
+        </div>
+      </div>
+      <div>
+        <div class="col-label">Numbers</div>
+        <div class="side-stat"><div class="v">24</div><div class="l">active applications</div></div>
+        <div class="side-stat"><div class="v">42%</div><div class="l">response rate (+5%)</div></div>
+        <div class="side-stat"><div class="v">18d</div><div class="l">average pipeline</div></div>
+        <div style="height:16px;"></div>
+        <div class="col-label">This week</div>
+        <div class="side-item"><div class="dot" style="background:#f59e0b;"></div><div class="name">Google Technical</div><div class="det">Today</div></div>
+        <div class="side-item"><div class="dot" style="background:#f59e0b;"></div><div class="name">Netflix Sys Design</div><div class="det">Thu</div></div>
+        <div class="side-item"><div class="dot" style="background:#f59e0b;"></div><div class="name">Vercel HM</div><div class="det">Fri</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="frame-label" style="color:#a8a29e;">Editorial</div>
+</div>
+
+<!-- F5: GLASS MINIMAL -->
+<div class="f5" id="opt-f5">
+  <div class="sb">
+    <div class="logo"><span></span></div>
+    <div class="ni act"><div class="d"></div></div>
+    <div class="ni"><div class="d"></div></div>
+    <div class="ni"><div class="d"></div></div>
+    <div class="ni"><div class="d"></div></div>
+    <div class="ni"><div class="d"></div></div>
+    <div class="ni"><div class="d"></div></div>
+    <div style="margin-top:auto;"><div class="ni"><div class="d"></div></div></div>
+  </div>
+  <div class="bd">
+    <div class="inner">
+      <div class="top-row">
+        <h1>Dashboard</h1>
+        <button class="ab">+ Add Application</button>
+      </div>
+      <div class="glass-card accent">
+        <div class="glass-nums">
+          <div class="gn"><div class="v">24</div><div class="l">active</div></div>
+          <div class="gn"><div class="v">3</div><div class="l">interviews</div></div>
+          <div class="gn"><div class="v">42%</div><div class="l">response</div></div>
+          <div class="gn"><div class="v">18d</div><div class="l">avg days</div></div>
+        </div>
+      </div>
+      <div class="two-glass">
+        <div class="glass-card">
+          <div style="font-size:12px;font-weight:600;color:#a8a29e;margin-bottom:12px;">Coming Up</div>
+          <div class="glass-li"><div class="bar" style="background:#f59e0b;"></div><div class="info"><h4>Google — Technical</h4><p>Today 2:00 PM · 60 min</p></div><div class="right" style="color:#f59e0b;">Today</div></div>
+          <div class="glass-li"><div class="bar" style="background:#f59e0b;"></div><div class="info"><h4>Netflix — System Design</h4><p>Thu 10:30 AM · 90 min</p></div><div class="right" style="color:#78716c;">Thu</div></div>
+          <div class="glass-li"><div class="bar" style="background:#f59e0b;"></div><div class="info"><h4>Vercel — Hiring Manager</h4><p>Fri 4:00 PM · 45 min</p></div><div class="right" style="color:#78716c;">Fri</div></div>
+        </div>
+        <div class="glass-card">
+          <div style="font-size:12px;font-weight:600;color:#a8a29e;margin-bottom:12px;">Needs Attention</div>
+          <div class="glass-li"><div class="bar" style="background:#ef4444;"></div><div class="info"><h4>Stripe — Senior Frontend</h4><p>Applied · 12 days, no response</p></div><div class="right" style="color:#ef4444;">12d</div></div>
+          <div class="glass-li"><div class="bar" style="background:#f59e0b;"></div><div class="info"><h4>Airbnb — Staff Engineer</h4><p>Screening · 9 days stale</p></div><div class="right" style="color:#f59e0b;">9d</div></div>
+          <div class="glass-li"><div class="bar" style="background:#22c55e;"></div><div class="info"><h4>Figma — Offer expires</h4><p>$185K + RSUs · Apr 21</p></div><div class="right" style="color:#22c55e;">5d</div></div>
+        </div>
+      </div>
+      <div class="glass-card" style="margin-top:16px;">
+        <div style="font-size:12px;font-weight:600;color:#a8a29e;margin-bottom:12px;">Recent</div>
+        <div class="glass-li"><div class="bar" style="background:#f59e0b;"></div><div class="info"><h4>Google — SDE III</h4><p>Moved to Interviewing</p></div><div class="right" style="color:#a8a29e;">2h ago</div></div>
+        <div class="glass-li"><div class="bar" style="background:#3b82f6;"></div><div class="info"><h4>Cloudflare — Systems Eng</h4><p>Application created</p></div><div class="right" style="color:#a8a29e;">5h ago</div></div>
+        <div class="glass-li"><div class="bar" style="background:#ef4444;"></div><div class="info"><h4>Coinbase — Backend Lead</h4><p>Moved to Rejected</p></div><div class="right" style="color:#a8a29e;">Yesterday</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="frame-label" style="color:#a8a29e;">Glass Minimal</div>
+</div>
+
+</div>
+</div>
+
+<div class="desc-area">
+  <div class="desc-row">
+    <div class="dc active" id="desc-f1"><h3>Today Briefing</h3><p>Collapsed icon sidebar. Centered single column. Feels like a daily briefing, not a dashboard. Big greeting, inline numbers, prioritized cards.</p><div class="vibe">"Open the app, know your day."</div></div>
+    <div class="dc" id="desc-f2"><h3>Bento Grid</h3><p>Asymmetric card grid. Big pipeline card dominates. Each card is a different size based on importance. Playful but organized.</p><div class="vibe">"Apple keynote energy."</div></div>
+    <div class="dc" id="desc-f3"><h3>Developer</h3><p>Dark sidebar, mono font accents, keyboard shortcut hints, lowercase labels. Information-dense but precise. For people who like terminals.</p><div class="vibe">"Linear meets the command line."</div></div>
+    <div class="dc" id="desc-f4"><h3>Editorial</h3><p>Two-column magazine layout. Headline summarizes your situation in one sentence. Left column is narrative, right column is data. Reads like a newsletter.</p><div class="vibe">"Your job search, told as a story."</div></div>
+    <div class="dc" id="desc-f5"><h3>Glass Minimal</h3><p>Frosted glass cards on warm gradient. Collapsed icon sidebar. Generous whitespace. Soft edges. Numbers breathe. Nothing competes for attention.</p><div class="vibe">"Calm productivity."</div></div>
+  </div>
+</div>
+
+<script>
+function pick(id,btn){
+  document.querySelectorAll('.pick-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#frame>div').forEach(d=>d.classList.remove('active'));
+  document.getElementById('opt-'+id).classList.add('active');
+  document.querySelectorAll('.dc').forEach(d=>d.classList.remove('active'));
+  document.getElementById('desc-'+id).classList.add('active');
+}
+</script>
+</body>
+</html>

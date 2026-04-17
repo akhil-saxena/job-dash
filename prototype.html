@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — Full Prototype v3</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-dominant: #fafaf9; --bg-secondary: #ffffff; --bg-accent: #292524;
+    --bg-hover: #f5f5f4; --bg-muted: #e7e5e4;
+    --text-primary: #292524; --text-secondary: #78716c; --text-muted: #a8a29e; --text-on-accent: #fff;
+    --border: #e7e5e4; --border-hover: #d6d3d1; --ring: #a8a29e;
+    --status-wishlist: #6b7280; --status-applied: #3b82f6; --status-screening: #8b5cf6;
+    --status-interviewing: #f59e0b; --status-offer: #22c55e; --status-accepted: #10b981;
+    --status-rejected: #ef4444; --status-withdrawn: #64748b;
+    --badge-wishlist: #f3f4f6; --badge-applied: #dbeafe; --badge-screening: #ede9fe;
+    --badge-interviewing: #fef3c7; --badge-offer: #dcfce7; --badge-accepted: #d1fae5;
+    --badge-rejected: #fee2e2; --badge-withdrawn: #f1f5f9;
+    --sidebar-width: 256px; --radius: 8px; --radius-lg: 12px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04); --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .dark {
+    --bg-dominant: #18181b; --bg-secondary: #27272a; --bg-accent: #f4f4f5;
+    --bg-hover: #3f3f46; --bg-muted: #3f3f46;
+    --text-primary: #f4f4f5; --text-secondary: #a1a1aa; --text-muted: #71717a; --text-on-accent: #18181b;
+    --border: #3f3f46; --border-hover: #52525b; --ring: #71717a;
+    --badge-wishlist: #374151; --badge-applied: #1e3a5f; --badge-screening: #2e1065;
+    --badge-interviewing: #451a03; --badge-offer: #052e16; --badge-accepted: #022c22;
+    --badge-rejected: #450a0a; --badge-withdrawn: #1e293b;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.2); --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 400; line-height: 1.5; color: var(--text-primary); background: var(--bg-dominant); }
+  .app-shell { display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar { width: var(--sidebar-width); background: var(--bg-secondary); border-right: 1px solid var(--border); padding: 24px 16px; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 30; }
+  .sidebar-logo { font-size: 20px; font-weight: 600; padding: 0 8px 24px; display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 8px; height: 8px; background: var(--status-applied); border-radius: 50%; }
+  .sidebar nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: var(--radius); color: var(--text-secondary); text-decoration: none; font-size: 14px; height: 48px; cursor: pointer; transition: background 0.15s, color 0.15s; }
+  .nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .nav-item.active { background: var(--bg-hover); color: var(--text-primary); font-weight: 600; border-left: 3px solid var(--bg-accent); padding-left: 9px; }
+  .nav-icon { width: 20px; height: 20px; opacity: 0.6; flex-shrink: 0; }
+  .nav-item.active .nav-icon { opacity: 1; }
+  .sidebar-footer { padding-top: 16px; border-top: 1px solid var(--border); margin-top: auto; }
+
+  /* Main */
+  .main { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; }
+  .header { height: 64px; background: var(--bg-secondary); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; position: sticky; top: 0; z-index: 20; }
+  .header-title { font-size: 20px; font-weight: 600; }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: var(--radius); font-size: 14px; font-weight: 600; cursor: pointer; border: none; height: 40px; padding: 0 16px; transition: background 0.15s; }
+  .btn-primary { background: var(--bg-accent); color: var(--text-on-accent); }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-outline { background: transparent; color: var(--text-primary); border: 1px solid var(--border); }
+  .btn-outline:hover { background: var(--bg-hover); }
+  .btn-sm { height: 32px; padding: 0 12px; font-size: 13px; }
+  .btn-icon { width: 40px; height: 40px; padding: 0; background: transparent; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .btn-icon:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+  .content { padding: 32px; flex: 1; overflow-y: auto; }
+  .content-wide { max-width: 1200px; }
+  .content-full { max-width: none; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* Cards & sections */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .stat-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm); transition: box-shadow 0.15s; }
+  .stat-card:hover { box-shadow: var(--shadow); }
+  .stat-label { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+  .stat-value { font-size: 28px; font-weight: 600; line-height: 1.2; }
+  .stat-trend { font-size: 12px; font-weight: 600; color: var(--status-offer); margin-top: 4px; }
+  .stat-trend.down { color: var(--status-rejected); }
+  .stat-trend.neutral { color: var(--text-muted); }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+  .section-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--border); }
+  .section-title { font-size: 14px; font-weight: 600; }
+  .section-link { font-size: 12px; font-weight: 600; color: var(--text-secondary); cursor: pointer; text-decoration: none; }
+  .section-link:hover { color: var(--text-primary); }
+  .list-item { display: flex; align-items: center; gap: 16px; padding: 16px 24px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
+  .list-item:last-child { border-bottom: none; }
+  .list-item:hover { background: var(--bg-hover); }
+  .list-avatar { width: 32px; height: 32px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: white; flex-shrink: 0; }
+  .list-content { flex: 1; min-width: 0; }
+  .list-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .list-subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .badge-stale { background: var(--badge-rejected); color: var(--status-rejected); }
+  .badge-warning { background: var(--badge-interviewing); color: #92400e; }
+  .dark .badge-warning { color: #fbbf24; }
+  .activity-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+  .activity-item { display: flex; gap: 16px; padding: 16px 24px; border-bottom: 1px solid var(--border); }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+  .activity-time { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .bell-wrapper { position: relative; }
+  .bell-badge { position: absolute; top: -2px; right: -2px; width: 16px; height: 16px; background: var(--status-rejected); border-radius: 50%; font-size: 10px; font-weight: 600; color: white; display: flex; align-items: center; justify-content: center; }
+  .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-muted); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--text-secondary); cursor: pointer; }
+
+  /* Kanban */
+  .kanban-board { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; min-height: calc(100vh - 160px); }
+  .kanban-column { min-width: 280px; max-width: 300px; flex-shrink: 0; display: flex; flex-direction: column; }
+  .kanban-col-header { display: flex; align-items: center; gap: 8px; padding: 8px 0; margin-bottom: 8px; font-size: 14px; font-weight: 600; }
+  .kanban-col-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .kanban-col-count { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-left: auto; background: var(--bg-hover); padding: 1px 8px; border-radius: 9999px; }
+  .kanban-cards { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .kanban-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s; }
+  .kanban-card:hover { box-shadow: var(--shadow); border-color: var(--border-hover); }
+  .kanban-card-company { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .kanban-card-role { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+  .kanban-card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .kanban-card-days { font-size: 12px; color: var(--text-muted); }
+  .kanban-card-priority { width: 8px; height: 8px; border-radius: 50%; }
+  .priority-high { background: var(--status-rejected); }
+  .priority-medium { background: var(--status-interviewing); }
+  .priority-low { background: var(--status-wishlist); }
+  .kanban-card-tag { font-size: 11px; padding: 1px 6px; border-radius: 4px; background: var(--bg-hover); color: var(--text-secondary); }
+
+  /* Table */
+  .table-controls { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .search-input { height: 36px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-secondary); color: var(--text-primary); font-size: 14px; width: 260px; outline: none; }
+  .search-input:focus { border-color: var(--ring); box-shadow: 0 0 0 2px rgba(168,162,158,0.2); }
+  .search-input::placeholder { color: var(--text-muted); }
+  .filter-chip { height: 32px; padding: 0 12px; border: 1px solid var(--border); border-radius: 9999px; background: var(--bg-secondary); color: var(--text-secondary); font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; }
+  .filter-chip:hover { background: var(--bg-hover); }
+  .filter-chip.active { background: var(--bg-accent); color: var(--text-on-accent); border-color: var(--bg-accent); }
+  .data-table { width: 100%; border-collapse: collapse; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .data-table th { text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text-secondary); background: var(--bg-hover); border-bottom: 1px solid var(--border); cursor: pointer; }
+  .data-table td { padding: 12px 16px; font-size: 14px; border-bottom: 1px solid var(--border); }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: var(--bg-hover); }
+  .company-cell { display: flex; align-items: center; gap: 12px; }
+  .table-avatar { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; flex-shrink: 0; }
+
+  /* ====== FULL PAGE DETAIL ====== */
+  .detail-page { display: none; }
+  .detail-page.active { display: flex; flex-direction: column; min-height: calc(100vh - 64px); }
+
+  .detail-hero {
+    background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 24px 32px 0;
+  }
+  .detail-breadcrumb { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; cursor: pointer; }
+  .detail-breadcrumb:hover { color: var(--text-secondary); }
+  .detail-hero-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+  .detail-hero-info h1 { font-size: 28px; font-weight: 600; line-height: 1.2; margin-bottom: 4px; }
+  .detail-hero-info .subtitle { font-size: 14px; color: var(--text-secondary); }
+  .detail-hero-actions { display: flex; gap: 8px; align-items: center; }
+  .detail-meta-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 16px; }
+  .detail-meta-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); }
+  .detail-meta-item strong { color: var(--text-primary); font-weight: 600; }
+
+  .detail-tabs-bar { display: flex; gap: 0; border-bottom: none; }
+  .dtab { padding: 12px 20px; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.15s; }
+  .dtab:hover { color: var(--text-primary); }
+  .dtab.active { color: var(--text-primary); border-bottom-color: var(--bg-accent); }
+
+  .detail-content { padding: 32px; flex: 1; }
+  .dtab-pane { display: none; }
+  .dtab-pane.active { display: block; }
+
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+  .field-group { margin-bottom: 24px; }
+  .field-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+  .field-input { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-dominant); color: var(--text-primary); font-size: 14px; outline: none; font-family: inherit; }
+  .field-input:focus { border-color: var(--ring); box-shadow: 0 0 0 2px rgba(168,162,158,0.15); }
+  .field-textarea { width: 100%; min-height: 120px; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-dominant); color: var(--text-primary); font-size: 14px; font-family: inherit; resize: vertical; outline: none; line-height: 1.6; }
+  .field-textarea:focus { border-color: var(--ring); box-shadow: 0 0 0 2px rgba(168,162,158,0.15); }
+
+  /* Interview round cards */
+  .round-card { border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 16px; overflow: hidden; }
+  .round-header { padding: 16px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.1s; }
+  .round-header:hover { background: var(--bg-hover); }
+  .round-num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+  .round-info { flex: 1; }
+  .round-info h3 { font-size: 14px; font-weight: 600; }
+  .round-info p { font-size: 12px; color: var(--text-secondary); }
+  .round-stars { display: flex; gap: 1px; font-size: 14px; }
+  .round-body { padding: 20px; border-top: 1px solid var(--border); background: var(--bg-dominant); display: none; }
+  .round-body.open { display: block; }
+  .round-upcoming { border-color: var(--status-interviewing); }
+
+  /* Document list */
+  .doc-item { padding: 16px 20px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--border); transition: background 0.1s; cursor: pointer; }
+  .doc-item:last-child { border-bottom: none; }
+  .doc-item:hover { background: var(--bg-hover); }
+  .doc-icon { width: 44px; height: 44px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .doc-info { flex: 1; }
+  .doc-info h4 { font-size: 14px; font-weight: 600; }
+  .doc-info p { font-size: 12px; color: var(--text-secondary); }
+  .upload-zone { margin-top: 16px; padding: 32px; border: 2px dashed var(--border); border-radius: var(--radius-lg); text-align: center; color: var(--text-muted); cursor: pointer; transition: border-color 0.15s; }
+  .upload-zone:hover { border-color: var(--border-hover); }
+
+  /* Timeline */
+  .tl-item { position: relative; padding-left: 28px; margin-bottom: 24px; }
+  .tl-line { position: absolute; left: 3px; top: 0; bottom: -24px; width: 2px; background: var(--border); }
+  .tl-item:last-child .tl-line { display: none; }
+  .tl-dot { position: absolute; left: 0; top: 5px; width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--bg-secondary); z-index: 1; }
+  .tl-text { font-size: 14px; font-weight: 600; }
+  .tl-time { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Calendar */
+  .cal-day { min-height: 90px; padding: 8px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
+  .cal-day:nth-child(7n) { border-right: none; }
+  .cal-num { font-size: 12px; font-weight: 600; }
+  .cal-day.dimmed .cal-num { color: var(--text-muted); }
+  .cal-day.weekend { background: var(--bg-hover); }
+  .cal-day.today { background: var(--badge-applied); }
+  .cal-day.today .cal-num { color: var(--status-applied); }
+  .cal-event { font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+  .hm-cell { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+  .hm-green { background: var(--badge-offer); color: #15803d; }
+  .hm-yellow { background: var(--badge-interviewing); color: #92400e; }
+  .hm-red { background: var(--badge-rejected); color: var(--status-rejected); }
+  .hm-gray { background: var(--bg-hover); color: var(--text-muted); }
+
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.3); align-items: center; justify-content: center; }
+  .dark .modal-overlay { background: rgba(0,0,0,0.6); }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius-lg); width: 480px; max-height: 80vh; overflow-y: auto; box-shadow: 0 24px 48px rgba(0,0,0,0.12); }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 24px 24px 0; }
+  .modal-title { font-size: 20px; font-weight: 600; }
+  .modal-body { padding: 24px; }
+  .modal-field { margin-bottom: 16px; }
+  .modal-field label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
+  .modal-field input, .modal-field select { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-dominant); color: var(--text-primary); font-size: 14px; outline: none; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 0 24px 24px; }
+  .modal-expand { font-size: 13px; color: var(--text-secondary); cursor: pointer; padding: 8px 0; }
+  .modal-expand:hover { color: var(--text-primary); }
+  .optional-fields { display: none; }
+  .optional-fields.show { display: block; }
+  .close-btn { width: 32px; height: 32px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .close-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); transition: transform 0.2s; }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .field-grid { grid-template-columns: 1fr; }
+    .content, .detail-content, .detail-hero { padding: 16px; }
+    .header { padding: 0 16px; }
+    .mobile-toggle { display: flex !important; }
+  }
+  .mobile-toggle { display: none; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><span class="logo-dot"></span> JobDash</div>
+    <nav>
+      <a class="nav-item active" onclick="switchPage('dashboard',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+      <a class="nav-item" onclick="switchPage('kanban',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>Kanban</a>
+      <a class="nav-item" onclick="switchPage('table',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>Table</a>
+      <a class="nav-item" onclick="switchPage('calendar',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar</a>
+      <a class="nav-item" onclick="switchPage('analytics',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>Analytics</a>
+      <a class="nav-item" onclick="switchPage('contacts',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Contacts</a>
+      <div class="sidebar-footer"><a class="nav-item" onclick="switchPage('settings',this)"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</a></div>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="header">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="btn-icon mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <span class="header-title" id="pageTitle">Dashboard</span>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-primary" style="height:36px;font-size:13px;" onclick="document.getElementById('addModal').classList.add('open')">+ Add Application</button>
+        <div class="bell-wrapper"><button class="btn-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button><span class="bell-badge">3</span></div>
+        <button class="btn-icon" onclick="document.documentElement.classList.toggle('dark')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+        <div class="user-avatar">AS</div>
+      </div>
+    </header>
+
+    <!-- DASHBOARD -->
+    <div class="content content-wide page active" id="page-dashboard">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">Active Applications</div><div class="stat-value">24</div><div class="stat-trend">+3 this week</div></div>
+        <div class="stat-card"><div class="stat-label">Interviews This Week</div><div class="stat-value">3</div><div class="stat-trend">+1 from last week</div></div>
+        <div class="stat-card"><div class="stat-label">Response Rate</div><div class="stat-value">42%</div><div class="stat-trend">+5% from last month</div></div>
+        <div class="stat-card"><div class="stat-label">Avg. Days in Pipeline</div><div class="stat-value">18</div><div class="stat-trend">-2 days improvement</div></div>
+      </div>
+      <div class="two-col">
+        <div class="section-card">
+          <div class="section-header"><span class="section-title">Stale Applications</span><a class="section-link">View all</a></div>
+          <div class="list-item" onclick="openDetail()"><div class="list-avatar" style="background:var(--status-applied)">S</div><div class="list-content"><div class="list-title">Stripe — Senior Frontend</div><div class="list-subtitle">Applied · No update for 12 days</div></div><span class="badge badge-stale">12d stale</span></div>
+          <div class="list-item" onclick="openDetail()"><div class="list-avatar" style="background:var(--status-screening)">A</div><div class="list-content"><div class="list-title">Airbnb — Staff Engineer</div><div class="list-subtitle">Screening · No update for 9 days</div></div><span class="badge badge-warning">9d stale</span></div>
+          <div class="list-item" onclick="openDetail()"><div class="list-avatar" style="background:var(--status-applied)">M</div><div class="list-content"><div class="list-title">Meta — Product Engineer</div><div class="list-subtitle">Applied · No update for 8 days</div></div><span class="badge badge-warning">8d stale</span></div>
+        </div>
+        <div class="section-card">
+          <div class="section-header"><span class="section-title">Upcoming Interviews</span><a class="section-link">View all</a></div>
+          <div class="list-item" onclick="openDetail()"><div class="list-avatar" style="background:var(--status-interviewing)">G</div><div class="list-content"><div class="list-title">Google — SDE III</div><div class="list-subtitle">Technical · Tomorrow, 2:00 PM</div></div><span class="badge" style="background:var(--badge-interviewing);color:#92400e;">Tomorrow</span></div>
+          <div class="list-item" onclick="openDetail()"><div class="list-avatar" style="background:var(--status-interviewing)">N</div><div class="list-content"><div class="list-title">Netflix — Senior SWE</div><div class="list-subtitle">System Design · Thu, 10:30 AM</div></div><span class="badge" style="background:var(--badge-applied);color:var(--status-applied);">In 3 days</span></div>
+          <div class="list-item" onclick="openDetail()"><div class="list-avatar" style="background:var(--status-interviewing)">V</div><div class="list-content"><div class="list-title">Vercel — Frontend Lead</div><div class="list-subtitle">Hiring Manager · Fri, 4:00 PM</div></div><span class="badge" style="background:var(--badge-applied);color:var(--status-applied);">In 4 days</span></div>
+        </div>
+      </div>
+      <div class="activity-card">
+        <div class="section-header"><span class="section-title">Recent Activity</span><a class="section-link">View all</a></div>
+        <div class="activity-item"><div class="activity-dot" style="background:var(--status-interviewing)"></div><div><div style="font-size:14px;"><strong>Google — SDE III</strong> moved to <span class="badge" style="background:var(--badge-interviewing);color:#92400e;">Interviewing</span></div><div class="activity-time">2 hours ago</div></div></div>
+        <div class="activity-item"><div class="activity-dot" style="background:var(--status-applied)"></div><div><div style="font-size:14px;"><strong>Cloudflare — Systems Engineer</strong> application created</div><div class="activity-time">5 hours ago</div></div></div>
+        <div class="activity-item"><div class="activity-dot" style="background:var(--status-rejected)"></div><div><div style="font-size:14px;"><strong>Coinbase — Backend Lead</strong> moved to <span class="badge" style="background:var(--badge-rejected);color:var(--status-rejected);">Rejected</span></div><div class="activity-time">Yesterday</div></div></div>
+      </div>
+    </div>
+
+    <!-- KANBAN (keep compact — already works) -->
+    <div class="content content-full page" id="page-kanban">
+      <div class="kanban-board">
+        <div class="kanban-column"><div class="kanban-col-header"><div class="kanban-col-dot" style="background:var(--status-wishlist)"></div>Wishlist<span class="kanban-col-count">2</span></div><div class="kanban-cards"><div class="kanban-card" onclick="openDetail()"><div class="kanban-card-company">Notion</div><div class="kanban-card-role">Product Engineer</div><div class="kanban-card-meta"><span class="kanban-card-priority priority-medium"></span><span class="kanban-card-days">3d</span><span class="kanban-card-tag">remote</span></div></div><div class="kanban-card" onclick="openDetail()"><div class="kanban-card-company">Linear</div><div class="kanban-card-role">Full Stack</div><div class="kanban-card-meta"><span class="kanban-card-priority priority-high"></span><span class="kanban-card-days">1d</span><span class="kanban-card-tag">startup</span></div></div></div></div>
+        <div class="kanban-column"><div class="kanban-col-header"><div class="kanban-col-dot" style="background:var(--status-applied)"></div>Applied<span class="kanban-col-count">5</span></div><div class="kanban-cards"><div class="kanban-card" onclick="openDetail()"><div class="kanban-card-company">Stripe</div><div class="kanban-card-role">Senior Frontend</div><div class="kanban-card-meta"><span class="kanban-card-priority priority-high"></span><span class="kanban-card-days">12d</span><span class="badge badge-stale" style="font-size:11px;padding:1px 6px;">stale</span></div></div><div class="kanban-card" onclick="openDetail()"><div class="kanban-card-company">Cloudflare</div><div class="kanban-card-role">Systems Engineer</div><div class="kanban-card-meta"><span class="kanban-card-priority priority-medium"></span><span class="kanban-card-days">1d</span><span class="kanban-card-tag">referral</span></div></div></div></div>
+        <div class="kanban-column"><div class="kanban-col-header"><div class="kanban-col-dot" style="background:var(--status-screening)"></div>Screening<span class="kanban-col-count">2</span></div><div class="kanban-cards"><div class="kanban-card" onclick="openDetail()"><div class="kanban-card-company">Airbnb</div><div class="kanban-card-role">Staff Engineer</div><div class="kanban-card-meta"><span class="kanban-card-priority priority-high"></span><span class="kanban-card-days">9d</span></div></div></div></div>
+        <div class="kanban-column"><div class="kanban-col-header"><div class="kanban-col-dot" style="background:var(--status-interviewing)"></div>Interviewing<span class="kanban-col-count">3</span></div><div class="kanban-cards"><div class="kanban-card" onclick="openDetail()"><div class="kanban-card-company">Google</div><div class="kanban-card-role">SDE III</div><div class="kanban-card-meta"><span class="kanban-card-priority priority-high"></span><span class="kanban-card-days">6d</span><span class="badge" style="font-size:11px;padding:1px 6px;background:var(--badge-interviewing);color:#92400e;">interview tmrw</span></div></div><div class="kanban-card" onclick="openDetail()"><div class="kanban-card-company">Netflix</div><div class="kanban-card-role">Senior SWE</div><div class="kanban-card-meta"><span class="kanban-card-priority priority-high"></span><span class="kanban-card-days">14d</span></div></div></div></div>
+        <div class="kanban-column"><div class="kanban-col-header"><div class="kanban-col-dot" style="background:var(--status-offer)"></div>Offer<span class="kanban-col-count">1</span></div><div class="kanban-cards"><div class="kanban-card" onclick="openDetail()"><div class="kanban-card-company">Figma</div><div class="kanban-card-role">Senior Frontend</div><div class="kanban-card-meta"><span class="kanban-card-priority priority-high"></span><span class="kanban-card-days">2d</span></div></div></div></div>
+        <div class="kanban-column" style="opacity:0.6;"><div class="kanban-col-header"><div class="kanban-col-dot" style="background:var(--status-rejected)"></div>Rejected<span class="kanban-col-count">3</span></div><div class="kanban-cards"><div class="kanban-card" onclick="openDetail()"><div class="kanban-card-company">Coinbase</div><div class="kanban-card-role">Backend Lead</div><div class="kanban-card-meta"><span class="kanban-card-days">After screening</span></div></div></div></div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="content content-full page" id="page-table">
+      <div class="table-controls">
+        <input class="search-input" placeholder="Search applications..." />
+        <span class="filter-chip active">All (24)</span>
+        <span class="filter-chip">Applied (5)</span>
+        <span class="filter-chip">Interviewing (3)</span>
+        <span class="filter-chip">Offer (1)</span>
+      </div>
+      <table class="data-table">
+        <thead><tr><th style="width:24px"><input type="checkbox"/></th><th>Company</th><th>Role</th><th>Status</th><th>Priority</th><th>Source</th><th>Applied</th><th>Days</th><th style="width:32px">Pin</th></tr></thead>
+        <tbody>
+          <tr onclick="openDetail()"><td><input type="checkbox"/></td><td><div class="company-cell"><div class="table-avatar" style="background:var(--status-offer)">F</div>Figma</div></td><td>Senior Frontend</td><td><span class="badge" style="background:var(--badge-offer);color:#15803d;">Offer</span></td><td><span class="kanban-card-priority priority-high" style="display:inline-block"></span> High</td><td>Referral</td><td>Apr 2</td><td>14</td><td style="color:var(--status-interviewing)">★</td></tr>
+          <tr onclick="openDetail()"><td><input type="checkbox"/></td><td><div class="company-cell"><div class="table-avatar" style="background:var(--status-interviewing)">G</div>Google</div></td><td>SDE III</td><td><span class="badge" style="background:var(--badge-interviewing);color:#92400e;">Interviewing</span></td><td><span class="kanban-card-priority priority-high" style="display:inline-block"></span> High</td><td>LinkedIn</td><td>Apr 5</td><td>11</td><td style="color:var(--status-interviewing)">★</td></tr>
+          <tr onclick="openDetail()"><td><input type="checkbox"/></td><td><div class="company-cell"><div class="table-avatar" style="background:var(--status-applied)">S</div>Stripe</div></td><td>Senior Frontend</td><td><span class="badge" style="background:var(--badge-applied);color:var(--status-applied);">Applied</span></td><td><span class="kanban-card-priority priority-high" style="display:inline-block"></span> High</td><td>Referral</td><td>Apr 4</td><td>12</td><td style="color:var(--text-muted)">☆</td></tr>
+          <tr onclick="openDetail()"><td><input type="checkbox"/></td><td><div class="company-cell"><div class="table-avatar" style="background:var(--status-screening)">A</div>Airbnb</div></td><td>Staff Engineer</td><td><span class="badge" style="background:var(--badge-screening);color:var(--status-screening);">Screening</span></td><td><span class="kanban-card-priority priority-high" style="display:inline-block"></span> High</td><td>LinkedIn</td><td>Apr 7</td><td>9</td><td style="color:var(--status-interviewing)">★</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CALENDAR / ANALYTICS / CONTACTS / SETTINGS abbreviated for context (same as before) -->
+    <div class="content content-wide page" id="page-calendar" style="display:none;"><div style="text-align:center;padding:40px 0;color:var(--text-secondary);">[Calendar — same as previous prototype with month grid, events, and upcoming list. Click Dashboard/Kanban/Table to see those views, or click any app to see the new full-page detail.]</div></div>
+    <div class="content content-wide page" id="page-analytics" style="display:none;"><div style="text-align:center;padding:40px 0;color:var(--text-secondary);">[Analytics — funnel, source effectiveness, heatmap. Same as previous prototype.]</div></div>
+    <div class="content content-wide page" id="page-contacts" style="display:none;"><div style="text-align:center;padding:40px 0;color:var(--text-secondary);">[Contacts — searchable list with role tags. Same as previous prototype.]</div></div>
+    <div class="content content-wide page" id="page-settings" style="display:none;"><div style="text-align:center;padding:40px 0;color:var(--text-secondary);">[Settings — profile, theme, tags, export. Same as previous prototype.]</div></div>
+
+    <!-- ====== FULL-PAGE APPLICATION DETAIL ====== -->
+    <div class="detail-page" id="page-detail">
+      <div class="detail-hero">
+        <div class="detail-breadcrumb" onclick="goBack()">← Back to Applications</div>
+        <div class="detail-hero-top">
+          <div class="detail-hero-info">
+            <h1>Google</h1>
+            <div class="subtitle">SDE III · Mountain View, CA (Hybrid)</div>
+          </div>
+          <div class="detail-hero-actions">
+            <select style="height:36px;padding:0 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--badge-interviewing);color:#92400e;font-size:13px;font-weight:600;cursor:pointer;">
+              <option selected>Interviewing</option><option>Wishlist</option><option>Applied</option><option>Screening</option><option>Offer</option><option>Accepted</option><option>Rejected</option><option>Withdrawn</option>
+            </select>
+            <button class="btn btn-sm btn-outline" style="color:var(--status-interviewing);">★ Pinned</button>
+            <button class="btn btn-sm btn-outline">Edit</button>
+            <button class="btn btn-sm btn-outline" style="color:var(--status-rejected);">Archive</button>
+          </div>
+        </div>
+        <div class="detail-meta-row">
+          <div class="detail-meta-item"><strong>Priority:</strong> <span class="kanban-card-priority priority-high" style="display:inline-block"></span> High</div>
+          <div class="detail-meta-item"><strong>Source:</strong> LinkedIn</div>
+          <div class="detail-meta-item"><strong>Applied:</strong> Apr 5, 2026</div>
+          <div class="detail-meta-item"><strong>Salary:</strong> $180K – $240K USD</div>
+          <div class="detail-meta-item"><strong>Days:</strong> 11d in pipeline</div>
+          <div class="detail-meta-item" style="gap:4px;">
+            <span class="kanban-card-tag">FAANG</span>
+            <span class="kanban-card-tag">hybrid</span>
+            <span style="font-size:11px;padding:1px 6px;border-radius:4px;border:1px dashed var(--border);color:var(--text-muted);cursor:pointer;">+ tag</span>
+          </div>
+        </div>
+        <div class="detail-tabs-bar">
+          <div class="dtab active" onclick="switchDTab('overview',this)">Overview</div>
+          <div class="dtab" onclick="switchDTab('interviews',this)">Interviews (3)</div>
+          <div class="dtab" onclick="switchDTab('jd',this)">JD Snapshot</div>
+          <div class="dtab" onclick="switchDTab('docs',this)">Documents (2)</div>
+          <div class="dtab" onclick="switchDTab('timeline',this)">Timeline</div>
+        </div>
+      </div>
+
+      <!-- OVERVIEW -->
+      <div class="detail-content dtab-pane active" id="dp-overview">
+        <div class="field-grid">
+          <div>
+            <div class="field-group"><div class="field-label">Company URL</div><input class="field-input" value="https://careers.google.com/jobs/123456" style="color:var(--status-applied);" /></div>
+            <div class="field-group"><div class="field-label">Location Type</div><select class="field-input"><option selected>Hybrid</option><option>Remote</option><option>Onsite</option></select></div>
+            <div class="field-group"><div class="field-label">City</div><input class="field-input" value="Mountain View, CA" /></div>
+            <div class="field-group">
+              <div class="field-label">Salary Range</div>
+              <div style="display:flex;gap:8px;">
+                <input class="field-input" value="180000" type="number" style="flex:1;" />
+                <span style="color:var(--text-muted);align-self:center;">–</span>
+                <input class="field-input" value="240000" type="number" style="flex:1;" />
+                <select class="field-input" style="width:80px;flex:none;"><option selected>USD</option><option>INR</option><option>EUR</option></select>
+              </div>
+            </div>
+            <div class="field-group"><div class="field-label">Equity</div><input class="field-input" value="RSUs, refresher grants" /></div>
+          </div>
+          <div>
+            <div class="field-group">
+              <div class="field-label">Notes <span style="font-size:11px;color:var(--status-offer);font-weight:400;">Saved</span></div>
+              <textarea class="field-textarea" style="min-height:260px;">Referred by James Chen from the Cloud Networking team.
+
+Interview prep focus areas:
+- Distributed system design (consistency models, partitioning strategies)
+- API design best practices (REST, gRPC)
+- Google-scale infrastructure patterns
+
+Team is hiring 3 more people this quarter. Working on Cloud VPC networking.
+
+Comp notes: Base ~$200K, L5 level but SDE III title. TC with RSUs likely $350-400K.</textarea>
+            </div>
+          </div>
+        </div>
+        <!-- Company Research -->
+        <div class="section-card" style="margin-bottom:24px;">
+          <div class="section-header"><span class="section-title">Company Research — Google</span><span style="font-size:12px;color:var(--text-muted);">Shared across all Google applications</span></div>
+          <div style="padding:24px;">
+            <textarea class="field-textarea" style="min-height:100px;">Glassdoor: 4.4/5 overall. Engineering culture is collaborative but slow-moving.
+Tech stack: Borg, Spanner, BigTable, Stubby (gRPC predecessor).
+Red flag: Layoffs in 2024 still affecting morale in some teams.
+Green flag: Cloud division is growing and hiring aggressively.</textarea>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;padding-top:16px;border-top:1px solid var(--border);">
+          <button class="btn btn-sm btn-outline" style="color:var(--status-rejected);">Delete Application</button>
+        </div>
+      </div>
+
+      <!-- INTERVIEWS -->
+      <div class="detail-content dtab-pane" id="dp-interviews">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+          <div style="font-size:16px;font-weight:600;">3 interview rounds</div>
+          <button class="btn btn-sm btn-primary">+ Add Round</button>
+        </div>
+        <div class="round-card">
+          <div class="round-header" onclick="this.nextElementSibling.classList.toggle('open')">
+            <div class="round-num" style="background:var(--badge-offer);color:var(--status-offer);">1</div>
+            <div class="round-info"><h3>Phone Screen</h3><p>Apr 8, 2026 · 30 min · James Chen (Recruiter)</p></div>
+            <span class="badge" style="background:var(--badge-offer);color:var(--status-offer);">Completed</span>
+            <div class="round-stars"><span style="color:var(--status-interviewing);">★★★★</span><span style="color:var(--text-muted);">★</span></div>
+          </div>
+          <div class="round-body">
+            <div class="field-group"><div class="field-label">Questions Asked</div><textarea class="field-textarea" style="min-height:80px;">- Tell me about a time you led a complex project
+- How do you handle disagreements with stakeholders?
+- Walk me through your approach to system design</textarea></div>
+            <div class="field-group"><div class="field-label">My Answers / Notes</div><textarea class="field-textarea" style="min-height:80px;">Used the cloud migration project as main example. Went well — interviewer seemed engaged. He mentioned the team is hiring 3 more people this quarter.</textarea></div>
+            <div class="field-group"><div class="field-label">Feedback Received</div><textarea class="field-textarea" style="min-height:60px;">Positive — moved to technical round. Recruiter said "strong fit for the team culture."</textarea></div>
+          </div>
+        </div>
+        <div class="round-card">
+          <div class="round-header" onclick="this.nextElementSibling.classList.toggle('open')">
+            <div class="round-num" style="background:var(--badge-offer);color:var(--status-offer);">2</div>
+            <div class="round-info"><h3>Technical</h3><p>Apr 12, 2026 · 60 min · Sarah Kim (L6 SWE)</p></div>
+            <span class="badge" style="background:var(--badge-offer);color:var(--status-offer);">Completed</span>
+            <div class="round-stars"><span style="color:var(--status-interviewing);">★★★</span><span style="color:var(--text-muted);">★★</span></div>
+          </div>
+          <div class="round-body">
+            <div class="field-group"><div class="field-label">Questions Asked</div><textarea class="field-textarea">- Design a URL shortener (system design, 25 min)
+- Implement LRU cache (coding, 25 min)
+- Discussion about distributed consensus (10 min)</textarea></div>
+            <div class="field-group"><div class="field-label">My Answers / Notes</div><textarea class="field-textarea">URL shortener went well — covered hashing, DB partitioning, caching layer. LRU cache was clean but ran slightly over time on the follow-up optimization. Consensus discussion was conversational.</textarea></div>
+          </div>
+        </div>
+        <div class="round-card round-upcoming">
+          <div class="round-header">
+            <div class="round-num" style="background:var(--badge-interviewing);color:#92400e;">3</div>
+            <div class="round-info"><h3>Bar Raiser</h3><p>Apr 22, 2026 · 45 min · TBD</p></div>
+            <span class="badge" style="background:var(--badge-interviewing);color:#92400e;">Scheduled</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- JD SNAPSHOT -->
+      <div class="detail-content dtab-pane" id="dp-jd">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+          <div><div style="font-weight:600;">Saved Apr 5, 2026</div><div style="font-size:12px;color:var(--text-muted);">Version 1 of 1</div></div>
+          <div style="display:flex;gap:8px;"><button class="btn btn-sm btn-outline">Re-scrape URL</button><button class="btn btn-sm btn-outline">Edit</button></div>
+        </div>
+        <div style="background:var(--bg-dominant);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;line-height:1.8;">
+          <h2 style="font-size:20px;font-weight:600;margin-bottom:8px;">Software Engineer III, Cloud Networking</h2>
+          <p style="color:var(--text-secondary);margin-bottom:24px;">Google · Mountain View, CA (Hybrid)</p>
+          <p style="margin-bottom:16px;"><strong>About the role</strong></p>
+          <p style="margin-bottom:16px;">As a Software Engineer on the Cloud Networking team, you'll design and build the infrastructure that powers Google Cloud's networking stack. You'll work on distributed systems operating at global scale, serving millions of customers.</p>
+          <p style="margin-bottom:8px;"><strong>Requirements</strong></p>
+          <ul style="padding-left:20px;margin-bottom:16px;"><li>5+ years of software engineering experience</li><li>Experience with distributed systems, networking protocols, or cloud infrastructure</li><li>Proficiency in Go, C++, or Java</li><li>Strong system design and problem-solving skills</li></ul>
+          <p style="margin-bottom:8px;"><strong>Nice to have</strong></p>
+          <ul style="padding-left:20px;"><li>Experience with Kubernetes, gRPC, or service mesh</li><li>Contributions to open source networking projects</li><li>MS or PhD in Computer Science</li></ul>
+        </div>
+      </div>
+
+      <!-- DOCUMENTS -->
+      <div class="detail-content dtab-pane" id="dp-docs">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+          <div style="font-size:16px;font-weight:600;">2 documents</div>
+          <button class="btn btn-sm btn-primary">+ Upload</button>
+        </div>
+        <div class="section-card">
+          <div class="doc-item">
+            <div class="doc-icon" style="background:var(--badge-applied);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--status-applied)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div class="doc-info"><h4>Resume_Akhil_SDE_2026.pdf</h4><p>Resume · Uploaded Apr 5 · 142 KB</p></div>
+            <button class="btn btn-sm btn-outline">Download</button>
+          </div>
+          <div class="doc-item">
+            <div class="doc-icon" style="background:var(--badge-screening);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--status-screening)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div class="doc-info"><h4>Cover_Letter_Google_SDE3.pdf</h4><p>Cover Letter · Uploaded Apr 5 · 89 KB</p></div>
+            <button class="btn btn-sm btn-outline">Download</button>
+          </div>
+        </div>
+        <div class="upload-zone">
+          <div style="font-size:28px;margin-bottom:8px;opacity:0.3;">+</div>
+          <div style="font-size:14px;font-weight:600;">Drop files here or click to upload</div>
+          <div style="font-size:12px;margin-top:4px;">Resume, cover letter, portfolio, offer letter — up to 10MB</div>
+        </div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div class="detail-content dtab-pane" id="dp-timeline">
+        <div class="tl-item"><div class="tl-line"></div><div class="tl-dot" style="background:var(--status-interviewing);"></div><div class="tl-text">Bar Raiser interview scheduled</div><div class="tl-time">Apr 16, 2026</div></div>
+        <div class="tl-item"><div class="tl-line"></div><div class="tl-dot" style="background:var(--status-interviewing);"></div><div class="tl-text">Moved to <span class="badge" style="background:var(--badge-interviewing);color:#92400e;">Interviewing</span></div><div class="tl-time">Apr 12, 2026 · After technical round</div></div>
+        <div class="tl-item"><div class="tl-line"></div><div class="tl-dot" style="background:var(--status-screening);"></div><div class="tl-text">Moved to <span class="badge" style="background:var(--badge-screening);color:var(--status-screening);">Screening</span></div><div class="tl-time">Apr 8, 2026 · Phone screen scheduled</div></div>
+        <div class="tl-item"><div class="tl-line"></div><div class="tl-dot" style="background:var(--status-applied);"></div><div class="tl-text">Pinned as high priority</div><div class="tl-time">Apr 5, 2026</div></div>
+        <div class="tl-item"><div class="tl-line"></div><div class="tl-dot" style="background:var(--status-applied);"></div><div class="tl-text">Resume uploaded</div><div class="tl-time">Apr 5, 2026 · Resume_Akhil_SDE_2026.pdf</div></div>
+        <div class="tl-item"><div class="tl-dot" style="background:var(--status-offer);"></div><div class="tl-text">Application created</div><div class="tl-time">Apr 5, 2026 · Via LinkedIn</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add Application</div><button class="close-btn" onclick="document.getElementById('addModal').classList.remove('open')">✕</button></div>
+    <div class="modal-body">
+      <div class="modal-field"><label>Company *</label><input placeholder="e.g. Google" /></div>
+      <div class="modal-field"><label>Role *</label><input placeholder="e.g. Senior Software Engineer" /></div>
+      <div class="modal-field"><label>Status</label><select><option>Wishlist</option><option>Applied</option><option>Screening</option><option>Interviewing</option></select></div>
+      <div class="modal-expand" onclick="document.querySelector('.optional-fields').classList.toggle('show')">▸ More fields (optional)</div>
+      <div class="optional-fields">
+        <div class="modal-field"><label>Job Posting URL</label><input placeholder="https://..." /></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="modal-field"><label>Priority</label><select><option>Medium</option><option>High</option><option>Low</option></select></div>
+          <div class="modal-field"><label>Source</label><select><option>LinkedIn</option><option>Referral</option><option>Company Site</option><option>Naukri</option><option>Other</option></select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="modal-field"><label>Location Type</label><select><option>Remote</option><option>Hybrid</option><option>Onsite</option></select></div>
+          <div class="modal-field"><label>City</label><input placeholder="e.g. Bangalore" /></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="document.getElementById('addModal').classList.remove('open')">Discard</button>
+      <button class="btn btn-primary">Add Application</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let prevPage = 'dashboard';
+function switchPage(name, el) {
+  document.querySelectorAll('.page, .detail-page').forEach(p => { p.classList.remove('active'); p.style.display = ''; });
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const titles = { dashboard:'Dashboard', kanban:'Kanban Board', table:'Applications', calendar:'Calendar', analytics:'Analytics', contacts:'Contacts', settings:'Settings' };
+  document.getElementById('pageTitle').textContent = titles[name] || name;
+  prevPage = name;
+}
+function openDetail() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-detail').classList.add('active');
+  document.getElementById('pageTitle').textContent = 'Google — SDE III';
+}
+function goBack() {
+  document.getElementById('page-detail').classList.remove('active');
+  document.getElementById('page-' + prevPage).classList.add('active');
+  const titles = { dashboard:'Dashboard', kanban:'Kanban Board', table:'Applications' };
+  document.getElementById('pageTitle').textContent = titles[prevPage] || 'Dashboard';
+}
+function switchDTab(name, el) {
+  document.querySelectorAll('.dtab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('dp-' + name).classList.add('active');
+  document.querySelectorAll('.dtab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('addModal').classList.remove('open'); });
+</script>
+</body>
+</html>

@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow-x:hidden;}
+:root{
+  --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',system-ui,sans-serif;
+  --mono:'SF Mono','Menlo','Monaco',monospace;
+}
+body{font-family:var(--font);background:linear-gradient(145deg,#f5f3f0 0%,#ece8e3 50%,#e8e4df 100%);min-height:100vh;font-size:14px;color:#1c1917;-webkit-font-smoothing:antialiased;}
+
+/* ===== SIDEBAR ===== */
+.sb{width:72px;position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;align-items:center;padding:20px 0;gap:6px;z-index:30;}
+.sb .logo{width:38px;height:38px;background:rgba(0,0,0,0.07);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;backdrop-filter:blur(8px);cursor:pointer;}
+.sb .logo span{width:10px;height:10px;background:#292524;border-radius:4px;}
+.sb .ni{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;position:relative;}
+.sb .ni:hover{background:rgba(0,0,0,.05);}
+.sb .ni.act{background:rgba(255,255,255,.75);box-shadow:0 1px 6px rgba(0,0,0,.06);}
+.sb .ni svg{width:20px;height:20px;color:#a8a29e;stroke-width:1.8;}
+.sb .ni.act svg{color:#44403c;}
+.sb .ni .badge{position:absolute;top:6px;right:6px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:2px solid #f0ede9;}
+.sb .ni .tip{position:absolute;left:54px;background:#292524;color:#fff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:20;}
+.sb .ni:hover .tip{opacity:1;}
+.sb .spacer{flex:1;}
+
+/* ===== MAIN ===== */
+.main{margin-left:72px;min-height:100vh;display:flex;flex-direction:column;flex:1;min-width:0;width:calc(100% - 72px);}
+
+/* Header */
+.hdr{padding:20px 32px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.hdr h1{font-size:22px;font-weight:700;letter-spacing:-.3px;}
+.hdr .date{font-size:13px;color:#a8a29e;font-weight:500;margin-left:12px;}
+.hdr-r{display:flex;gap:8px;align-items:center;}
+.search-bar{height:36px;padding:0 14px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.5);backdrop-filter:blur(8px);font-size:13px;color:#78716c;display:flex;align-items:center;gap:8px;cursor:pointer;width:200px;transition:all .15s;}
+.search-bar:hover{background:rgba(255,255,255,.7);}
+.search-bar .k{font-size:10px;background:rgba(0,0,0,.06);padding:2px 6px;border-radius:4px;color:#a8a29e;font-family:var(--mono);margin-left:auto;}
+.add-btn{height:36px;padding:0 16px;background:#292524;color:#fff;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.add-btn:hover{opacity:.9;}
+.ib{width:36px;height:36px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.5);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+.ib:hover{background:rgba(255,255,255,.7);}
+.ib svg{width:18px;height:18px;color:#78716c;}
+.ib .nd{position:absolute;top:7px;right:7px;width:7px;height:7px;background:#ef4444;border-radius:50%;border:2px solid #f0ede9;}
+.av{width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#78716c;cursor:pointer;}
+
+/* Content */
+.content{padding:20px 32px 32px;flex:1;}
+
+/* Page switching */
+.pg{display:none;}.pg.act{display:block;}
+
+/* ===== GLASS CARD ===== */
+.gc{background:rgba(255,255,255,.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.6);border-radius:16px;padding:22px;transition:all .2s;}
+.gc:hover{background:rgba(255,255,255,.7);box-shadow:0 4px 16px rgba(0,0,0,.04);transform:translateY(-1px);}
+.gc.accent{background:rgba(255,255,255,.75);}
+.gc-label{font-size:11px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;}
+.big-n{font-size:44px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-1px;}
+.big-s{font-size:13px;color:#a8a29e;margin-top:4px;}
+.med-n{font-size:28px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;}
+.med-s{font-size:12px;color:#a8a29e;margin-top:3px;}
+.t-up{color:#22c55e;font-size:12px;font-weight:600;margin-top:4px;}
+.t-dn{color:#ef4444;font-size:12px;font-weight:600;margin-top:4px;}
+
+/* List items */
+.bi{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.04);}
+.bi:last-child{border-bottom:none;}
+.bi .bar{width:3px;height:28px;border-radius:2px;flex-shrink:0;}
+.bi h4{font-size:13px;font-weight:600;color:#292524;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bi p{font-size:11px;color:#a8a29e;margin-top:1px;}
+.bi .info{flex:1;min-width:0;}.bi .rt{font-size:12px;font-weight:600;white-space:nowrap;flex-shrink:0;}
+
+/* Pipeline rows */
+.pr{display:flex;align-items:center;gap:10px;padding:6px 0;}
+.pr .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.pr .nm{font-size:13px;color:#57534e;flex:1;}
+.pr .bw{flex:2;height:6px;background:rgba(0,0,0,.04);border-radius:3px;overflow:hidden;}
+.pr .bf{height:100%;border-radius:3px;}
+.pr .ct{font-size:14px;font-weight:700;width:24px;text-align:right;font-variant-numeric:tabular-nums;}
+.pipe-mini{display:flex;height:8px;border-radius:4px;overflow:hidden;gap:2px;margin-top:12px;}
+.pipe-mini div{flex:none;height:100%;border-radius:3px;}
+
+/* ===== BENTO GRID ===== */
+.bento{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.gc.big{grid-column:span 2;grid-row:span 2;}
+.gc.wide{grid-column:span 2;}
+
+/* ===== KANBAN ===== */
+.kb{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;padding-bottom:16px;}
+.kb-col{display:flex;flex-direction:column;min-width:0;}
+.kb-hdr{display:flex;align-items:center;gap:8px;padding:8px 4px;margin-bottom:8px;font-size:13px;font-weight:600;color:#57534e;}
+.kb-hdr .dot{width:10px;height:10px;border-radius:50%;}
+.kb-hdr .cnt{margin-left:auto;font-size:11px;font-weight:600;color:#a8a29e;background:rgba(0,0,0,.04);padding:1px 7px;border-radius:9px;}
+.kb-cards{display:flex;flex-direction:column;gap:8px;flex:1;}
+.kb-card{background:rgba(255,255,255,.6);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.5);border-radius:12px;padding:14px;cursor:pointer;transition:all .15s;}
+.kb-card:hover{background:rgba(255,255,255,.8);box-shadow:0 2px 8px rgba(0,0,0,.04);transform:translateY(-1px);}
+.kb-card h4{font-size:13px;font-weight:600;margin-bottom:2px;}
+.kb-card .role{font-size:12px;color:#78716c;margin-bottom:8px;}
+.kb-card .meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.kb-card .pri{width:7px;height:7px;border-radius:50%;}
+.kb-card .days{font-size:11px;color:#a8a29e;}
+.kb-card .tag{font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(0,0,0,.04);color:#78716c;}
+.kb-card .stale{font-size:10px;padding:1px 6px;border-radius:4px;font-weight:600;}
+
+/* ===== TABLE ===== */
+.tbl-ctrl{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.chip{height:30px;padding:0 12px;border:1px solid rgba(0,0,0,.06);border-radius:99px;background:rgba(255,255,255,.5);backdrop-filter:blur(8px);color:#78716c;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;}
+.chip:hover{background:rgba(255,255,255,.7);}
+.chip.on{background:#292524;color:#fff;border-color:#292524;}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;background:rgba(255,255,255,.55);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.6);border-radius:14px;overflow:hidden;}
+.tbl th{text-align:left;padding:10px 16px;font-size:11px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid rgba(0,0,0,.06);background:rgba(255,255,255,.3);}
+.tbl td{padding:12px 16px;font-size:13px;border-bottom:1px solid rgba(0,0,0,.03);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(255,255,255,.3);}
+.tbl .co{display:flex;align-items:center;gap:10px;}
+.tbl .co .a{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0;}
+.tbl .badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;}
+
+/* ===== DETAIL PAGE ===== */
+.det-hero{background:rgba(255,255,255,.5);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.4);padding:20px 32px 0;}
+.det-back{font-size:13px;color:#a8a29e;cursor:pointer;margin-bottom:12px;display:inline-block;}
+.det-back:hover{color:#78716c;}
+.det-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:12px;}
+.det-top h1{font-size:26px;font-weight:700;letter-spacing:-.3px;}
+.det-top .sub{font-size:14px;color:#78716c;margin-top:2px;}
+.det-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.det-acts select{height:32px;padding:0 10px;border:1px solid rgba(0,0,0,.1);border-radius:8px;font-size:12px;font-weight:600;background:rgba(255,255,255,.6);color:#292524;cursor:pointer;font-family:var(--font);}
+.det-acts .sm-btn{height:32px;padding:0 12px;border:1px solid rgba(0,0,0,.08);border-radius:8px;background:rgba(255,255,255,.5);font-size:12px;font-weight:600;color:#57534e;cursor:pointer;font-family:var(--font);}
+.det-meta{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:14px;font-size:13px;color:#78716c;}
+.det-meta strong{color:#292524;font-weight:600;}
+.dtabs{display:flex;gap:0;}
+.dtab{padding:10px 18px;font-size:13px;font-weight:600;color:#a8a29e;cursor:pointer;border-bottom:2px solid transparent;}
+.dtab:hover{color:#57534e;}
+.dtab.act{color:#292524;border-bottom-color:#292524;}
+.det-body{padding:24px 32px;}
+.dtab-p{display:none;}.dtab-p.act{display:block;}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.fi{margin-bottom:20px;}
+.fi label{font-size:11px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block;}
+.fi input,.fi select,.fi textarea{width:100%;padding:8px 12px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.5);backdrop-filter:blur(8px);font-size:13px;color:#292524;outline:none;font-family:var(--font);transition:border-color .15s;}
+.fi input:focus,.fi select:focus,.fi textarea:focus{border-color:rgba(0,0,0,.2);background:rgba(255,255,255,.7);}
+.fi textarea{min-height:120px;resize:vertical;line-height:1.6;}
+
+/* Round cards */
+.rnd{border:1px solid rgba(0,0,0,.06);border-radius:14px;margin-bottom:12px;overflow:hidden;background:rgba(255,255,255,.4);backdrop-filter:blur(8px);}
+.rnd-h{padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .1s;}
+.rnd-h:hover{background:rgba(255,255,255,.3);}
+.rnd-num{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;}
+.rnd-info{flex:1;}.rnd-info h4{font-size:13px;font-weight:600;}.rnd-info p{font-size:11px;color:#a8a29e;}
+.rnd-stars{font-size:13px;}
+.rnd-body{padding:18px;border-top:1px solid rgba(0,0,0,.04);background:rgba(255,255,255,.2);display:none;}
+.rnd-body.open{display:block;}
+
+/* Doc items */
+.doc-i{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.04);cursor:pointer;transition:background .1s;}
+.doc-i:last-child{border-bottom:none;}
+.doc-i:hover{background:rgba(255,255,255,.3);}
+.doc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.doc-i .info{flex:1;}.doc-i .info h4{font-size:13px;font-weight:600;}.doc-i .info p{font-size:11px;color:#a8a29e;}
+.upload-z{margin-top:14px;padding:28px;border:2px dashed rgba(0,0,0,.1);border-radius:14px;text-align:center;color:#a8a29e;cursor:pointer;transition:border-color .15s;}
+.upload-z:hover{border-color:rgba(0,0,0,.2);}
+
+/* Timeline */
+.tl-i{position:relative;padding-left:24px;margin-bottom:20px;}
+.tl-line{position:absolute;left:3px;top:0;bottom:-20px;width:2px;background:rgba(0,0,0,.06);}
+.tl-i:last-child .tl-line{display:none;}
+.tl-dot{position:absolute;left:0;top:5px;width:8px;height:8px;border-radius:50%;z-index:1;}
+.tl-text{font-size:13px;font-weight:600;}
+.tl-time{font-size:11px;color:#a8a29e;margin-top:2px;}
+
+/* Mobile card list (replaces table on small screens) */
+.card-list{display:none;}
+.app-card{background:rgba(255,255,255,.6);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.5);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all .15s;}
+.app-card:hover{background:rgba(255,255,255,.8);box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.app-card:active{transform:scale(.99);}
+.app-card-top{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.app-card-top .a{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0;}
+.app-card-info{flex:1;min-width:0;}
+.app-card-name{font-size:14px;font-weight:600;color:#292524;}
+.app-card-role{font-size:12px;color:#78716c;margin-top:1px;}
+.app-card-bottom{display:flex;gap:12px;font-size:11px;color:#a8a29e;padding-top:8px;border-top:1px solid rgba(0,0,0,.04);}
+.app-card-bottom span{display:flex;align-items:center;}
+
+/* Markdown hint */
+.md-hint{font-size:10px;color:#a8a29e;margin-top:4px;display:flex;align-items:center;gap:4px;}
+.md-hint code{font-family:var(--mono);font-size:10px;background:rgba(0,0,0,.04);padding:1px 4px;border-radius:3px;}
+
+/* Q&A pairs */
+.qa-pair{border:1px solid rgba(0,0,0,.06);border-radius:12px;padding:14px;margin-bottom:10px;background:rgba(255,255,255,.3);}
+.qa-pair .qa-q{margin-bottom:10px;}
+.qa-pair .qa-q label,.qa-pair .qa-a label{font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block;}
+.qa-pair textarea{width:100%;padding:8px 12px;border:1px solid rgba(0,0,0,.06);border-radius:8px;background:rgba(255,255,255,.4);font-size:13px;color:#292524;font-family:var(--font);resize:vertical;min-height:48px;outline:none;line-height:1.5;}
+.qa-pair textarea:focus{border-color:rgba(0,0,0,.15);background:rgba(255,255,255,.6);}
+.qa-add{display:flex;align-items:center;gap:6px;padding:10px;border:1px dashed rgba(0,0,0,.1);border-radius:10px;color:#a8a29e;font-size:12px;font-weight:600;cursor:pointer;justify-content:center;transition:all .15s;}
+.qa-add:hover{border-color:rgba(0,0,0,.2);color:#78716c;background:rgba(255,255,255,.3);}
+.qa-remove{font-size:11px;color:#a8a29e;cursor:pointer;margin-left:auto;padding:2px 6px;border-radius:4px;}
+.qa-remove:hover{color:#ef4444;background:rgba(239,68,68,.08);}
+
+/* ===== MOBILE ===== */
+.mobile-bar{display:none;}
+@media(max-width:768px){
+  .sb{display:none;}
+  .main{margin-left:0;width:100%;}
+  .hdr,.content,.det-hero,.det-body{padding-left:14px;padding-right:14px;}
+  .hdr{flex-direction:column;align-items:flex-start;gap:8px;padding-top:14px;}
+  .hdr-r{width:100%;justify-content:space-between;}
+  .search-bar{flex:1;width:auto;}
+  .bento{grid-template-columns:1fr 1fr;gap:10px;}
+  .gc.big{grid-column:span 2;}
+  .gc.wide{grid-column:span 2;}
+  .gc{padding:16px;}
+  .big-n{font-size:36px;}
+  .kb{grid-template-columns:1fr 1fr;gap:10px;}
+  .kb-col{min-width:0;}
+  .kb-card{padding:12px;}
+  .kb-card h4{font-size:12px;}
+  .kb-card .role{font-size:11px;}
+  .tbl-desktop{display:none;}
+  .card-list{display:block;}
+  .fg{grid-template-columns:1fr;}
+  .det-hero{padding:14px 14px 0;}
+  .det-top{flex-direction:column;gap:10px;}
+  .det-acts{flex-wrap:wrap;}
+  .det-meta{gap:10px;font-size:12px;}
+  .dtabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:0;flex-wrap:nowrap;}
+  .dtabs::-webkit-scrollbar{display:none;}
+  .dtab{white-space:nowrap;flex-shrink:0;padding:10px 14px;font-size:12px;}
+  .det-body{padding:16px 14px;}
+  .hdr h1{font-size:18px;}
+  .det-top h1{font-size:20px;}
+  .mobile-bar{display:flex;position:fixed;bottom:0;left:0;right:0;height:60px;background:rgba(255,255,255,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.06);z-index:30;justify-content:space-around;align-items:center;padding:0 4px;padding-bottom:env(safe-area-inset-bottom);}
+  .mobile-bar .mb-i{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px 14px;border-radius:10px;transition:background .15s;}
+  .mobile-bar .mb-i:active{background:rgba(0,0,0,.04);}
+  .mobile-bar .mb-i svg{width:22px;height:22px;color:#a8a29e;transition:color .15s;}
+  .mobile-bar .mb-i.act svg{color:#292524;}
+  .mobile-bar .mb-i span{font-size:10px;font-weight:600;color:#a8a29e;transition:color .15s;}
+  .mobile-bar .mb-i.act span{color:#292524;}
+  .content{padding-bottom:76px;}
+  .add-btn{font-size:12px;height:32px;padding:0 12px;}
+  .rnd-h{flex-wrap:wrap;gap:8px;}
+  .rnd-stars{font-size:12px;}
+}
+@media(max-width:480px){
+  .bento{grid-template-columns:1fr;gap:10px;}
+  .gc.big,.gc.wide{grid-column:span 1;}
+  .big-n{font-size:32px;}
+  .med-n{font-size:24px;}
+  .kb{grid-template-columns:1fr;}
+  .hdr-r .search-bar{display:none;}
+  .tbl-ctrl .search-bar{width:100%;}
+  .det-meta{flex-direction:column;gap:6px;}
+}
+</style>
+</head>
+<body>
+<div style="display:flex;min-height:100vh;width:100%;">
+
+<!-- SIDEBAR -->
+<nav class="sb">
+  <div class="logo"><span></span></div>
+  <div class="ni act" onclick="go('dash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="tip">Dashboard</span></div>
+  <div class="ni" onclick="go('kanban')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg><span class="tip">Kanban</span></div>
+  <div class="ni" onclick="go('table')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span class="tip">Table</span></div>
+  <div class="ni" onclick="go('cal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="tip">Calendar</span><span class="badge"></span></div>
+  <div class="ni" onclick="go('analytics')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg><span class="tip">Analytics</span></div>
+  <div class="spacer"></div>
+  <div class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="tip">Settings</span></div>
+</nav>
+
+<div class="main">
+  <!-- HEADER -->
+  <div class="hdr" id="hdr">
+    <div style="display:flex;align-items:baseline;"><h1 id="pgTitle">Dashboard</h1><span class="date">Wed, Apr 16</span></div>
+    <div class="hdr-r">
+      <div class="search-bar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search...<span class="k">&#8984;K</span></div>
+      <button class="add-btn">+ Add</button>
+      <div class="ib"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="nd"></span></div>
+      <div class="av">AS</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="pg act" id="pg-dash">
+      <div class="bento">
+        <div class="gc big accent">
+          <div class="gc-label">Pipeline</div>
+          <div class="big-n">24</div><div class="big-s">active applications</div>
+          <div class="pipe-mini"><div style="width:8%;background:#6b7280;"></div><div style="width:21%;background:#3b82f6;"></div><div style="width:8%;background:#8b5cf6;"></div><div style="width:13%;background:#f59e0b;"></div><div style="width:4%;background:#22c55e;"></div></div>
+          <div style="margin-top:16px;">
+            <div class="pr"><div class="dot" style="background:#6b7280"></div><div class="nm">Wishlist</div><div class="bw"><div class="bf" style="width:8%;background:#6b7280"></div></div><div class="ct">2</div></div>
+            <div class="pr"><div class="dot" style="background:#3b82f6"></div><div class="nm">Applied</div><div class="bw"><div class="bf" style="width:21%;background:#3b82f6"></div></div><div class="ct">5</div></div>
+            <div class="pr"><div class="dot" style="background:#8b5cf6"></div><div class="nm">Screening</div><div class="bw"><div class="bf" style="width:8%;background:#8b5cf6"></div></div><div class="ct">2</div></div>
+            <div class="pr"><div class="dot" style="background:#f59e0b"></div><div class="nm">Interviewing</div><div class="bw"><div class="bf" style="width:13%;background:#f59e0b"></div></div><div class="ct">3</div></div>
+            <div class="pr"><div class="dot" style="background:#22c55e"></div><div class="nm">Offer</div><div class="bw"><div class="bf" style="width:4%;background:#22c55e"></div></div><div class="ct">1</div></div>
+          </div>
+        </div>
+        <div class="gc"><div class="gc-label">Interviews</div><div class="med-n">3</div><div class="med-s">this week</div><div class="t-up">+1 from last week</div></div>
+        <div class="gc"><div class="gc-label">Response Rate</div><div class="med-n">42%</div><div class="med-s">got a reply</div><div class="t-up">+5%</div></div>
+        <div class="gc wide">
+          <div class="gc-label">Coming Up</div>
+          <div class="bi"><div class="bar" style="background:#f59e0b"></div><div class="info"><h4>Google — Technical Interview</h4><p>Today 2:00 PM · 60 min</p></div><div class="rt" style="color:#f59e0b;">Today</div></div>
+          <div class="bi"><div class="bar" style="background:#f59e0b"></div><div class="info"><h4>Netflix — System Design</h4><p>Thu 10:30 AM · 90 min</p></div><div class="rt" style="color:#78716c;">Thu</div></div>
+          <div class="bi"><div class="bar" style="background:#f59e0b"></div><div class="info"><h4>Vercel — Hiring Manager</h4><p>Fri 4:00 PM · 45 min</p></div><div class="rt" style="color:#78716c;">Fri</div></div>
+        </div>
+        <div class="gc wide">
+          <div class="gc-label">Needs Attention</div>
+          <div class="bi"><div class="bar" style="background:#ef4444"></div><div class="info"><h4>Stripe — Senior Frontend</h4><p>Applied · 12 days, no response</p></div><div class="rt" style="color:#ef4444;">12d</div></div>
+          <div class="bi"><div class="bar" style="background:#f59e0b"></div><div class="info"><h4>Airbnb — Staff Engineer</h4><p>Screening · 9 days stale</p></div><div class="rt" style="color:#f59e0b;">9d</div></div>
+          <div class="bi"><div class="bar" style="background:#22c55e"></div><div class="info"><h4>Figma — Offer expires Apr 21</h4><p>$185K + RSUs · 5 days left</p></div><div class="rt" style="color:#22c55e;">5d</div></div>
+        </div>
+        <div class="gc"><div class="gc-label">Avg Pipeline</div><div class="med-n">18d</div><div class="med-s">time in pipeline</div><div class="t-up">-2d</div></div>
+        <div class="gc">
+          <div class="gc-label">Recent</div>
+          <div class="bi"><div class="bar" style="background:#f59e0b"></div><div class="info"><h4>Google → Interviewing</h4><p>2h ago</p></div></div>
+          <div class="bi"><div class="bar" style="background:#3b82f6"></div><div class="info"><h4>Cloudflare — created</h4><p>5h ago</p></div></div>
+          <div class="bi"><div class="bar" style="background:#ef4444"></div><div class="info"><h4>Coinbase → Rejected</h4><p>Yesterday</p></div></div>
+          <div class="bi"><div class="bar" style="background:#22c55e"></div><div class="info"><h4>Figma → Offer</h4><p>Yesterday</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== KANBAN ===== -->
+    <div class="pg" id="pg-kanban">
+      <div class="kb">
+        <div class="kb-col"><div class="kb-hdr"><div class="dot" style="background:#6b7280"></div>Wishlist<span class="cnt">2</span></div><div class="kb-cards"><div class="kb-card" onclick="go('detail')"><h4>Notion</h4><div class="role">Product Engineer</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">3d</span><span class="tag">remote</span></div></div><div class="kb-card" onclick="go('detail')"><h4>Linear</h4><div class="role">Full Stack</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">1d</span><span class="tag">startup</span></div></div></div></div>
+        <div class="kb-col"><div class="kb-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div><div class="kb-cards"><div class="kb-card" onclick="go('detail')"><h4>Stripe</h4><div class="role">Senior Frontend</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">12d</span><span class="stale" style="background:#fee2e2;color:#ef4444;">stale</span></div></div><div class="kb-card" onclick="go('detail')"><h4>Cloudflare</h4><div class="role">Systems Engineer</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">1d</span><span class="tag">referral</span></div></div><div class="kb-card" onclick="go('detail')"><h4>Meta</h4><div class="role">Product Engineer</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">8d</span><span class="stale" style="background:#fef3c7;color:#92400e;">stale</span></div></div></div></div>
+        <div class="kb-col"><div class="kb-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span></div><div class="kb-cards"><div class="kb-card" onclick="go('detail')"><h4>Airbnb</h4><div class="role">Staff Engineer</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">9d</span></div></div><div class="kb-card" onclick="go('detail')"><h4>Shopify</h4><div class="role">Senior SWE</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">4d</span></div></div></div></div>
+        <div class="kb-col"><div class="kb-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div><div class="kb-cards"><div class="kb-card" onclick="go('detail')"><h4>Google</h4><div class="role">SDE III</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">6d</span><span class="stale" style="background:#fef3c7;color:#92400e;">tmrw</span></div></div><div class="kb-card" onclick="go('detail')"><h4>Netflix</h4><div class="role">Senior SWE</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">14d</span></div></div><div class="kb-card" onclick="go('detail')"><h4>Vercel</h4><div class="role">Frontend Lead</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">10d</span></div></div></div></div>
+        <div class="kb-col"><div class="kb-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div><div class="kb-cards"><div class="kb-card" onclick="go('detail')"><h4>Figma</h4><div class="role">Senior Frontend</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">2d</span></div></div></div></div>
+        <div class="kb-col" style="opacity:.5;"><div class="kb-hdr"><div class="dot" style="background:#ef4444"></div>Rejected<span class="cnt">3</span></div><div class="kb-cards"><div class="kb-card"><h4>Coinbase</h4><div class="role">Backend Lead</div><div class="meta"><span class="days">After screening</span></div></div></div></div>
+      </div>
+    </div>
+
+    <!-- ===== TABLE ===== -->
+    <div class="pg" id="pg-table">
+      <div class="tbl-ctrl">
+        <div class="search-bar" style="width:240px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search...</div>
+        <span class="chip on">All (24)</span><span class="chip">Applied</span><span class="chip">Interviewing</span><span class="chip">Offer</span>
+      </div>
+      <!-- Desktop table -->
+      <table class="tbl tbl-desktop">
+        <thead><tr><th>Company</th><th>Role</th><th>Status</th><th>Priority</th><th>Source</th><th>Applied</th><th>Days</th></tr></thead>
+        <tbody>
+          <tr onclick="go('detail')" style="cursor:pointer"><td><div class="co"><div class="a" style="background:#22c55e">F</div>Figma</div></td><td>Senior Frontend</td><td><span class="badge" style="background:rgba(34,197,94,.12);color:#15803d;">Offer</span></td><td style="font-weight:600;">High</td><td>Referral</td><td>Apr 2</td><td>14</td></tr>
+          <tr onclick="go('detail')" style="cursor:pointer"><td><div class="co"><div class="a" style="background:#f59e0b">G</div>Google</div></td><td>SDE III</td><td><span class="badge" style="background:rgba(245,158,11,.12);color:#92400e;">Interviewing</span></td><td style="font-weight:600;">High</td><td>LinkedIn</td><td>Apr 5</td><td>11</td></tr>
+          <tr onclick="go('detail')" style="cursor:pointer"><td><div class="co"><div class="a" style="background:#3b82f6">S</div>Stripe</div></td><td>Senior Frontend</td><td><span class="badge" style="background:rgba(59,130,246,.12);color:#2563eb;">Applied</span></td><td style="font-weight:600;">High</td><td>Referral</td><td>Apr 4</td><td>12</td></tr>
+          <tr onclick="go('detail')" style="cursor:pointer"><td><div class="co"><div class="a" style="background:#8b5cf6">A</div>Airbnb</div></td><td>Staff Engineer</td><td><span class="badge" style="background:rgba(139,92,246,.12);color:#7c3aed;">Screening</span></td><td style="font-weight:600;">High</td><td>LinkedIn</td><td>Apr 7</td><td>9</td></tr>
+          <tr onclick="go('detail')" style="cursor:pointer"><td><div class="co"><div class="a" style="background:#3b82f6">C</div>Cloudflare</div></td><td>Systems Engineer</td><td><span class="badge" style="background:rgba(59,130,246,.12);color:#2563eb;">Applied</span></td><td>Medium</td><td>Referral</td><td>Apr 15</td><td>1</td></tr>
+          <tr onclick="go('detail')" style="cursor:pointer"><td><div class="co"><div class="a" style="background:#f59e0b">N</div>Netflix</div></td><td>Senior SWE</td><td><span class="badge" style="background:rgba(245,158,11,.12);color:#92400e;">Interviewing</span></td><td style="font-weight:600;">High</td><td>Company Site</td><td>Apr 1</td><td>15</td></tr>
+        </tbody>
+      </table>
+      <!-- Mobile card list -->
+      <div class="card-list">
+        <div class="app-card" onclick="go('detail')">
+          <div class="app-card-top"><div class="a" style="background:#22c55e">F</div><div class="app-card-info"><div class="app-card-name">Figma</div><div class="app-card-role">Senior Frontend</div></div><span class="badge" style="background:rgba(34,197,94,.12);color:#15803d;">Offer</span></div>
+          <div class="app-card-bottom"><span>High</span><span>Referral</span><span>Apr 2</span><span>14d</span></div>
+        </div>
+        <div class="app-card" onclick="go('detail')">
+          <div class="app-card-top"><div class="a" style="background:#f59e0b">G</div><div class="app-card-info"><div class="app-card-name">Google</div><div class="app-card-role">SDE III</div></div><span class="badge" style="background:rgba(245,158,11,.12);color:#92400e;">Interviewing</span></div>
+          <div class="app-card-bottom"><span>High</span><span>LinkedIn</span><span>Apr 5</span><span>11d</span></div>
+        </div>
+        <div class="app-card" onclick="go('detail')">
+          <div class="app-card-top"><div class="a" style="background:#3b82f6">S</div><div class="app-card-info"><div class="app-card-name">Stripe</div><div class="app-card-role">Senior Frontend</div></div><span class="badge" style="background:rgba(59,130,246,.12);color:#2563eb;">Applied</span></div>
+          <div class="app-card-bottom"><span>High</span><span>Referral</span><span>Apr 4</span><span style="color:#ef4444;font-weight:600;">12d</span></div>
+        </div>
+        <div class="app-card" onclick="go('detail')">
+          <div class="app-card-top"><div class="a" style="background:#8b5cf6">A</div><div class="app-card-info"><div class="app-card-name">Airbnb</div><div class="app-card-role">Staff Engineer</div></div><span class="badge" style="background:rgba(139,92,246,.12);color:#7c3aed;">Screening</span></div>
+          <div class="app-card-bottom"><span>High</span><span>LinkedIn</span><span>Apr 7</span><span>9d</span></div>
+        </div>
+        <div class="app-card" onclick="go('detail')">
+          <div class="app-card-top"><div class="a" style="background:#3b82f6">C</div><div class="app-card-info"><div class="app-card-name">Cloudflare</div><div class="app-card-role">Systems Engineer</div></div><span class="badge" style="background:rgba(59,130,246,.12);color:#2563eb;">Applied</span></div>
+          <div class="app-card-bottom"><span>Medium</span><span>Referral</span><span>Apr 15</span><span>1d</span></div>
+        </div>
+        <div class="app-card" onclick="go('detail')">
+          <div class="app-card-top"><div class="a" style="background:#f59e0b">N</div><div class="app-card-info"><div class="app-card-name">Netflix</div><div class="app-card-role">Senior SWE</div></div><span class="badge" style="background:rgba(245,158,11,.12);color:#92400e;">Interviewing</span></div>
+          <div class="app-card-bottom"><span>High</span><span>Company Site</span><span>Apr 1</span><span>15d</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CALENDAR (simplified) ===== -->
+    <div class="pg" id="pg-cal">
+      <div class="gc accent" style="margin-bottom:14px;padding:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div style="font-size:18px;font-weight:700;">April 2026</div>
+          <div style="display:flex;gap:6px;"><span class="chip on" style="height:28px;">Month</span><span class="chip" style="height:28px;">Week</span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;">
+          <div style="font-size:11px;font-weight:600;color:#a8a29e;padding:4px;">Mon</div><div style="font-size:11px;font-weight:600;color:#a8a29e;padding:4px;">Tue</div><div style="font-size:11px;font-weight:600;color:#a8a29e;padding:4px;">Wed</div><div style="font-size:11px;font-weight:600;color:#a8a29e;padding:4px;">Thu</div><div style="font-size:11px;font-weight:600;color:#a8a29e;padding:4px;">Fri</div><div style="font-size:11px;font-weight:600;color:#a8a29e;padding:4px;">Sat</div><div style="font-size:11px;font-weight:600;color:#a8a29e;padding:4px;">Sun</div>
+          <div style="padding:8px;color:#d4d4d4;font-size:12px;">30</div><div style="padding:8px;color:#d4d4d4;font-size:12px;">31</div><div style="padding:8px;font-size:12px;">1</div><div style="padding:8px;font-size:12px;">2</div><div style="padding:8px;font-size:12px;">3</div><div style="padding:8px;font-size:12px;color:#a8a29e;">4</div><div style="padding:8px;font-size:12px;color:#a8a29e;">5</div>
+          <div style="padding:8px;font-size:12px;">6</div><div style="padding:8px;font-size:12px;">7</div><div style="padding:8px;font-size:12px;">8</div><div style="padding:8px;font-size:12px;">9</div><div style="padding:8px;font-size:12px;">10</div><div style="padding:8px;font-size:12px;color:#a8a29e;">11</div><div style="padding:8px;font-size:12px;color:#a8a29e;">12</div>
+          <div style="padding:8px;font-size:12px;">13</div><div style="padding:8px;font-size:12px;">14</div><div style="padding:8px;font-size:12px;">15</div><div style="padding:6px;font-size:12px;font-weight:700;background:rgba(59,130,246,.15);border-radius:8px;color:#2563eb;">16</div><div style="padding:6px;font-size:12px;"><div style="font-size:9px;background:rgba(245,158,11,.15);color:#92400e;border-radius:3px;padding:1px 3px;margin-top:2px;">Netflix</div>17</div><div style="padding:6px;font-size:12px;color:#a8a29e;"><div style="font-size:9px;background:rgba(245,158,11,.15);color:#92400e;border-radius:3px;padding:1px 3px;margin-top:2px;">Vercel</div>18</div><div style="padding:8px;font-size:12px;color:#a8a29e;">19</div>
+          <div style="padding:8px;font-size:12px;">20</div><div style="padding:6px;font-size:12px;"><div style="font-size:9px;background:rgba(34,197,94,.15);color:#15803d;border-radius:3px;padding:1px 3px;margin-top:2px;">Figma !</div>21</div><div style="padding:6px;font-size:12px;"><div style="font-size:9px;background:rgba(245,158,11,.15);color:#92400e;border-radius:3px;padding:1px 3px;margin-top:2px;">Google</div>22</div><div style="padding:8px;font-size:12px;">23</div><div style="padding:8px;font-size:12px;">24</div><div style="padding:8px;font-size:12px;color:#a8a29e;">25</div><div style="padding:8px;font-size:12px;color:#a8a29e;">26</div>
+        </div>
+      </div>
+      <div class="gc" style="margin-bottom:14px;"><div class="gc-label">This Week</div>
+        <div class="bi"><div class="bar" style="background:#f59e0b"></div><div class="info"><h4>Google — Technical</h4><p>Today 2:00 PM · 60 min</p></div><div class="rt" style="color:#f59e0b;">Today</div></div>
+        <div class="bi"><div class="bar" style="background:#f59e0b"></div><div class="info"><h4>Netflix — System Design</h4><p>Thu 10:30 AM · 90 min</p></div><div class="rt" style="color:#78716c;">Thu</div></div>
+        <div class="bi"><div class="bar" style="background:#f59e0b"></div><div class="info"><h4>Vercel — Hiring Manager</h4><p>Fri 4:00 PM · 45 min</p></div><div class="rt" style="color:#78716c;">Fri</div></div>
+      </div>
+    </div>
+
+    <!-- ===== ANALYTICS ===== -->
+    <div class="pg" id="pg-analytics">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <div class="gc">
+          <div class="gc-label">Pipeline Funnel</div>
+          <div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px;"><span>Applied</span><span>42</span></div><div style="height:18px;background:rgba(0,0,0,.04);border-radius:4px;overflow:hidden;"><div style="height:100%;width:100%;background:#3b82f6;border-radius:4px;"></div></div></div>
+          <div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px;"><span>Screening</span><span>18</span></div><div style="height:18px;background:rgba(0,0,0,.04);border-radius:4px;overflow:hidden;"><div style="height:100%;width:43%;background:#8b5cf6;border-radius:4px;"></div></div></div>
+          <div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px;"><span>Interviewing</span><span>10</span></div><div style="height:18px;background:rgba(0,0,0,.04);border-radius:4px;overflow:hidden;"><div style="height:100%;width:24%;background:#f59e0b;border-radius:4px;"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px;"><span>Offer</span><span>3</span></div><div style="height:18px;background:rgba(0,0,0,.04);border-radius:4px;overflow:hidden;"><div style="height:100%;width:7%;background:#22c55e;border-radius:4px;"></div></div></div>
+        </div>
+        <div class="gc">
+          <div class="gc-label">Source Effectiveness</div>
+          <div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px;"><span>Referral</span><span style="color:#22c55e;">67%</span></div><div style="height:12px;background:rgba(0,0,0,.04);border-radius:3px;overflow:hidden;"><div style="height:100%;width:67%;background:#22c55e;border-radius:3px;"></div></div><div style="font-size:10px;color:#a8a29e;margin-top:2px;">6 apps · 4 responses</div></div>
+          <div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px;"><span>LinkedIn</span><span style="color:#f59e0b;">45%</span></div><div style="height:12px;background:rgba(0,0,0,.04);border-radius:3px;overflow:hidden;"><div style="height:100%;width:45%;background:#f59e0b;border-radius:3px;"></div></div><div style="font-size:10px;color:#a8a29e;margin-top:2px;">20 apps · 9 responses</div></div>
+          <div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px;"><span>Company Site</span><span style="color:#3b82f6;">30%</span></div><div style="height:12px;background:rgba(0,0,0,.04);border-radius:3px;overflow:hidden;"><div style="height:100%;width:30%;background:#3b82f6;border-radius:3px;"></div></div><div style="font-size:10px;color:#a8a29e;margin-top:2px;">10 apps · 3 responses</div></div>
+        </div>
+      </div>
+      <div class="gc"><div class="gc-label">Summary</div>
+        <div style="display:flex;gap:40px;">
+          <div><div class="med-n">42</div><div class="med-s">total applications</div></div>
+          <div><div class="med-n">42%</div><div class="med-s">response rate</div></div>
+          <div><div class="med-n">6.2d</div><div class="med-s">avg response time</div></div>
+          <div><div class="med-n">24%</div><div class="med-s">interview conversion</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== DETAIL PAGE ===== -->
+    <div class="pg" id="pg-detail">
+      <div class="det-hero">
+        <div class="det-back" onclick="go(prevPg)">← Back</div>
+        <div class="det-top">
+          <div><h1>Google</h1><div class="sub">SDE III · Mountain View, CA (Hybrid)</div></div>
+          <div class="det-acts">
+            <select><option selected>Interviewing</option><option>Applied</option><option>Screening</option><option>Offer</option><option>Rejected</option></select>
+            <button class="sm-btn">★ Pinned</button>
+            <button class="sm-btn" style="color:#ef4444;">Archive</button>
+          </div>
+        </div>
+        <div class="det-meta">
+          <span><strong>Priority:</strong> High</span>
+          <span><strong>Source:</strong> LinkedIn</span>
+          <span><strong>Applied:</strong> Apr 5</span>
+          <span><strong>Salary:</strong> $180K–$240K</span>
+          <span><strong>Days:</strong> 11d</span>
+        </div>
+        <div class="dtabs">
+          <div class="dtab act" onclick="dtab('ov',this)">Overview</div>
+          <div class="dtab" onclick="dtab('int',this)">Interviews (3)</div>
+          <div class="dtab" onclick="dtab('jd',this)">JD Snapshot</div>
+          <div class="dtab" onclick="dtab('doc',this)">Documents (2)</div>
+          <div class="dtab" onclick="dtab('tl',this)">Timeline</div>
+        </div>
+      </div>
+      <div class="det-body">
+        <!-- Overview -->
+        <div class="dtab-p act" id="dt-ov">
+          <div class="fg">
+            <div>
+              <div class="fi"><label>Posting URL</label><input value="https://careers.google.com/jobs/123456" style="color:#3b82f6;"/></div>
+              <div class="fi"><label>Location</label><div style="display:flex;gap:8px;"><select style="flex:1;padding:8px 12px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.5);font-size:13px;font-family:var(--font);"><option selected>Hybrid</option><option>Remote</option><option>Onsite</option></select><input value="Mountain View, CA" style="flex:2;"/></div></div>
+              <div class="fi"><label>Salary Range</label><div style="display:flex;gap:8px;align-items:center;"><input value="180000" type="number" style="width:100px;"/><span style="color:#a8a29e;">–</span><input value="240000" type="number" style="width:100px;"/><select style="width:70px;padding:8px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.5);font-size:12px;font-family:var(--font);"><option selected>USD</option><option>INR</option></select></div></div>
+            </div>
+            <div>
+              <div class="fi"><label>Notes <span style="color:#22c55e;font-weight:400;text-transform:none;letter-spacing:0;">Saved</span></label><textarea>Referred by James Chen from Cloud Networking.
+
+Prep focus:
+- Distributed system design
+- API design (REST, gRPC)
+- Google-scale infra
+
+TC estimate: $350-400K with RSUs</textarea><div class="md-hint"><code>**bold**</code> <code>*italic*</code> <code>- lists</code> <code>[links](url)</code> <code>`code`</code> — markdown supported</div></div>
+            </div>
+          </div>
+          <div class="gc" style="margin-bottom:16px;">
+            <div class="gc-label">Company Research — Google</div>
+            <textarea class="fi" style="width:100%;min-height:80px;padding:12px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.5);font-size:13px;font-family:var(--font);resize:vertical;">**Glassdoor:** 4.4/5. Cloud division growing aggressively.
+
+🔴 **Red flag:** 2024 layoffs still impacting morale in some teams
+🟢 **Green flag:** Networking team is well-funded, hiring aggressively
+
+### Tech Stack
+Borg, Spanner, BigTable, gRPC (Stubby predecessor)</textarea>
+            <div class="md-hint"><code>**bold**</code> <code>### headings</code> <code>- lists</code> — markdown supported</div>
+          </div>
+        </div>
+        <!-- Interviews -->
+        <div class="dtab-p" id="dt-int">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><span style="font-weight:600;">3 rounds</span><button class="add-btn" style="height:32px;font-size:12px;">+ Add Round</button></div>
+
+          <!-- Round 1 — completed, with Q&A pairs -->
+          <div class="rnd">
+            <div class="rnd-h" onclick="this.parentElement.querySelector('.rnd-body').classList.toggle('open')">
+              <div class="rnd-num" style="background:rgba(34,197,94,.12);color:#15803d;">1</div>
+              <div class="rnd-info"><h4>Phone Screen</h4><p>Apr 8 · 30 min · James Chen (Recruiter)</p></div>
+              <span class="badge" style="background:rgba(34,197,94,.12);color:#15803d;font-size:11px;padding:2px 8px;border-radius:99px;">Done</span>
+              <div class="rnd-stars"><span style="color:#f59e0b;">★★★★</span><span style="color:#d4d4d4;">★</span></div>
+            </div>
+            <div class="rnd-body">
+              <div style="font-size:11px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Questions & Answers</div>
+
+              <div class="qa-pair">
+                <div style="display:flex;align-items:center;margin-bottom:6px;"><span style="font-size:11px;font-weight:600;color:#78716c;">Q1</span><span class="qa-remove">✕</span></div>
+                <div class="qa-q"><label>Question</label><textarea>Tell me about a time you led a complex project from start to finish</textarea></div>
+                <div class="qa-a"><label>Your Answer</label><textarea style="min-height:64px;">Led the **cloud migration** of our core payment system from on-prem to AWS.
+
+- Coordinated 4 teams over 6 months
+- Achieved **zero downtime** during cutover
+- Reduced infra costs by 40%
+
+Key challenge: handling data consistency during dual-write period. Used a custom reconciliation pipeline.</textarea></div>
+                <div class="md-hint"><code>**bold**</code> <code>*italic*</code> <code>- lists</code> <code>`code`</code> — markdown supported</div>
+              </div>
+
+              <div class="qa-pair">
+                <div style="display:flex;align-items:center;margin-bottom:6px;"><span style="font-size:11px;font-weight:600;color:#78716c;">Q2</span><span class="qa-remove">✕</span></div>
+                <div class="qa-q"><label>Question</label><textarea>How do you handle disagreements with stakeholders?</textarea></div>
+                <div class="qa-a"><label>Your Answer</label><textarea>Talked about the API redesign conflict with the mobile team. Resolved by:
+
+1. Getting data on actual usage patterns
+2. Running a 2-week prototype of both approaches
+3. Letting metrics decide instead of opinions</textarea></div>
+                <div class="md-hint"><code>**bold**</code> <code>- lists</code> <code>1. numbered</code> — markdown supported</div>
+              </div>
+
+              <div class="qa-pair">
+                <div style="display:flex;align-items:center;margin-bottom:6px;"><span style="font-size:11px;font-weight:600;color:#78716c;">Q3</span><span class="qa-remove">✕</span></div>
+                <div class="qa-q"><label>Question</label><textarea>Walk me through your approach to system design</textarea></div>
+                <div class="qa-a"><label>Your Answer</label><textarea>Described my framework: requirements → constraints → high-level → deep dive → trade-offs. Interviewer seemed to appreciate the structured approach.</textarea></div>
+              </div>
+
+              <div class="qa-add" onclick="addQA(this)">+ Add Question & Answer</div>
+
+              <div style="margin-top:16px;border-top:1px solid rgba(0,0,0,.06);padding-top:14px;">
+                <div class="fi"><label>Experience Notes <span style="color:#a8a29e;font-weight:400;text-transform:none;letter-spacing:0;">markdown</span></label><textarea style="min-height:60px;">Overall positive. Interviewer was engaged, asked follow-ups. He mentioned the team is hiring 3 more this quarter.
+
+**Vibe:** Collaborative, not adversarial. Good sign for team culture.</textarea></div>
+                <div class="fi"><label>Feedback Received <span style="color:#a8a29e;font-weight:400;text-transform:none;letter-spacing:0;">markdown</span></label><textarea style="min-height:48px;">Recruiter said *"strong fit for the team culture"*. Moved to technical round same day.</textarea></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Round 2 — completed -->
+          <div class="rnd">
+            <div class="rnd-h" onclick="this.parentElement.querySelector('.rnd-body').classList.toggle('open')">
+              <div class="rnd-num" style="background:rgba(34,197,94,.12);color:#15803d;">2</div>
+              <div class="rnd-info"><h4>Technical</h4><p>Apr 12 · 60 min · Sarah Kim (L6 SWE)</p></div>
+              <span class="badge" style="background:rgba(34,197,94,.12);color:#15803d;font-size:11px;padding:2px 8px;border-radius:99px;">Done</span>
+              <div class="rnd-stars"><span style="color:#f59e0b;">★★★</span><span style="color:#d4d4d4;">★★</span></div>
+            </div>
+            <div class="rnd-body">
+              <div style="font-size:11px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Questions & Answers</div>
+
+              <div class="qa-pair">
+                <div style="display:flex;align-items:center;margin-bottom:6px;"><span style="font-size:11px;font-weight:600;color:#78716c;">Q1</span><span class="qa-remove">✕</span></div>
+                <div class="qa-q"><label>Question</label><textarea>Design a URL shortener (system design, 25 min)</textarea></div>
+                <div class="qa-a"><label>Your Answer</label><textarea>Covered:
+- **Hashing strategy**: Base62 encoding of auto-increment ID
+- **DB partitioning**: Range-based sharding by hash prefix
+- **Caching layer**: Redis LRU for hot URLs (80/20 rule)
+- **Read path**: Cache → DB → 404
+- **Analytics**: Async event pipeline with Kafka
+
+Went well — covered all expected components within time.</textarea></div>
+                <div class="md-hint"><code>**bold**</code> <code>- lists</code> — markdown supported</div>
+              </div>
+
+              <div class="qa-pair">
+                <div style="display:flex;align-items:center;margin-bottom:6px;"><span style="font-size:11px;font-weight:600;color:#78716c;">Q2</span><span class="qa-remove">✕</span></div>
+                <div class="qa-q"><label>Question</label><textarea>Implement LRU cache (coding, 25 min)</textarea></div>
+                <div class="qa-a"><label>Your Answer</label><textarea>Used `HashMap` + doubly linked list. Clean implementation, O(1) get/put.
+
+Ran slightly over on follow-up optimization (thread safety). Should practice timed coding more.</textarea></div>
+              </div>
+
+              <div class="qa-add" onclick="addQA(this)">+ Add Question & Answer</div>
+
+              <div style="margin-top:16px;border-top:1px solid rgba(0,0,0,.06);padding-top:14px;">
+                <div class="fi"><label>Experience Notes <span style="color:#a8a29e;font-weight:400;text-transform:none;letter-spacing:0;">markdown</span></label><textarea>URL shortener went well. LRU was clean but ran over on thread-safety follow-up. Consensus discussion was conversational — interviewer seemed genuinely curious about my experience with Raft.</textarea></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Round 3 — upcoming -->
+          <div class="rnd" style="border-color:rgba(245,158,11,.3);">
+            <div class="rnd-h">
+              <div class="rnd-num" style="background:rgba(245,158,11,.12);color:#92400e;">3</div>
+              <div class="rnd-info"><h4>Bar Raiser</h4><p>Apr 22 · 45 min · TBD</p></div>
+              <span class="badge" style="background:rgba(245,158,11,.12);color:#92400e;font-size:11px;padding:2px 8px;border-radius:99px;">Scheduled</span>
+            </div>
+          </div>
+        </div>
+        <!-- JD -->
+        <div class="dtab-p" id="dt-jd">
+          <div style="display:flex;justify-content:space-between;margin-bottom:16px;"><div><div style="font-weight:600;">Saved Apr 5</div><div style="font-size:12px;color:#a8a29e;">Version 1</div></div><div style="display:flex;gap:8px;"><button class="sm-btn">Re-scrape</button><button class="sm-btn">Edit</button></div></div>
+          <div class="gc accent" style="line-height:1.8;">
+            <h3 style="font-size:18px;font-weight:700;margin-bottom:4px;">Software Engineer III, Cloud Networking</h3>
+            <p style="color:#78716c;margin-bottom:16px;">Google · Mountain View, CA</p>
+            <p style="margin-bottom:12px;"><strong>About:</strong> Design and build infrastructure powering Google Cloud's networking stack at global scale.</p>
+            <p style="margin-bottom:4px;"><strong>Requirements:</strong></p>
+            <ul style="padding-left:20px;margin-bottom:12px;font-size:13px;"><li>5+ years SWE experience</li><li>Distributed systems or cloud infra</li><li>Go, C++, or Java</li></ul>
+          </div>
+        </div>
+        <!-- Docs -->
+        <div class="dtab-p" id="dt-doc">
+          <div style="display:flex;justify-content:space-between;margin-bottom:16px;"><span style="font-weight:600;">2 documents</span><button class="add-btn" style="height:32px;font-size:12px;">+ Upload</button></div>
+          <div class="gc" style="padding:0;overflow:hidden;">
+            <div class="doc-i"><div class="doc-icon" style="background:rgba(59,130,246,.1);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="info"><h4>Resume_Akhil_SDE_2026.pdf</h4><p>Resume · 142 KB</p></div></div>
+            <div class="doc-i"><div class="doc-icon" style="background:rgba(139,92,246,.1);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="info"><h4>Cover_Letter_Google.pdf</h4><p>Cover Letter · 89 KB</p></div></div>
+          </div>
+          <div class="upload-z"><div style="font-size:24px;margin-bottom:6px;opacity:.3;">+</div><div style="font-size:13px;font-weight:600;">Drop files or click to upload</div></div>
+        </div>
+        <!-- Timeline -->
+        <div class="dtab-p" id="dt-tl">
+          <div class="tl-i"><div class="tl-line"></div><div class="tl-dot" style="background:#f59e0b;"></div><div class="tl-text">Bar Raiser scheduled</div><div class="tl-time">Apr 16</div></div>
+          <div class="tl-i"><div class="tl-line"></div><div class="tl-dot" style="background:#f59e0b;"></div><div class="tl-text">→ Interviewing</div><div class="tl-time">Apr 12</div></div>
+          <div class="tl-i"><div class="tl-line"></div><div class="tl-dot" style="background:#8b5cf6;"></div><div class="tl-text">→ Screening</div><div class="tl-time">Apr 8</div></div>
+          <div class="tl-i"><div class="tl-line"></div><div class="tl-dot" style="background:#3b82f6;"></div><div class="tl-text">Pinned</div><div class="tl-time">Apr 5</div></div>
+          <div class="tl-i"><div class="tl-dot" style="background:#22c55e;"></div><div class="tl-text">Created</div><div class="tl-time">Apr 5 · via LinkedIn</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="mobile-bar">
+  <div class="mb-i act" onclick="go('dash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Home</span></div>
+  <div class="mb-i" onclick="go('kanban')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg><span>Board</span></div>
+  <div class="mb-i" onclick="go('table')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span>List</span></div>
+  <div class="mb-i" onclick="go('cal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Cal</span></div>
+  <div class="mb-i" onclick="go('analytics')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg><span>Stats</span></div>
+</div>
+
+<script>
+function addQA(btn){
+  const n=btn.parentElement.querySelectorAll('.qa-pair').length+1;
+  const pair=document.createElement('div');
+  pair.className='qa-pair';
+  pair.innerHTML=`<div style="display:flex;align-items:center;margin-bottom:6px;"><span style="font-size:11px;font-weight:600;color:#78716c;">Q${n}</span><span class="qa-remove" onclick="this.closest('.qa-pair').remove()">✕</span></div><div class="qa-q"><label>Question</label><textarea placeholder="What were you asked?"></textarea></div><div class="qa-a"><label>Your Answer</label><textarea placeholder="How did you respond? Use **markdown** for formatting." style="min-height:64px;"></textarea></div><div class="md-hint"><code>**bold**</code> <code>- lists</code> <code>\`code\`</code> — markdown supported</div>`;
+  btn.before(pair);
+  pair.querySelector('textarea').focus();
+}
+let prevPg='dash';
+const titles={dash:'Dashboard',kanban:'Kanban Board',table:'Applications',cal:'Calendar',analytics:'Analytics',detail:'Google — SDE III'};
+function go(pg){
+  if(pg!=='detail')prevPg=pg;
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('act'));
+  document.getElementById('pg-'+pg).classList.add('act');
+  document.getElementById('pgTitle').textContent=titles[pg]||'Dashboard';
+  document.querySelectorAll('.sb .ni').forEach(n=>n.classList.remove('act'));
+  document.querySelectorAll('.mobile-bar .mb-i').forEach(n=>n.classList.remove('act'));
+  const idx={dash:0,kanban:1,table:2,cal:3,analytics:4};
+  if(idx[pg]!==undefined){document.querySelectorAll('.sb .ni')[idx[pg]].classList.add('act');document.querySelectorAll('.mobile-bar .mb-i')[idx[pg]]?.classList.add('act');}
+  window.scrollTo(0,0);
+}
+function dtab(id,el){
+  document.querySelectorAll('.dtab-p').forEach(p=>p.classList.remove('act'));
+  document.getElementById('dt-'+id).classList.add('act');
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('act'));
+  el.classList.add('act');
+}
+</script>
+</body>
+</html>

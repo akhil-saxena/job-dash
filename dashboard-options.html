@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — Dashboard Layout Options</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#0a0a0a;color:#fff;}
+
+  .picker{position:fixed;top:0;left:0;right:0;z-index:100;background:#111;border-bottom:1px solid #2a2a2a;padding:14px 32px;display:flex;align-items:center;gap:16px;}
+  .picker h2{font-size:15px;font-weight:600;color:#888;white-space:nowrap;}
+  .pick-btn{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid #333;background:#1a1a1a;color:#888;cursor:pointer;transition:all 0.15s;}
+  .pick-btn:hover{border-color:#555;color:#ccc;}
+  .pick-btn.active{background:#fff;color:#000;border-color:#fff;}
+
+  .preview{margin-top:64px;padding:32px;display:flex;justify-content:center;}
+  .frame{width:1280px;height:780px;border-radius:12px;overflow:hidden;border:1px solid #2a2a2a;position:relative;background:#fafaf9;box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+  .frame>div{display:none;position:absolute;inset:0;}
+  .frame>div.active{display:block;}
+
+  /* Shared sidebar (A2 shell, simplified for context) */
+  .sb{position:absolute;left:0;top:0;bottom:0;width:248px;background:#fff;border-right:1px solid #e5e5e4;padding:16px 12px;display:flex;flex-direction:column;font-size:13px;}
+  .sb .logo{font-size:17px;font-weight:700;color:#292524;display:flex;align-items:center;gap:6px;padding:0 8px 14px;}
+  .sb .logo .dot{width:7px;height:7px;background:#3b82f6;border-radius:50%;}
+  .sb .search{margin:0 4px 12px;padding:6px 10px;border:1px solid #e5e5e4;border-radius:7px;color:#a8a29e;background:#fafaf9;display:flex;align-items:center;gap:6px;font-size:12px;}
+  .sb .search .k{font-size:10px;background:#e7e5e4;padding:1px 4px;border-radius:3px;color:#78716c;font-family:monospace;margin-left:auto;}
+  .sb .pin-lbl{font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:0.5px;padding:0 16px;margin-bottom:4px;}
+  .sb .pin-i{display:flex;align-items:center;gap:8px;height:28px;padding:0 12px;font-size:12px;color:#57534e;}
+  .sb .pin-i .pd{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .sb .ni{display:flex;align-items:center;gap:10px;height:38px;padding:0 12px;border-radius:7px;color:#78716c;}
+  .sb .ni.act{background:#f5f5f4;color:#292524;font-weight:600;}
+  .sb .ni .ic{width:15px;height:15px;background:#d4d4d4;border-radius:3px;flex-shrink:0;}
+  .sb .ni.act .ic{background:#78716c;}
+  .sb .ni .ct{margin-left:auto;font-size:11px;background:#e7e5e4;color:#78716c;padding:0 5px;border-radius:8px;height:16px;display:flex;align-items:center;}
+  .sb .pipe{display:flex;height:5px;border-radius:3px;overflow:hidden;gap:1px;margin-top:4px;}
+  .sb .pipe div{flex:none;height:100%;border-radius:2px;}
+  .sb .foot{border-top:1px solid #e5e5e4;padding:10px 4px 0;margin-top:auto;display:flex;flex-direction:column;gap:2px;}
+
+  .hd{position:absolute;left:248px;top:0;right:0;height:52px;background:#fff;border-bottom:1px solid #e5e5e4;display:flex;align-items:center;justify-content:space-between;padding:0 24px;}
+  .hd .tt{font-size:17px;font-weight:600;color:#292524;display:flex;align-items:center;gap:10px;}
+  .hd .tt .date{font-size:11px;color:#a8a29e;background:#f5f5f4;padding:2px 8px;border-radius:4px;font-weight:400;}
+  .hd .acts{display:flex;gap:8px;align-items:center;}
+  .hd .ab{height:30px;padding:0 12px;background:#292524;color:#fff;border-radius:7px;font-size:12px;font-weight:600;border:none;}
+  .hd .ib{width:30px;height:30px;border:1px solid #e5e5e4;border-radius:7px;background:#fff;}
+  .hd .av{width:26px;height:26px;border-radius:50%;background:#e5e5e4;}
+
+  .bd{position:absolute;left:248px;top:52px;right:0;bottom:0;overflow-y:auto;padding:20px 24px;}
+
+  /* Content styling for all options */
+  .stat-row{display:grid;gap:12px;margin-bottom:20px;}
+  .sc{background:#fff;border:1px solid #e5e5e4;border-radius:10px;padding:18px 20px;}
+  .sc .sl{font-size:12px;font-weight:600;color:#78716c;margin-bottom:4px;}
+  .sc .sv{font-size:24px;font-weight:600;color:#292524;line-height:1.2;}
+  .sc .st{font-size:11px;font-weight:600;margin-top:3px;}
+  .st-up{color:#22c55e;} .st-down{color:#ef4444;} .st-mute{color:#a8a29e;}
+
+  .sec{background:#fff;border:1px solid #e5e5e4;border-radius:10px;overflow:hidden;margin-bottom:16px;}
+  .sec-h{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #e5e5e4;font-size:13px;font-weight:600;color:#292524;}
+  .sec-h a{font-size:11px;color:#78716c;font-weight:600;}
+  .li{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid #f5f5f4;font-size:13px;}
+  .li:last-child{border-bottom:none;}
+  .li .av{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0;}
+  .li .tx{flex:1;min-width:0;}
+  .li .tx .t1{font-weight:600;color:#292524;font-size:13px;}
+  .li .tx .t2{color:#78716c;font-size:11px;margin-top:1px;}
+  .li .bg{font-size:11px;font-weight:600;padding:2px 7px;border-radius:99px;white-space:nowrap;}
+
+  .act-i{display:flex;gap:12px;padding:12px 18px;border-bottom:1px solid #f5f5f4;font-size:13px;}
+  .act-i:last-child{border-bottom:none;}
+  .act-i .dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+  .act-i .at{font-size:11px;color:#a8a29e;margin-top:2px;}
+
+  /* Hero for option B */
+  .hero-card{background:#fff;border:1px solid #e5e5e4;border-radius:12px;padding:24px;margin-bottom:20px;}
+  .hero-greeting{font-size:20px;font-weight:600;color:#292524;margin-bottom:4px;}
+  .hero-subtitle{font-size:13px;color:#78716c;margin-bottom:16px;}
+  .hero-alerts{display:flex;gap:12px;flex-wrap:wrap;}
+  .hero-alert{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:background 0.1s;}
+  .hero-alert:hover{filter:brightness(0.97);}
+
+  /* Right sidebar for option C */
+  .right-panel{position:absolute;right:0;top:52px;bottom:0;width:300px;background:#fff;border-left:1px solid #e5e5e4;overflow-y:auto;padding:20px 16px;}
+
+  .frame-label{position:absolute;bottom:10px;right:14px;font-size:10px;color:#a8a29e;font-weight:600;letter-spacing:0.3px;z-index:5;}
+
+  /* Descriptions */
+  .desc-area{max-width:1280px;margin:0 auto;padding:16px 32px 64px;}
+  .desc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+  .dc{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:24px;transition:border-color 0.15s;}
+  .dc.active{border-color:#3b82f6;}
+  .dc h3{font-size:15px;font-weight:600;margin-bottom:6px;}
+  .dc p{font-size:13px;color:#777;line-height:1.6;}
+  .dc .best{margin-top:12px;font-size:12px;color:#22c55e;font-weight:600;}
+  .dc .risk{margin-top:4px;font-size:12px;color:#f59e0b;font-weight:600;}
+  .dc .tags{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;}
+  .dc .tag{font-size:11px;padding:2px 8px;border-radius:4px;background:#222;color:#888;}
+</style>
+</head>
+<body>
+
+<div class="picker">
+  <h2>Dashboard Layout —</h2>
+  <div style="display:flex;gap:8px;">
+    <button class="pick-btn active" onclick="pick('d1',this)">D1: Stats-First</button>
+    <button class="pick-btn" onclick="pick('d2',this)">D2: Action-First</button>
+    <button class="pick-btn" onclick="pick('d3',this)">D3: Feed + Panel</button>
+  </div>
+</div>
+
+<div class="preview">
+  <div class="frame" id="frame">
+
+    <!-- Shared sidebar (rendered in each option) -->
+
+    <!-- D1: STATS-FIRST -->
+    <div class="active" id="opt-d1">
+      <!-- Sidebar -->
+      <div class="sb">
+        <div class="logo"><span class="dot"></span>JobDash</div>
+        <div class="search"><span style="opacity:0.5">&#128269;</span>Search...<span class="k">&#8984;K</span></div>
+        <div class="pin-lbl">Pinned</div>
+        <div class="pin-i"><div class="pd" style="background:#f59e0b"></div>Google — SDE III</div>
+        <div class="pin-i"><div class="pd" style="background:#22c55e"></div>Figma — Sr Frontend</div>
+        <div style="height:8px;"></div>
+        <div class="ni act"><div class="ic"></div>Dashboard</div>
+        <div class="ni"><div class="ic"></div>Kanban<span class="ct">24</span></div>
+        <div class="ni"><div class="ic"></div>Table</div>
+        <div class="ni"><div class="ic"></div>Calendar<span class="ct">3</span></div>
+        <div class="ni"><div class="ic"></div>Analytics</div>
+        <div class="ni"><div class="ic"></div>Contacts</div>
+        <div class="foot">
+          <div style="font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;padding:0 4px;">Pipeline</div>
+          <div class="pipe"><div style="width:8%;background:#6b7280;"></div><div style="width:21%;background:#3b82f6;"></div><div style="width:8%;background:#8b5cf6;"></div><div style="width:13%;background:#f59e0b;"></div><div style="width:4%;background:#22c55e;"></div><div style="width:13%;background:#ef4444;opacity:0.4;"></div></div>
+          <div class="ni" style="margin-top:8px;"><div class="ic"></div>Settings</div>
+        </div>
+      </div>
+      <div class="hd"><div class="tt">Dashboard <span class="date">Apr 16, 2026</span></div><div class="acts"><button class="ab">+ Add Application</button><div class="ib"></div><div class="ib"></div><div class="av"></div></div></div>
+      <div class="bd">
+        <!-- 4 stat cards -->
+        <div class="stat-row" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+          <div class="sc"><div class="sl">Active Applications</div><div class="sv">24</div><div class="st st-up">+3 this week</div></div>
+          <div class="sc"><div class="sl">Interviews This Week</div><div class="sv">3</div><div class="st st-up">+1 from last week</div></div>
+          <div class="sc"><div class="sl">Response Rate</div><div class="sv">42%</div><div class="st st-up">+5% from last month</div></div>
+          <div class="sc"><div class="sl">Avg. Days in Pipeline</div><div class="sv">18</div><div class="st st-up">-2 days improvement</div></div>
+        </div>
+        <!-- Two columns -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <div class="sec">
+            <div class="sec-h">Stale Applications <a>View all</a></div>
+            <div class="li"><div class="av" style="background:#3b82f6;">S</div><div class="tx"><div class="t1">Stripe — Senior Frontend</div><div class="t2">Applied · 12 days ago</div></div><div class="bg" style="background:#fee2e2;color:#ef4444;">12d</div></div>
+            <div class="li"><div class="av" style="background:#8b5cf6;">A</div><div class="tx"><div class="t1">Airbnb — Staff Engineer</div><div class="t2">Screening · 9 days ago</div></div><div class="bg" style="background:#fef3c7;color:#92400e;">9d</div></div>
+            <div class="li"><div class="av" style="background:#3b82f6;">M</div><div class="tx"><div class="t1">Meta — Product Engineer</div><div class="t2">Applied · 8 days ago</div></div><div class="bg" style="background:#fef3c7;color:#92400e;">8d</div></div>
+          </div>
+          <div class="sec">
+            <div class="sec-h">Upcoming Interviews <a>View all</a></div>
+            <div class="li"><div class="av" style="background:#f59e0b;">G</div><div class="tx"><div class="t1">Google — SDE III</div><div class="t2">Technical · Today, 2:00 PM</div></div><div class="bg" style="background:#fef3c7;color:#92400e;">Today</div></div>
+            <div class="li"><div class="av" style="background:#f59e0b;">N</div><div class="tx"><div class="t1">Netflix — Senior SWE</div><div class="t2">System Design · Thu, 10:30 AM</div></div><div class="bg" style="background:#dbeafe;color:#3b82f6;">In 1 day</div></div>
+            <div class="li"><div class="av" style="background:#f59e0b;">V</div><div class="tx"><div class="t1">Vercel — Frontend Lead</div><div class="t2">Hiring Manager · Fri, 4:00 PM</div></div><div class="bg" style="background:#dbeafe;color:#3b82f6;">In 2 days</div></div>
+          </div>
+        </div>
+        <!-- Activity -->
+        <div class="sec">
+          <div class="sec-h">Recent Activity <a>View all</a></div>
+          <div class="act-i"><div class="dot" style="background:#f59e0b;"></div><div><div><strong>Google — SDE III</strong> moved to <span class="bg" style="background:#fef3c7;color:#92400e;">Interviewing</span></div><div class="at">2 hours ago</div></div></div>
+          <div class="act-i"><div class="dot" style="background:#3b82f6;"></div><div><div><strong>Cloudflare — Systems Engineer</strong> application created</div><div class="at">5 hours ago</div></div></div>
+          <div class="act-i"><div class="dot" style="background:#ef4444;"></div><div><div><strong>Coinbase — Backend Lead</strong> moved to <span class="bg" style="background:#fee2e2;color:#ef4444;">Rejected</span></div><div class="at">Yesterday</div></div></div>
+        </div>
+      </div>
+      <div class="frame-label">D1 — Stats-First Dashboard</div>
+    </div>
+
+    <!-- D2: ACTION-FIRST -->
+    <div id="opt-d2">
+      <div class="sb">
+        <div class="logo"><span class="dot"></span>JobDash</div>
+        <div class="search"><span style="opacity:0.5">&#128269;</span>Search...<span class="k">&#8984;K</span></div>
+        <div class="pin-lbl">Pinned</div>
+        <div class="pin-i"><div class="pd" style="background:#f59e0b"></div>Google — SDE III</div>
+        <div class="pin-i"><div class="pd" style="background:#22c55e"></div>Figma — Sr Frontend</div>
+        <div style="height:8px;"></div>
+        <div class="ni act"><div class="ic"></div>Dashboard</div>
+        <div class="ni"><div class="ic"></div>Kanban<span class="ct">24</span></div>
+        <div class="ni"><div class="ic"></div>Table</div>
+        <div class="ni"><div class="ic"></div>Calendar<span class="ct">3</span></div>
+        <div class="ni"><div class="ic"></div>Analytics</div>
+        <div class="ni"><div class="ic"></div>Contacts</div>
+        <div class="foot">
+          <div style="font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;padding:0 4px;">Pipeline</div>
+          <div class="pipe"><div style="width:8%;background:#6b7280;"></div><div style="width:21%;background:#3b82f6;"></div><div style="width:8%;background:#8b5cf6;"></div><div style="width:13%;background:#f59e0b;"></div><div style="width:4%;background:#22c55e;"></div><div style="width:13%;background:#ef4444;opacity:0.4;"></div></div>
+          <div class="ni" style="margin-top:8px;"><div class="ic"></div>Settings</div>
+        </div>
+      </div>
+      <div class="hd"><div class="tt">Dashboard <span class="date">Apr 16, 2026</span></div><div class="acts"><button class="ab">+ Add Application</button><div class="ib"></div><div class="ib"></div><div class="av"></div></div></div>
+      <div class="bd">
+        <!-- Hero greeting with action alerts -->
+        <div class="hero-card">
+          <div class="hero-greeting">Good afternoon, Akhil</div>
+          <div class="hero-subtitle">You have 3 interviews this week and 3 applications need follow-up.</div>
+          <div class="hero-alerts">
+            <div class="hero-alert" style="background:#fef3c7;color:#92400e;">&#128197; Google Technical — Today 2:00 PM</div>
+            <div class="hero-alert" style="background:#fee2e2;color:#ef4444;">&#9888; 3 stale applications need follow-up</div>
+            <div class="hero-alert" style="background:#dcfce7;color:#15803d;">&#127881; Figma offer — expires Apr 21</div>
+          </div>
+        </div>
+        <!-- Stats smaller, 4 across -->
+        <div class="stat-row" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+          <div class="sc" style="padding:14px 16px;"><div class="sl" style="font-size:11px;">Active</div><div class="sv" style="font-size:20px;">24</div></div>
+          <div class="sc" style="padding:14px 16px;"><div class="sl" style="font-size:11px;">Interviews</div><div class="sv" style="font-size:20px;">3</div></div>
+          <div class="sc" style="padding:14px 16px;"><div class="sl" style="font-size:11px;">Response Rate</div><div class="sv" style="font-size:20px;">42%</div></div>
+          <div class="sc" style="padding:14px 16px;"><div class="sl" style="font-size:11px;">Avg. Days</div><div class="sv" style="font-size:20px;">18</div></div>
+        </div>
+        <!-- Three columns: stale, interviews, recent -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div class="sec">
+            <div class="sec-h" style="padding:12px 14px;font-size:12px;">Needs Attention</div>
+            <div class="li" style="padding:10px 14px;"><div class="av" style="background:#3b82f6;width:24px;height:24px;font-size:9px;">S</div><div class="tx"><div class="t1" style="font-size:12px;">Stripe</div><div class="t2" style="font-size:10px;">12d no response</div></div></div>
+            <div class="li" style="padding:10px 14px;"><div class="av" style="background:#8b5cf6;width:24px;height:24px;font-size:9px;">A</div><div class="tx"><div class="t1" style="font-size:12px;">Airbnb</div><div class="t2" style="font-size:10px;">9d no response</div></div></div>
+            <div class="li" style="padding:10px 14px;"><div class="av" style="background:#3b82f6;width:24px;height:24px;font-size:9px;">M</div><div class="tx"><div class="t1" style="font-size:12px;">Meta</div><div class="t2" style="font-size:10px;">8d no response</div></div></div>
+          </div>
+          <div class="sec">
+            <div class="sec-h" style="padding:12px 14px;font-size:12px;">This Week</div>
+            <div class="li" style="padding:10px 14px;"><div style="width:3px;height:24px;border-radius:2px;background:#f59e0b;flex-shrink:0;"></div><div class="tx"><div class="t1" style="font-size:12px;">Google — Technical</div><div class="t2" style="font-size:10px;">Today 2:00 PM</div></div></div>
+            <div class="li" style="padding:10px 14px;"><div style="width:3px;height:24px;border-radius:2px;background:#f59e0b;flex-shrink:0;"></div><div class="tx"><div class="t1" style="font-size:12px;">Netflix — Sys Design</div><div class="t2" style="font-size:10px;">Thu 10:30 AM</div></div></div>
+            <div class="li" style="padding:10px 14px;"><div style="width:3px;height:24px;border-radius:2px;background:#f59e0b;flex-shrink:0;"></div><div class="tx"><div class="t1" style="font-size:12px;">Vercel — HM Call</div><div class="t2" style="font-size:10px;">Fri 4:00 PM</div></div></div>
+          </div>
+          <div class="sec">
+            <div class="sec-h" style="padding:12px 14px;font-size:12px;">Recent</div>
+            <div class="act-i" style="padding:10px 14px;font-size:12px;"><div class="dot" style="background:#f59e0b;width:6px;height:6px;margin-top:4px;"></div><div><div><strong>Google</strong> → Interviewing</div><div class="at" style="font-size:10px;">2h ago</div></div></div>
+            <div class="act-i" style="padding:10px 14px;font-size:12px;"><div class="dot" style="background:#3b82f6;width:6px;height:6px;margin-top:4px;"></div><div><div><strong>Cloudflare</strong> created</div><div class="at" style="font-size:10px;">5h ago</div></div></div>
+            <div class="act-i" style="padding:10px 14px;font-size:12px;"><div class="dot" style="background:#ef4444;width:6px;height:6px;margin-top:4px;"></div><div><div><strong>Coinbase</strong> → Rejected</div><div class="at" style="font-size:10px;">Yesterday</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="frame-label">D2 — Action-First Dashboard</div>
+    </div>
+
+    <!-- D3: FEED + PANEL -->
+    <div id="opt-d3">
+      <div class="sb">
+        <div class="logo"><span class="dot"></span>JobDash</div>
+        <div class="search"><span style="opacity:0.5">&#128269;</span>Search...<span class="k">&#8984;K</span></div>
+        <div class="pin-lbl">Pinned</div>
+        <div class="pin-i"><div class="pd" style="background:#f59e0b"></div>Google — SDE III</div>
+        <div class="pin-i"><div class="pd" style="background:#22c55e"></div>Figma — Sr Frontend</div>
+        <div style="height:8px;"></div>
+        <div class="ni act"><div class="ic"></div>Dashboard</div>
+        <div class="ni"><div class="ic"></div>Kanban<span class="ct">24</span></div>
+        <div class="ni"><div class="ic"></div>Table</div>
+        <div class="ni"><div class="ic"></div>Calendar<span class="ct">3</span></div>
+        <div class="ni"><div class="ic"></div>Analytics</div>
+        <div class="ni"><div class="ic"></div>Contacts</div>
+        <div class="foot">
+          <div style="font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;padding:0 4px;">Pipeline</div>
+          <div class="pipe"><div style="width:8%;background:#6b7280;"></div><div style="width:21%;background:#3b82f6;"></div><div style="width:8%;background:#8b5cf6;"></div><div style="width:13%;background:#f59e0b;"></div><div style="width:4%;background:#22c55e;"></div><div style="width:13%;background:#ef4444;opacity:0.4;"></div></div>
+          <div class="ni" style="margin-top:8px;"><div class="ic"></div>Settings</div>
+        </div>
+      </div>
+      <div class="hd"><div class="tt">Dashboard <span class="date">Apr 16, 2026</span></div><div class="acts"><button class="ab">+ Add Application</button><div class="ib"></div><div class="ib"></div><div class="av"></div></div></div>
+      <!-- Main feed area (narrower, right panel takes space) -->
+      <div class="bd" style="right:300px;">
+        <!-- Stats row compact -->
+        <div class="stat-row" style="grid-template-columns:1fr 1fr 1fr 1fr;margin-bottom:16px;">
+          <div class="sc" style="padding:12px 14px;"><div class="sl" style="font-size:11px;">Active</div><div class="sv" style="font-size:18px;">24</div></div>
+          <div class="sc" style="padding:12px 14px;"><div class="sl" style="font-size:11px;">Interviews</div><div class="sv" style="font-size:18px;">3</div></div>
+          <div class="sc" style="padding:12px 14px;"><div class="sl" style="font-size:11px;">Response</div><div class="sv" style="font-size:18px;">42%</div></div>
+          <div class="sc" style="padding:12px 14px;"><div class="sl" style="font-size:11px;">Avg. Days</div><div class="sv" style="font-size:18px;">18</div></div>
+        </div>
+        <!-- Activity feed (primary content) -->
+        <div class="sec">
+          <div class="sec-h">Activity Feed <a>Filter</a></div>
+          <div class="act-i"><div class="dot" style="background:#f59e0b;"></div><div><div><strong>Google — SDE III</strong> moved to <span class="bg" style="background:#fef3c7;color:#92400e;">Interviewing</span></div><div class="at">2 hours ago</div></div></div>
+          <div class="act-i"><div class="dot" style="background:#3b82f6;"></div><div><div><strong>Cloudflare — Systems Engineer</strong> application created</div><div class="at">5 hours ago · via LinkedIn</div></div></div>
+          <div class="act-i"><div class="dot" style="background:#ef4444;"></div><div><div><strong>Coinbase — Backend Lead</strong> moved to <span class="bg" style="background:#fee2e2;color:#ef4444;">Rejected</span></div><div class="at">Yesterday · After screening round</div></div></div>
+          <div class="act-i"><div class="dot" style="background:#22c55e;"></div><div><div><strong>Figma — Senior Frontend</strong> moved to <span class="bg" style="background:#dcfce7;color:#15803d;">Offer</span></div><div class="at">Yesterday · $185K base + RSUs</div></div></div>
+          <div class="act-i"><div class="dot" style="background:#8b5cf6;"></div><div><div><strong>Airbnb — Staff Engineer</strong> moved to <span class="bg" style="background:#ede9fe;color:#8b5cf6;">Screening</span></div><div class="at">2 days ago</div></div></div>
+          <div class="act-i"><div class="dot" style="background:#3b82f6;"></div><div><div><strong>Notion — Product Engineer</strong> added to wishlist</div><div class="at">2 days ago</div></div></div>
+          <div class="act-i"><div class="dot" style="background:#f59e0b;"></div><div><div><strong>Netflix — Senior SWE</strong> interview round 2 scheduled</div><div class="at">3 days ago · System Design, Apr 17</div></div></div>
+        </div>
+      </div>
+      <!-- Right panel -->
+      <div class="right-panel">
+        <div style="font-size:13px;font-weight:600;color:#292524;margin-bottom:12px;">Today</div>
+        <div class="sec" style="margin-bottom:16px;">
+          <div class="li" style="padding:10px 14px;"><div style="width:3px;height:28px;border-radius:2px;background:#f59e0b;flex-shrink:0;"></div><div class="tx"><div class="t1" style="font-size:12px;">Google — Technical</div><div class="t2" style="font-size:10px;">2:00 PM · 60 min · Meet</div></div></div>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:#292524;margin-bottom:12px;">Needs Attention</div>
+        <div class="sec" style="margin-bottom:16px;">
+          <div class="li" style="padding:10px 14px;"><div class="av" style="background:#3b82f6;width:22px;height:22px;font-size:9px;">S</div><div class="tx"><div class="t1" style="font-size:12px;">Stripe</div><div class="t2" style="font-size:10px;">12d stale · follow up</div></div></div>
+          <div class="li" style="padding:10px 14px;"><div class="av" style="background:#8b5cf6;width:22px;height:22px;font-size:9px;">A</div><div class="tx"><div class="t1" style="font-size:12px;">Airbnb</div><div class="t2" style="font-size:10px;">9d stale</div></div></div>
+          <div class="li" style="padding:10px 14px;"><div class="av" style="background:#3b82f6;width:22px;height:22px;font-size:9px;">M</div><div class="tx"><div class="t1" style="font-size:12px;">Meta</div><div class="t2" style="font-size:10px;">8d stale</div></div></div>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:#292524;margin-bottom:12px;">Deadlines</div>
+        <div class="sec">
+          <div class="li" style="padding:10px 14px;"><div style="width:3px;height:28px;border-radius:2px;background:#22c55e;flex-shrink:0;"></div><div class="tx"><div class="t1" style="font-size:12px;">Figma offer expires</div><div class="t2" style="font-size:10px;">Apr 21 · 5 days left</div></div></div>
+          <div class="li" style="padding:10px 14px;"><div style="width:3px;height:28px;border-radius:2px;background:#ef4444;flex-shrink:0;"></div><div class="tx"><div class="t1" style="font-size:12px;">Stripe follow-up</div><div class="t2" style="font-size:10px;">Overdue</div></div></div>
+        </div>
+      </div>
+      <div class="frame-label">D3 — Feed + Right Panel</div>
+    </div>
+  </div>
+</div>
+
+<div class="desc-area">
+  <div class="desc-grid">
+    <div class="dc active" id="desc-d1">
+      <h3>D1 — Stats-First</h3>
+      <p>Classic dashboard. 4 big stat cards at top, two-column lists below (stale apps + interviews), activity feed at bottom. You see numbers first.</p>
+      <div class="best">Best for: Quick overview, metrics-oriented users</div>
+      <div class="risk">Risk: Stats aren't actionable — "24 active" doesn't tell you what to do</div>
+      <div class="tags"><span class="tag">proven pattern</span><span class="tag">metrics-first</span><span class="tag">familiar</span></div>
+    </div>
+    <div class="dc" id="desc-d2">
+      <h3>D2 — Action-First</h3>
+      <p>Hero greeting with urgency alerts (interview today, stale apps, expiring offer). Stats are smaller and secondary. Three-column grid below. You see what needs doing first.</p>
+      <div class="best">Best for: "What needs my attention right now?" — matches your core value</div>
+      <div class="risk">Risk: Hero card takes vertical space. Greeting can feel gimmicky over time</div>
+      <div class="tags"><span class="tag">urgency-driven</span><span class="tag">action-oriented</span><span class="tag">Todoist-like</span></div>
+    </div>
+    <div class="dc" id="desc-d3">
+      <h3>D3 — Feed + Panel</h3>
+      <p>Activity feed as the main content (chronological, rich detail). Right panel shows today's schedule, attention items, and deadlines. Like an inbox with a sidebar.</p>
+      <div class="best">Best for: Staying updated on what changed, catching up on pipeline activity</div>
+      <div class="risk">Risk: Three-column (sidebar + feed + panel) may feel cramped. Activity is passive, not action-oriented</div>
+      <div class="tags"><span class="tag">inbox feel</span><span class="tag">context-rich</span><span class="tag">Slack-like</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function pick(id,btn){
+  document.querySelectorAll('.pick-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#frame>div').forEach(d=>d.classList.remove('active'));
+  document.getElementById('opt-'+id).classList.add('active');
+  document.querySelectorAll('.dc').forEach(d=>d.classList.remove('active'));
+  document.getElementById('desc-'+id).classList.add('active');
+}
+</script>
+</body>
+</html>
