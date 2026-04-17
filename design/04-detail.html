@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — Application Detail Variants</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;overflow-x:hidden;}
+:root{--font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',system-ui,sans-serif;--mono:'SF Mono','Menlo','Monaco',monospace;}
+body{font-family:var(--font);background:#0a0a0a;color:#fff;-webkit-font-smoothing:antialiased;font-size:14px;}
+
+.top{position:fixed;top:0;left:0;right:0;z-index:100;background:#111;border-bottom:1px solid #222;padding:12px 24px;display:flex;align-items:center;gap:12px;}
+.top h2{font-size:14px;font-weight:600;color:#666;}
+.top .pills{display:flex;gap:6px;}
+.top .pill{padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;border:1px solid #2a2a2a;background:transparent;color:#666;cursor:pointer;}
+.top .pill:hover{color:#aaa;border-color:#444;}
+.top .pill.on{background:#fff;color:#000;border-color:#fff;}
+
+.stage{margin-top:56px;padding:24px;}
+.pair{display:flex;gap:20px;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px;}
+.frame{border-radius:12px;overflow:hidden;border:1px solid #222;position:relative;box-shadow:0 16px 48px rgba(0,0,0,.5);}
+.frame.desktop{width:960px;height:740px;}
+.frame.mobile{width:375px;height:740px;border-radius:24px;}
+.frame-tag{position:absolute;top:8px;right:10px;font-size:9px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.5px;z-index:5;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:4px;}
+
+.bg{background:linear-gradient(145deg,#f5f3f0,#ece8e3);position:absolute;inset:0;overflow-y:auto;}
+
+/* Descriptions */
+.desc-area{max-width:1400px;margin:0 auto;padding:0 24px 64px;}
+.desc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.dc{background:#111;border:1px solid #222;border-radius:10px;padding:18px;}
+.dc h3{font-size:14px;font-weight:600;margin-bottom:6px;}
+.dc p{font-size:12px;color:#666;line-height:1.6;}
+.dc ul{margin-top:8px;font-size:12px;color:#888;line-height:1.8;list-style:none;}
+.dc ul li::before{content:"-> ";color:#444;}
+
+.opt{display:none;}.opt.on{display:block;}
+
+/* ===== SHARED DETAIL ATOMS ===== */
+
+/* Back button */
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#78716c;cursor:pointer;padding:6px 10px;border-radius:8px;border:none;background:transparent;}
+.back-btn:hover{background:rgba(0,0,0,.04);color:#292524;}
+.back-btn svg{width:14px;height:14px;}
+
+/* Status dropdown */
+.status-drop{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid transparent;}
+.status-drop:hover{border-color:rgba(0,0,0,.08);}
+.status-drop .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.status-drop svg{width:10px;height:10px;color:#a8a29e;}
+
+/* Priority badge */
+.pri-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;}
+
+/* Tags */
+.dtag{font-size:10px;padding:2px 8px;border-radius:99px;background:rgba(0,0,0,.05);color:#57534e;font-weight:500;display:inline-block;}
+
+/* Meta items */
+.meta-item{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#78716c;}
+.meta-item svg{width:12px;height:12px;color:#a8a29e;}
+
+/* Tab bar */
+.tab-bar{display:flex;gap:0;border-bottom:1px solid rgba(0,0,0,.08);padding:0 0 0 0;}
+.tab-item{padding:10px 16px;font-size:12px;font-weight:600;color:#a8a29e;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.tab-item.active{color:#292524;border-bottom-color:#292524;}
+.tab-item:hover:not(.active){color:#57534e;}
+
+/* Glass card */
+.glass{background:rgba(255,255,255,.55);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:10px;}
+
+/* Section label */
+.sec-label{font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+
+/* Interview accordion */
+.accord{margin-bottom:6px;border-radius:10px;overflow:hidden;}
+.accord .accord-head{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;}
+.accord .num-badge{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+.accord .accord-info{flex:1;min-width:0;}
+.accord .accord-info h4{font-size:12px;font-weight:600;color:#292524;}
+.accord .accord-info p{font-size:10px;color:#78716c;}
+.accord .accord-right{display:flex;align-items:center;gap:8px;}
+.accord .accord-body{padding:0 12px 12px;font-size:11px;color:#57534e;line-height:1.6;}
+
+/* Star rating SVG */
+.stars{display:flex;gap:1px;align-items:center;}
+.stars svg{width:12px;height:12px;}
+
+/* Status indicator badges */
+.round-status{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;}
+.round-done{background:rgba(34,197,94,.1);color:#15803d;}
+.round-sched{background:rgba(59,130,246,.1);color:#2563eb;}
+.round-pending{background:rgba(0,0,0,.04);color:#a8a29e;}
+
+/* Q&A pair */
+.qa-card{border:1px solid rgba(0,0,0,.06);border-radius:10px;padding:10px;margin-bottom:6px;background:rgba(255,255,255,.3);}
+.qa-label{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;display:inline-block;margin-bottom:4px;}
+.qa-q{background:rgba(41,37,36,.08);color:#292524;}
+.qa-a{background:rgba(34,197,94,.1);color:#15803d;}
+.qa-text{font-size:11px;color:#292524;line-height:1.5;}
+
+/* Timeline events */
+.tl-event{display:flex;gap:10px;position:relative;padding-bottom:14px;}
+.tl-event .tl-line{position:absolute;left:11px;top:24px;bottom:0;width:2px;background:rgba(0,0,0,.06);}
+.tl-event:last-child .tl-line{display:none;}
+.tl-event .tl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;z-index:1;}
+.tl-event .tl-content h4{font-size:11px;font-weight:600;color:#292524;}
+.tl-event .tl-content p{font-size:10px;color:#a8a29e;}
+
+/* Doc card */
+.doc-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.55);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);margin-bottom:6px;}
+.doc-card .doc-icon{width:32px;height:32px;border-radius:8px;background:rgba(0,0,0,.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.doc-card .doc-icon svg{width:16px;height:16px;color:#78716c;}
+.doc-card .doc-info{flex:1;min-width:0;}
+.doc-card .doc-info h4{font-size:12px;font-weight:600;color:#292524;}
+.doc-card .doc-info p{font-size:10px;color:#a8a29e;}
+.doc-card .doc-action{font-size:10px;color:#78716c;cursor:pointer;}
+
+/* Upload dropzone */
+.upload-zone{border:2px dashed rgba(0,0,0,.1);border-radius:10px;padding:16px;text-align:center;cursor:pointer;}
+.upload-zone:hover{border-color:rgba(0,0,0,.2);background:rgba(255,255,255,.3);}
+.upload-zone svg{width:20px;height:20px;color:#a8a29e;margin-bottom:4px;}
+.upload-zone p{font-size:11px;color:#a8a29e;}
+
+/* Notes textarea */
+.notes-area{width:100%;min-height:80px;padding:10px;border:1px solid rgba(0,0,0,.06);border-radius:10px;background:rgba(255,255,255,.4);font-family:var(--font);font-size:12px;color:#292524;line-height:1.6;resize:vertical;outline:none;}
+
+/* Field row */
+.field-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(0,0,0,.04);}
+.field-row:last-child{border-bottom:none;}
+.field-label{font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.3px;width:80px;flex-shrink:0;}
+.field-value{font-size:12px;color:#292524;font-weight:500;}
+
+/* Action buttons row */
+.action-row{display:flex;gap:6px;align-items:center;}
+.icon-btn{width:30px;height:30px;border-radius:8px;border:1px solid rgba(0,0,0,.08);background:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.icon-btn:hover{background:rgba(255,255,255,.8);}
+.icon-btn svg{width:14px;height:14px;color:#57534e;}
+
+/* JD content */
+.jd-content{font-size:12px;color:#292524;line-height:1.7;}
+.jd-content h3{font-size:13px;font-weight:700;margin:10px 0 4px;color:#292524;}
+.jd-content ul{padding-left:16px;margin:4px 0 8px;}
+.jd-content li{margin-bottom:3px;color:#57534e;}
+.jd-content p{margin-bottom:6px;color:#57534e;}
+
+/* Mobile detail header */
+.mob-detail-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,.7);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,0,0,.06);}
+.mob-detail-hdr .back-btn{padding:4px 0;}
+
+/* Mobile summary strip */
+.mob-summary{display:flex;align-items:center;gap:6px;padding:8px 14px;background:rgba(255,255,255,.4);border-bottom:1px solid rgba(0,0,0,.04);flex-wrap:wrap;}
+
+/* Sidebar panel */
+.sidebar-panel{padding:16px;overflow-y:auto;}
+.sidebar-panel .company-name{font-size:18px;font-weight:700;color:#292524;margin-bottom:2px;}
+.sidebar-panel .role-name{font-size:13px;color:#78716c;margin-bottom:12px;}
+
+/* Scroll section label for D3 */
+.scroll-sec-label{font-size:11px;font-weight:700;color:#292524;text-transform:uppercase;letter-spacing:.5px;padding:10px 0 6px;border-bottom:1px solid rgba(0,0,0,.06);margin-bottom:8px;}
+
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h2>Detail Page --</h2>
+  <div class="pills">
+    <button class="pill on" onclick="pick('d1',this)">D1: Hero + Tabs</button>
+    <button class="pill" onclick="pick('d2',this)">D2: Sidebar Info</button>
+    <button class="pill" onclick="pick('d3',this)">D3: Single Scroll</button>
+  </div>
+</div>
+
+<div class="stage">
+
+<!-- ==================== D1: HERO + TABS ==================== -->
+<div class="opt on" id="opt-d1">
+<div class="pair">
+
+  <!-- D1 DESKTOP -->
+  <div class="frame desktop">
+    <span class="frame-tag">Desktop 960</span>
+    <div class="bg" style="overflow-y:auto;">
+
+      <!-- Back button -->
+      <div style="padding:12px 20px 0;">
+        <button class="back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </button>
+      </div>
+
+      <!-- Hero section -->
+      <div style="padding:8px 20px 0;">
+        <div class="glass" style="padding:20px;">
+          <!-- Top row: company + actions -->
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+            <div>
+              <div style="font-size:22px;font-weight:700;color:#292524;letter-spacing:-.3px;">Google</div>
+              <div style="font-size:14px;color:#78716c;margin-top:1px;">SDE III</div>
+            </div>
+            <div class="action-row">
+              <div class="status-drop" style="background:rgba(245,158,11,.1);">
+                <span class="dot" style="background:#f59e0b;"></span>
+                <span style="color:#92400e;">Interviewing</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+              <div class="icon-btn" title="Pin">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v8m0 0l3-3m-3 3L9 7"/><path d="M5 12h14"/><path d="M12 12v10"/></svg>
+              </div>
+              <div class="icon-btn" title="Archive">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="5" rx="1"/><path d="M3 8v10a2 2 0 002 2h14a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Meta row -->
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <span class="pri-badge" style="background:rgba(239,68,68,.1);color:#ef4444;">
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+              High
+            </span>
+            <span class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 01-12 0 6 6 0 0112 0z"/><path d="M2 20c0-3.3 2.7-6 6-6h8c3.3 0 6 2.7 6 6"/></svg>
+              LinkedIn
+            </span>
+            <span class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              Applied Apr 5
+            </span>
+            <span class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+              $180-240K
+            </span>
+            <span class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Mountain View, Hybrid
+            </span>
+            <span class="meta-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              11d
+            </span>
+            <span class="dtag">FAANG</span>
+            <span class="dtag">hybrid</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab bar -->
+      <div style="padding:0 20px;">
+        <div class="tab-bar" style="margin-top:12px;">
+          <div class="tab-item active">Overview</div>
+          <div class="tab-item">Interviews</div>
+          <div class="tab-item">JD</div>
+          <div class="tab-item">Docs</div>
+          <div class="tab-item">Timeline</div>
+        </div>
+      </div>
+
+      <!-- Tab content: Overview (two column) -->
+      <div style="padding:16px 20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <!-- Left: Fields -->
+        <div class="glass" style="padding:14px;">
+          <div class="sec-label">Application Details</div>
+          <div class="field-row">
+            <span class="field-label">Status</span>
+            <span class="field-value" style="display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#f59e0b;"></span> Interviewing</span>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Priority</span>
+            <span class="field-value" style="color:#ef4444;">High</span>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Source</span>
+            <span class="field-value">LinkedIn</span>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Salary</span>
+            <span class="field-value">$180-240K</span>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Location</span>
+            <span class="field-value">Mountain View, Hybrid</span>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Applied</span>
+            <span class="field-value">Apr 5, 2026</span>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Pipeline</span>
+            <span class="field-value">11 days</span>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Tags</span>
+            <span class="field-value" style="display:flex;gap:4px;"><span class="dtag">FAANG</span><span class="dtag">hybrid</span></span>
+          </div>
+        </div>
+        <!-- Right: Notes -->
+        <div class="glass" style="padding:14px;">
+          <div class="sec-label">Notes</div>
+          <textarea class="notes-area" style="min-height:200px;" readonly>Recruiter: Sarah Chen (sarah.c@google.com)
+Team: Core Infrastructure, Cloud Platform
+Referred by: James from college (L6 on Cloud team)
+
+Bar raiser round scheduled for next week. Need to prep system design (distributed caching, load balancing). Review Google's recent papers on Borg.
+
+Compensation: base + RSU vesting over 4 years. Signing bonus likely negotiable based on competing offers.</textarea>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- D1 MOBILE -->
+  <div class="frame mobile">
+    <span class="frame-tag">Mobile 375</span>
+    <div class="bg" style="overflow-y:auto;">
+
+      <!-- Mobile header -->
+      <div class="mob-detail-hdr">
+        <button class="back-btn" style="font-size:11px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </button>
+        <div class="action-row">
+          <div class="icon-btn" style="width:28px;height:28px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v8m0 0l3-3m-3 3L9 7"/><path d="M5 12h14"/><path d="M12 12v10"/></svg>
+          </div>
+          <div class="icon-btn" style="width:28px;height:28px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="5" rx="1"/><path d="M3 8v10a2 2 0 002 2h14a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile hero -->
+      <div style="padding:12px 14px;">
+        <div style="font-size:20px;font-weight:700;color:#292524;">Google</div>
+        <div style="font-size:13px;color:#78716c;margin-bottom:8px;">SDE III</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+          <div class="status-drop" style="background:rgba(245,158,11,.1);font-size:10px;padding:3px 8px;">
+            <span class="dot" style="background:#f59e0b;width:6px;height:6px;"></span>
+            <span style="color:#92400e;">Interviewing</span>
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <span class="pri-badge" style="background:rgba(239,68,68,.1);color:#ef4444;font-size:9px;padding:2px 6px;">High</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:10px;color:#78716c;">
+          <span>LinkedIn</span>
+          <span style="color:#d6d3d1;">|</span>
+          <span>$180-240K</span>
+          <span style="color:#d6d3d1;">|</span>
+          <span>11d</span>
+          <span style="color:#d6d3d1;">|</span>
+          <span>MV, Hybrid</span>
+        </div>
+        <div style="display:flex;gap:4px;margin-top:6px;">
+          <span class="dtag" style="font-size:9px;padding:1px 6px;">FAANG</span>
+          <span class="dtag" style="font-size:9px;padding:1px 6px;">hybrid</span>
+        </div>
+      </div>
+
+      <!-- Mobile tab bar -->
+      <div class="tab-bar" style="padding:0 14px;font-size:11px;">
+        <div class="tab-item active" style="padding:8px 10px;font-size:11px;">Overview</div>
+        <div class="tab-item" style="padding:8px 10px;font-size:11px;">Interviews</div>
+        <div class="tab-item" style="padding:8px 10px;font-size:11px;">JD</div>
+        <div class="tab-item" style="padding:8px 10px;font-size:11px;">Docs</div>
+        <div class="tab-item" style="padding:8px 10px;font-size:11px;">Timeline</div>
+      </div>
+
+      <!-- Mobile content -->
+      <div style="padding:12px 14px 24px;">
+        <div class="glass" style="padding:12px;margin-bottom:10px;">
+          <div class="sec-label">Details</div>
+          <div class="field-row"><span class="field-label" style="font-size:9px;width:60px;">Source</span><span class="field-value" style="font-size:11px;">LinkedIn</span></div>
+          <div class="field-row"><span class="field-label" style="font-size:9px;width:60px;">Salary</span><span class="field-value" style="font-size:11px;">$180-240K</span></div>
+          <div class="field-row"><span class="field-label" style="font-size:9px;width:60px;">Location</span><span class="field-value" style="font-size:11px;">Mountain View, Hybrid</span></div>
+          <div class="field-row"><span class="field-label" style="font-size:9px;width:60px;">Applied</span><span class="field-value" style="font-size:11px;">Apr 5, 2026</span></div>
+          <div class="field-row"><span class="field-label" style="font-size:9px;width:60px;">Pipeline</span><span class="field-value" style="font-size:11px;">11 days</span></div>
+        </div>
+        <div class="glass" style="padding:12px;">
+          <div class="sec-label">Notes</div>
+          <div style="font-size:11px;color:#57534e;line-height:1.5;">Recruiter: Sarah Chen. Bar raiser round scheduled for next week. Need to prep system design.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ==================== D2: SIDEBAR INFO ==================== -->
+<div class="opt" id="opt-d2">
+<div class="pair">
+
+  <!-- D2 DESKTOP -->
+  <div class="frame desktop">
+    <span class="frame-tag">Desktop 960</span>
+    <div class="bg" style="display:flex;overflow:hidden;">
+
+      <!-- Left sidebar -->
+      <div style="width:260px;flex-shrink:0;background:rgba(255,255,255,.45);backdrop-filter:blur(12px);border-right:1px solid rgba(0,0,0,.06);display:flex;flex-direction:column;overflow-y:auto;">
+        <div class="sidebar-panel">
+          <!-- Back -->
+          <button class="back-btn" style="margin-bottom:12px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back
+          </button>
+
+          <!-- Company info -->
+          <div class="sidebar-panel" style="padding:0;">
+            <div class="company-name">Google</div>
+            <div class="role-name">SDE III</div>
+
+            <!-- Status -->
+            <div class="status-drop" style="background:rgba(245,158,11,.1);margin-bottom:12px;width:100%;justify-content:flex-start;">
+              <span class="dot" style="background:#f59e0b;"></span>
+              <span style="color:#92400e;">Interviewing</span>
+              <svg style="margin-left:auto;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+
+            <!-- Fields -->
+            <div class="field-row">
+              <span class="field-label">Priority</span>
+              <span class="pri-badge" style="background:rgba(239,68,68,.1);color:#ef4444;font-size:9px;padding:1px 6px;">High</span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Source</span>
+              <span class="field-value">LinkedIn</span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Salary</span>
+              <span class="field-value">$180-240K</span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Location</span>
+              <span class="field-value">MV, Hybrid</span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Applied</span>
+              <span class="field-value">Apr 5, 2026</span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Pipeline</span>
+              <span class="field-value">11 days</span>
+            </div>
+
+            <div style="margin-top:10px;display:flex;gap:4px;flex-wrap:wrap;">
+              <span class="dtag">FAANG</span>
+              <span class="dtag">hybrid</span>
+            </div>
+
+            <!-- Actions -->
+            <div style="margin-top:14px;display:flex;gap:6px;">
+              <div class="icon-btn" title="Pin">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v8m0 0l3-3m-3 3L9 7"/><path d="M5 12h14"/><path d="M12 12v10"/></svg>
+              </div>
+              <div class="icon-btn" title="Archive">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="5" rx="1"/><path d="M3 8v10a2 2 0 002 2h14a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content area -->
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+        <!-- Tab bar -->
+        <div class="tab-bar" style="padding:0 20px;flex-shrink:0;">
+          <div class="tab-item active">Notes</div>
+          <div class="tab-item">Interviews</div>
+          <div class="tab-item">JD</div>
+          <div class="tab-item">Docs</div>
+          <div class="tab-item">Timeline</div>
+        </div>
+
+        <!-- Notes content -->
+        <div style="flex:1;overflow-y:auto;padding:16px 20px;">
+          <textarea class="notes-area" style="min-height:240px;" readonly>Recruiter: Sarah Chen (sarah.c@google.com)
+Team: Core Infrastructure, Cloud Platform
+Referred by: James from college (L6 on Cloud team)
+
+Bar raiser round scheduled for next week. Need to prep system design (distributed caching, load balancing). Review Google's recent papers on Borg.
+
+Compensation: base + RSU vesting over 4 years. Signing bonus likely negotiable based on competing offers.
+
+Interview Prep:
+- Review LC Hard problems (graphs, DP)
+- System design: design Google Drive, design YouTube recommendations
+- Behavioral: leadership principles, conflict resolution examples
+
+Next steps:
+- Bar Raiser: Apr 18, 2pm PT
+- If pass, team matching round follows within a week</textarea>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- D2 MOBILE -->
+  <div class="frame mobile">
+    <span class="frame-tag">Mobile 375</span>
+    <div class="bg" style="overflow-y:auto;">
+
+      <!-- Mobile header -->
+      <div class="mob-detail-hdr">
+        <button class="back-btn" style="font-size:11px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </button>
+        <div class="action-row">
+          <div class="icon-btn" style="width:28px;height:28px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v8m0 0l3-3m-3 3L9 7"/><path d="M5 12h14"/><path d="M12 12v10"/></svg>
+          </div>
+          <div class="icon-btn" style="width:28px;height:28px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="5" rx="1"/><path d="M3 8v10a2 2 0 002 2h14a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collapsed summary strip (sidebar collapses to this on mobile) -->
+      <div class="mob-summary">
+        <span style="font-size:15px;font-weight:700;color:#292524;">Google</span>
+        <span style="font-size:11px;color:#78716c;">SDE III</span>
+        <div style="margin-left:auto;display:flex;gap:4px;align-items:center;">
+          <div class="status-drop" style="background:rgba(245,158,11,.1);font-size:9px;padding:2px 6px;">
+            <span class="dot" style="background:#f59e0b;width:5px;height:5px;"></span>
+            <span style="color:#92400e;">Interviewing</span>
+          </div>
+          <span class="pri-badge" style="background:rgba(239,68,68,.1);color:#ef4444;font-size:8px;padding:1px 5px;">High</span>
+        </div>
+      </div>
+      <!-- Expandable meta row -->
+      <div style="padding:4px 14px 8px;display:flex;gap:6px;flex-wrap:wrap;font-size:9px;color:#a8a29e;border-bottom:1px solid rgba(0,0,0,.04);">
+        <span>LinkedIn</span>
+        <span>$180-240K</span>
+        <span>MV, Hybrid</span>
+        <span>11d</span>
+        <span class="dtag" style="font-size:8px;padding:0 4px;">FAANG</span>
+        <span class="dtag" style="font-size:8px;padding:0 4px;">hybrid</span>
+      </div>
+
+      <!-- Tab bar -->
+      <div class="tab-bar" style="padding:0 14px;">
+        <div class="tab-item active" style="padding:8px 10px;font-size:11px;">Notes</div>
+        <div class="tab-item" style="padding:8px 10px;font-size:11px;">Interviews</div>
+        <div class="tab-item" style="padding:8px 10px;font-size:11px;">JD</div>
+        <div class="tab-item" style="padding:8px 10px;font-size:11px;">Docs</div>
+        <div class="tab-item" style="padding:8px 10px;font-size:11px;">Timeline</div>
+      </div>
+
+      <!-- Notes content -->
+      <div style="padding:12px 14px 24px;">
+        <div style="font-size:11px;color:#57534e;line-height:1.6;">
+          <p style="margin-bottom:8px;">Recruiter: Sarah Chen (sarah.c@google.com)</p>
+          <p style="margin-bottom:8px;">Team: Core Infrastructure, Cloud Platform</p>
+          <p style="margin-bottom:8px;">Bar raiser round scheduled for next week. Need to prep system design (distributed caching, load balancing).</p>
+          <p style="margin-bottom:8px;">Compensation: base + RSU vesting over 4 years. Signing bonus likely negotiable.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ==================== D3: SINGLE SCROLL ==================== -->
+<div class="opt" id="opt-d3">
+<div class="pair">
+
+  <!-- D3 DESKTOP -->
+  <div class="frame desktop">
+    <span class="frame-tag">Desktop 960</span>
+    <div class="bg" style="overflow-y:auto;">
+
+      <!-- Back -->
+      <div style="padding:12px 24px 0;">
+        <button class="back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </button>
+      </div>
+
+      <!-- Content container -->
+      <div style="max-width:720px;margin:0 auto;padding:8px 24px 32px;">
+
+        <!-- Header with status + meta -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
+          <div>
+            <div style="font-size:24px;font-weight:700;color:#292524;letter-spacing:-.3px;">Google</div>
+            <div style="font-size:14px;color:#78716c;">SDE III</div>
+          </div>
+          <div class="action-row">
+            <div class="status-drop" style="background:rgba(245,158,11,.1);">
+              <span class="dot" style="background:#f59e0b;"></span>
+              <span style="color:#92400e;">Interviewing</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+            <div class="icon-btn" title="Pin">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v8m0 0l3-3m-3 3L9 7"/><path d="M5 12h14"/><path d="M12 12v10"/></svg>
+            </div>
+            <div class="icon-btn" title="Archive">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="5" rx="1"/><path d="M3 8v10a2 2 0 002 2h14a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Meta strip -->
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+          <span class="pri-badge" style="background:rgba(239,68,68,.1);color:#ef4444;">
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+            High
+          </span>
+          <span class="meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 01-12 0 6 6 0 0112 0z"/><path d="M2 20c0-3.3 2.7-6 6-6h8c3.3 0 6 2.7 6 6"/></svg> LinkedIn</span>
+          <span class="meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> Apr 5</span>
+          <span class="meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> $180-240K</span>
+          <span class="meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> MV, Hybrid</span>
+          <span class="meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 11d</span>
+          <span class="dtag">FAANG</span>
+          <span class="dtag">hybrid</span>
+        </div>
+
+        <!-- === NOTES SECTION === -->
+        <div class="scroll-sec-label">Notes</div>
+        <div class="glass" style="padding:14px;margin-bottom:20px;">
+          <textarea class="notes-area" style="min-height:100px;border:none;background:transparent;padding:0;" readonly>Recruiter: Sarah Chen (sarah.c@google.com)
+Team: Core Infrastructure, Cloud Platform
+Referred by: James from college (L6 on Cloud team)
+
+Bar raiser round scheduled for next week. Need to prep system design.</textarea>
+        </div>
+
+        <!-- === INTERVIEW ROUNDS SECTION === -->
+        <div class="scroll-sec-label">Interview Rounds</div>
+        <div style="margin-bottom:20px;">
+
+          <!-- Round 1: Phone Screen (done, 4/5) -->
+          <div class="accord glass" style="margin-bottom:6px;">
+            <div class="accord-head">
+              <div class="num-badge" style="background:rgba(34,197,94,.12);color:#15803d;">1</div>
+              <div class="accord-info">
+                <h4>Phone Screen</h4>
+                <p>Apr 8 -- 45 min with Sarah Chen (Recruiter)</p>
+              </div>
+              <div class="accord-right">
+                <div class="stars">
+                  <svg viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#d6d3d1" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <span class="round-status round-done">Done</span>
+              </div>
+            </div>
+            <div class="accord-body">
+              <div class="qa-card">
+                <div class="qa-label qa-q">Q</div>
+                <div class="qa-text">Tell me about a time you led a technical migration at scale.</div>
+              </div>
+              <div class="qa-card">
+                <div class="qa-label qa-a">A</div>
+                <div class="qa-text">Discussed the monolith-to-microservices migration at previous company. 200+ services, 18-month timeline, zero downtime.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Round 2: Technical (done, 3/5) -->
+          <div class="accord glass" style="margin-bottom:6px;">
+            <div class="accord-head">
+              <div class="num-badge" style="background:rgba(34,197,94,.12);color:#15803d;">2</div>
+              <div class="accord-info">
+                <h4>Technical</h4>
+                <p>Apr 12 -- 60 min with Priya Sharma (L6 SWE)</p>
+              </div>
+              <div class="accord-right">
+                <div class="stars">
+                  <svg viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#d6d3d1" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#d6d3d1" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <span class="round-status round-done">Done</span>
+              </div>
+            </div>
+            <div class="accord-body">
+              <div class="qa-card">
+                <div class="qa-label qa-q">Q</div>
+                <div class="qa-text">Design a distributed caching layer for a global web app with 100M daily users.</div>
+              </div>
+              <div class="qa-card">
+                <div class="qa-label qa-a">A</div>
+                <div class="qa-text">Proposed multi-tier cache (L1 in-process, L2 Redis cluster, L3 CDN). Discussed consistency trade-offs. Struggled with cache invalidation across regions.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Round 3: Bar Raiser (scheduled) -->
+          <div class="accord glass" style="margin-bottom:6px;">
+            <div class="accord-head">
+              <div class="num-badge" style="background:rgba(59,130,246,.12);color:#2563eb;">3</div>
+              <div class="accord-info">
+                <h4>Bar Raiser</h4>
+                <p>Apr 18, 2:00 PM -- 60 min with TBD</p>
+              </div>
+              <div class="accord-right">
+                <span class="round-status round-sched">Scheduled</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- === JD SNAPSHOT SECTION === -->
+        <div class="scroll-sec-label">Job Description</div>
+        <div class="glass" style="padding:14px;margin-bottom:20px;">
+          <div class="jd-content">
+            <h3>About the Role</h3>
+            <p>We are looking for a Software Engineer III to join our Core Infrastructure team in Mountain View. You will design and build large-scale distributed systems that power Google Cloud Platform.</p>
+            <h3>Responsibilities</h3>
+            <ul>
+              <li>Design, develop, and maintain distributed systems at scale</li>
+              <li>Lead technical projects across multiple teams</li>
+              <li>Mentor junior engineers and contribute to hiring</li>
+              <li>Drive improvements in system reliability and performance</li>
+            </ul>
+            <h3>Requirements</h3>
+            <ul>
+              <li>5+ years of software engineering experience</li>
+              <li>Strong background in distributed systems and algorithms</li>
+              <li>Experience with cloud infrastructure (GCP, AWS, or Azure)</li>
+              <li>BS/MS in Computer Science or equivalent</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- === DOCUMENTS SECTION === -->
+        <div class="scroll-sec-label">Documents</div>
+        <div style="margin-bottom:20px;">
+          <div class="doc-card">
+            <div class="doc-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+            </div>
+            <div class="doc-info">
+              <h4>Resume_v3_Google.pdf</h4>
+              <p>Uploaded Apr 4 -- 2.1 MB</p>
+            </div>
+            <span class="doc-action">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            </span>
+          </div>
+          <div class="doc-card">
+            <div class="doc-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+            </div>
+            <div class="doc-info">
+              <h4>Cover_Letter_Google.pdf</h4>
+              <p>Uploaded Apr 4 -- 340 KB</p>
+            </div>
+            <span class="doc-action">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            </span>
+          </div>
+          <div class="upload-zone" style="margin-top:6px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+            <p>Drop files here or click to upload</p>
+          </div>
+        </div>
+
+        <!-- === TIMELINE SECTION === -->
+        <div class="scroll-sec-label">Timeline</div>
+        <div class="glass" style="padding:14px;margin-bottom:20px;">
+          <div class="tl-event">
+            <div class="tl-line"></div>
+            <div class="tl-dot" style="background:#59e0b;background:#22c55e;"></div>
+            <div class="tl-content">
+              <h4>Bar Raiser scheduled</h4>
+              <p>Apr 14 -- Round 3 confirmed for Apr 18</p>
+            </div>
+          </div>
+          <div class="tl-event">
+            <div class="tl-line"></div>
+            <div class="tl-dot" style="background:#f59e0b;"></div>
+            <div class="tl-content">
+              <h4>Technical round completed</h4>
+              <p>Apr 12 -- Rated 3/5. Feedback: strong coding, needs work on system design trade-offs</p>
+            </div>
+          </div>
+          <div class="tl-event">
+            <div class="tl-line"></div>
+            <div class="tl-dot" style="background:#f59e0b;"></div>
+            <div class="tl-content">
+              <h4>Phone Screen completed</h4>
+              <p>Apr 8 -- Rated 4/5. Moved to technical round</p>
+            </div>
+          </div>
+          <div class="tl-event">
+            <div class="tl-line"></div>
+            <div class="tl-dot" style="background:#3b82f6;"></div>
+            <div class="tl-content">
+              <h4>Status changed to Interviewing</h4>
+              <p>Apr 7 -- Recruiter reached out to schedule phone screen</p>
+            </div>
+          </div>
+          <div class="tl-event">
+            <div class="tl-dot" style="background:#8b5cf6;"></div>
+            <div class="tl-content">
+              <h4>Application submitted</h4>
+              <p>Apr 5 -- Applied via LinkedIn. Referral from James.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- D3 MOBILE -->
+  <div class="frame mobile">
+    <span class="frame-tag">Mobile 375</span>
+    <div class="bg" style="overflow-y:auto;">
+
+      <!-- Mobile header -->
+      <div class="mob-detail-hdr">
+        <button class="back-btn" style="font-size:11px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </button>
+        <div class="action-row">
+          <div class="icon-btn" style="width:28px;height:28px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v8m0 0l3-3m-3 3L9 7"/><path d="M5 12h14"/><path d="M12 12v10"/></svg>
+          </div>
+          <div class="icon-btn" style="width:28px;height:28px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="5" rx="1"/><path d="M3 8v10a2 2 0 002 2h14a2 2 0 002-2V8"/><path d="M10 12h4"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:12px 14px 32px;">
+
+        <!-- Header -->
+        <div style="margin-bottom:10px;">
+          <div style="font-size:20px;font-weight:700;color:#292524;">Google</div>
+          <div style="font-size:13px;color:#78716c;margin-bottom:6px;">SDE III</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+            <div class="status-drop" style="background:rgba(245,158,11,.1);font-size:10px;padding:3px 8px;">
+              <span class="dot" style="background:#f59e0b;width:6px;height:6px;"></span>
+              <span style="color:#92400e;">Interviewing</span>
+            </div>
+            <span class="pri-badge" style="background:rgba(239,68,68,.1);color:#ef4444;font-size:9px;padding:2px 6px;">High</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:9px;color:#a8a29e;margin-bottom:4px;">
+            <span>LinkedIn</span><span>$180-240K</span><span>MV, Hybrid</span><span>11d</span>
+          </div>
+          <div style="display:flex;gap:4px;">
+            <span class="dtag" style="font-size:8px;padding:1px 5px;">FAANG</span>
+            <span class="dtag" style="font-size:8px;padding:1px 5px;">hybrid</span>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="scroll-sec-label" style="font-size:9px;">Notes</div>
+        <div class="glass" style="padding:10px;margin-bottom:14px;">
+          <div style="font-size:10px;color:#57534e;line-height:1.5;">Recruiter: Sarah Chen. Bar raiser round scheduled for next week. Need to prep system design.</div>
+        </div>
+
+        <!-- Interview Rounds -->
+        <div class="scroll-sec-label" style="font-size:9px;">Interview Rounds</div>
+        <div style="margin-bottom:14px;">
+
+          <!-- Round 1 -->
+          <div class="accord glass" style="margin-bottom:5px;">
+            <div class="accord-head" style="padding:8px 10px;">
+              <div class="num-badge" style="background:rgba(34,197,94,.12);color:#15803d;width:20px;height:20px;font-size:9px;">1</div>
+              <div class="accord-info">
+                <h4 style="font-size:11px;">Phone Screen</h4>
+                <p style="font-size:9px;">Apr 8 -- Sarah Chen</p>
+              </div>
+              <div class="accord-right">
+                <div class="stars" style="gap:0;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#d6d3d1" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <span class="round-status round-done" style="font-size:8px;padding:1px 4px;">Done</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Round 2 -->
+          <div class="accord glass" style="margin-bottom:5px;">
+            <div class="accord-head" style="padding:8px 10px;">
+              <div class="num-badge" style="background:rgba(34,197,94,.12);color:#15803d;width:20px;height:20px;font-size:9px;">2</div>
+              <div class="accord-info">
+                <h4 style="font-size:11px;">Technical</h4>
+                <p style="font-size:9px;">Apr 12 -- Priya Sharma</p>
+              </div>
+              <div class="accord-right">
+                <div class="stars" style="gap:0;">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#d6d3d1" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#d6d3d1" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <span class="round-status round-done" style="font-size:8px;padding:1px 4px;">Done</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Round 3 -->
+          <div class="accord glass" style="margin-bottom:5px;">
+            <div class="accord-head" style="padding:8px 10px;">
+              <div class="num-badge" style="background:rgba(59,130,246,.12);color:#2563eb;width:20px;height:20px;font-size:9px;">3</div>
+              <div class="accord-info">
+                <h4 style="font-size:11px;">Bar Raiser</h4>
+                <p style="font-size:9px;">Apr 18, 2:00 PM</p>
+              </div>
+              <div class="accord-right">
+                <span class="round-status round-sched" style="font-size:8px;padding:1px 4px;">Scheduled</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- JD Snapshot -->
+        <div class="scroll-sec-label" style="font-size:9px;">Job Description</div>
+        <div class="glass" style="padding:10px;margin-bottom:14px;">
+          <div class="jd-content" style="font-size:10px;">
+            <p>Looking for SDE III to join Core Infrastructure team. Design and build large-scale distributed systems powering Google Cloud Platform.</p>
+            <h3 style="font-size:11px;margin:6px 0 2px;">Requirements</h3>
+            <ul style="font-size:10px;">
+              <li>5+ years SWE experience</li>
+              <li>Distributed systems background</li>
+              <li>Cloud infrastructure experience</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="scroll-sec-label" style="font-size:9px;">Documents</div>
+        <div style="margin-bottom:14px;">
+          <div class="doc-card" style="padding:8px 10px;">
+            <div class="doc-icon" style="width:28px;height:28px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+            </div>
+            <div class="doc-info">
+              <h4 style="font-size:11px;">Resume_v3_Google.pdf</h4>
+              <p style="font-size:9px;">Apr 4 -- 2.1 MB</p>
+            </div>
+          </div>
+          <div class="doc-card" style="padding:8px 10px;margin-top:4px;">
+            <div class="doc-icon" style="width:28px;height:28px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+            </div>
+            <div class="doc-info">
+              <h4 style="font-size:11px;">Cover_Letter_Google.pdf</h4>
+              <p style="font-size:9px;">Apr 4 -- 340 KB</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="scroll-sec-label" style="font-size:9px;">Timeline</div>
+        <div style="padding-left:4px;">
+          <div class="tl-event" style="padding-bottom:10px;">
+            <div class="tl-line"></div>
+            <div class="tl-dot" style="background:#22c55e;width:6px;height:6px;margin-top:5px;"></div>
+            <div class="tl-content">
+              <h4 style="font-size:10px;">Bar Raiser scheduled</h4>
+              <p style="font-size:9px;">Apr 14</p>
+            </div>
+          </div>
+          <div class="tl-event" style="padding-bottom:10px;">
+            <div class="tl-line"></div>
+            <div class="tl-dot" style="background:#f59e0b;width:6px;height:6px;margin-top:5px;"></div>
+            <div class="tl-content">
+              <h4 style="font-size:10px;">Technical completed</h4>
+              <p style="font-size:9px;">Apr 12 -- 3/5</p>
+            </div>
+          </div>
+          <div class="tl-event" style="padding-bottom:10px;">
+            <div class="tl-line"></div>
+            <div class="tl-dot" style="background:#f59e0b;width:6px;height:6px;margin-top:5px;"></div>
+            <div class="tl-content">
+              <h4 style="font-size:10px;">Phone Screen completed</h4>
+              <p style="font-size:9px;">Apr 8 -- 4/5</p>
+            </div>
+          </div>
+          <div class="tl-event" style="padding-bottom:10px;">
+            <div class="tl-line"></div>
+            <div class="tl-dot" style="background:#3b82f6;width:6px;height:6px;margin-top:5px;"></div>
+            <div class="tl-content">
+              <h4 style="font-size:10px;">Status: Interviewing</h4>
+              <p style="font-size:9px;">Apr 7</p>
+            </div>
+          </div>
+          <div class="tl-event">
+            <div class="tl-dot" style="background:#8b5cf6;width:6px;height:6px;margin-top:5px;"></div>
+            <div class="tl-content">
+              <h4 style="font-size:10px;">Applied</h4>
+              <p style="font-size:9px;">Apr 5 -- via LinkedIn</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+</div><!-- end stage -->
+
+<!-- Descriptions -->
+<div class="desc-area">
+  <div class="desc-grid">
+    <div class="dc">
+      <h3>D1: Hero + Tabs</h3>
+      <p>Sticky hero section at top with company name, role, status dropdown, pin/archive actions, and a full meta row (priority, source, date, salary, location, days, tags). Below the hero: an underline tab bar switches between Overview, Interviews, JD, Docs, and Timeline panels.</p>
+      <ul>
+        <li>Overview shows two-column grid: editable fields on left, notes on right</li>
+        <li>Hero gives immediate context without scrolling</li>
+        <li>Familiar tab pattern reduces cognitive load</li>
+        <li>Mobile: hero compresses, tabs scroll horizontally</li>
+        <li>Trade-off: hero takes vertical space; deep content requires tab switching</li>
+      </ul>
+    </div>
+    <div class="dc">
+      <h3>D2: Sidebar Info</h3>
+      <p>Company info lives in a persistent left sidebar panel -- status, priority, source, salary, dates, tags, all visible and editable at all times. Main area on right holds tabs (Notes, Interviews, JD, Docs, Timeline). No hero needed.</p>
+      <ul>
+        <li>Info is always visible regardless of which tab is active</li>
+        <li>Sidebar collapses to a summary strip on mobile (company + status + priority)</li>
+        <li>Feels like a CRM or issue tracker (Jira, Linear)</li>
+        <li>Good for frequent status/field updates while reading notes</li>
+        <li>Trade-off: sidebar eats horizontal space on smaller desktops</li>
+      </ul>
+    </div>
+    <div class="dc">
+      <h3>D3: Single Scroll</h3>
+      <p>No tabs at all. Everything on one scrollable page in sequential sections: header with status and meta, Notes, Interview Rounds, JD Snapshot, Documents, Timeline. Sections separated by uppercase labels.</p>
+      <ul>
+        <li>Simplest mental model -- no tab switching, just scroll</li>
+        <li>Everything visible with a single scroll gesture</li>
+        <li>Mobile: identical layout, just narrower. No adaptation needed</li>
+        <li>Good when applications don't have tons of content per section</li>
+        <li>Trade-off: long page if many interview rounds or large JD</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+function pick(id,btn){
+  document.querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.opt').forEach(o=>o.classList.remove('on'));
+  document.getElementById('opt-'+id).classList.add('on');
+}
+</script>
+</body>
+</html>

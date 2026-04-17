@@ -27,7 +27,8 @@ async function fetchApplications(): Promise<Application[]> {
 	const res = await fetch("/api/applications?limit=100&archived=false");
 	if (!res.ok) throw new Error("Failed to fetch applications");
 	const json = await res.json();
-	return json.data.items;
+	// API returns { data: [...], pagination: {...} } via paginated() helper
+	return json.data;
 }
 
 export function useApplications() {

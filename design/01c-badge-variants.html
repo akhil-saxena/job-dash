@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — Company Badge Variations</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',system-ui,sans-serif;}
+body{font-family:var(--font);background:#0a0a0a;color:#fff;-webkit-font-smoothing:antialiased;font-size:14px;}
+
+.top{position:fixed;top:0;left:0;right:0;z-index:100;background:#111;border-bottom:1px solid #222;padding:12px 24px;display:flex;align-items:center;gap:12px;overflow-x:auto;}
+.top h2{font-size:14px;font-weight:600;color:#666;white-space:nowrap;}
+.top .pills{display:flex;gap:5px;}
+.top .pill{padding:7px 14px;border-radius:7px;font-size:11px;font-weight:600;border:1px solid #2a2a2a;background:transparent;color:#666;cursor:pointer;white-space:nowrap;}
+.top .pill:hover{color:#aaa;border-color:#444;}
+.top .pill.on{background:#fff;color:#000;border-color:#fff;}
+
+.stage{margin-top:56px;padding:24px;max-width:1400px;margin-left:auto;margin-right:auto;}
+.opt{display:none;}.opt.on{display:block;}
+.opt-hdr{margin-bottom:4px;}
+.opt-hdr h2{font-size:16px;font-weight:700;}
+.opt-desc{font-size:12px;color:#555;line-height:1.5;max-width:700px;margin-bottom:16px;}
+.opt-tags{display:flex;gap:4px;margin-bottom:20px;}
+.opt-tags .tg{font-size:9px;padding:2px 6px;border-radius:3px;background:#1a1a1a;color:#555;}
+
+.views{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;}
+.view-label{font-size:10px;font-weight:600;color:#444;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+.desk-frame{background:linear-gradient(145deg,#f5f3f0,#ece8e3);border-radius:12px;border:1px solid #222;padding:14px;flex:1;min-width:600px;}
+.desk-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.desk-col-hdr{display:flex;align-items:center;gap:4px;padding:3px 2px;margin-bottom:5px;font-size:10px;font-weight:600;color:#57534e;}
+.desk-col-hdr .dot{width:6px;height:6px;border-radius:50%;}
+.desk-col-hdr .cnt{margin-left:auto;font-size:8px;font-weight:600;color:#a8a29e;background:rgba(0,0,0,.04);padding:0 4px;border-radius:4px;}
+.mob-frame{background:linear-gradient(145deg,#f5f3f0,#ece8e3);border-radius:20px;border:1px solid #222;padding:14px;width:340px;flex-shrink:0;}
+.mob-sec{margin-bottom:10px;}
+.mob-sec-hdr{display:flex;align-items:center;gap:5px;padding:6px 0;font-size:12px;font-weight:600;color:#57534e;border-bottom:1px solid rgba(0,0,0,.04);margin-bottom:6px;}
+.mob-sec-hdr .dot{width:7px;height:7px;border-radius:50%;}
+.mob-sec-hdr .cnt{font-size:10px;color:#a8a29e;margin-left:4px;}
+
+/* Small SVG icon helper */
+.ico{width:12px;height:12px;flex-shrink:0;display:inline-flex;}
+.ico svg{width:100%;height:100%;}
+.ico-m{width:14px;height:14px;flex-shrink:0;display:inline-flex;}
+.ico-m svg{width:100%;height:100%;}
+
+/* ===== BASE: Company Badge (shared) ===== */
+.cd{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:8px;padding:8px;margin-bottom:5px;display:flex;gap:8px;cursor:default;transition:all .15s;}
+.cd:hover{background:rgba(255,255,255,.8);box-shadow:0 2px 6px rgba(0,0,0,.04);}
+.cd .av{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0;margin-top:1px;}
+.cd .ct{flex:1;min-width:0;}
+.cd h4{font-size:11px;font-weight:600;color:#292524;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cd .role{font-size:10px;color:#78716c;}
+.cd .meta{display:flex;gap:3px;align-items:center;flex-wrap:wrap;margin-top:3px;}
+.cd .days{font-size:9px;color:#a8a29e;}
+.cd .tag{font-size:8px;padding:1px 4px;border-radius:3px;background:rgba(0,0,0,.04);color:#78716c;}
+.cd .stale{font-size:8px;padding:1px 4px;border-radius:3px;font-weight:600;}
+.cd .hint{display:flex;align-items:center;gap:3px;font-size:8px;font-weight:600;margin-top:3px;}
+
+/* Mobile badge card */
+.cdm{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:12px;padding:12px;margin-bottom:6px;display:flex;gap:12px;cursor:default;transition:all .15s;}
+.cdm:hover{background:rgba(255,255,255,.8);}
+.cdm .av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0;}
+.cdm .ct{flex:1;min-width:0;}
+.cdm h4{font-size:14px;font-weight:600;color:#292524;margin-bottom:2px;}
+.cdm .role{font-size:12px;color:#78716c;}
+.cdm .meta{display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-top:5px;}
+.cdm .days{font-size:10px;color:#a8a29e;}
+.cdm .tag{font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.04);color:#78716c;}
+.cdm .stale{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;}
+.cdm .hint{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;margin-top:5px;}
+.cdm .rt{margin-left:auto;flex-shrink:0;display:flex;align-items:center;}
+
+/* Variant-specific overrides */
+
+/* V-A: Standard (clean baseline) */
+
+/* V-B: Tinted urgency — whole card gets a wash */
+.cd.tint-amber{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.15);}
+.cd.tint-green{background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.15);}
+.cd.tint-red{background:rgba(239,68,68,.05);border-color:rgba(239,68,68,.12);}
+.cdm.tint-amber{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.15);}
+.cdm.tint-green{background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.15);}
+.cdm.tint-red{background:rgba(239,68,68,.05);border-color:rgba(239,68,68,.12);}
+
+/* V-C: Right-aligned days */
+.cd.rt-layout{align-items:center;}
+.cd.rt-layout .ct{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline;}
+.cd.rt-layout h4{margin:0;}
+.cd.rt-layout .role{margin:0;}
+.cd.rt-layout .days-rt{margin-left:auto;font-size:9px;color:#a8a29e;font-variant-numeric:tabular-nums;flex-shrink:0;}
+
+/* V-D: With bottom bar */
+.cd.with-bar{flex-direction:column;gap:0;}
+.cd.with-bar .top-row{display:flex;gap:8px;padding-bottom:6px;}
+.cd.with-bar .bottom-bar{display:flex;gap:4px;align-items:center;padding-top:5px;border-top:1px solid rgba(0,0,0,.04);}
+
+/* V-E: Compact */
+.cd.compact{padding:6px 7px;gap:6px;border-radius:7px;}
+.cd.compact .av{width:20px;height:20px;border-radius:5px;font-size:9px;}
+.cd.compact h4{font-size:10px;}
+.cd.compact .role{font-size:9px;}
+.cd.compact .meta{margin-top:2px;}
+.cd.compact .days{font-size:8px;}
+
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h2>Badge Variants —</h2>
+  <div class="pills">
+    <button class="pill on" onclick="pick('a',this)">A: Clean Standard</button>
+    <button class="pill" onclick="pick('b',this)">B: Tinted Urgency</button>
+    <button class="pill" onclick="pick('c',this)">C: Right-Aligned</button>
+    <button class="pill" onclick="pick('d',this)">D: Bottom Detail Bar</button>
+    <button class="pill" onclick="pick('e',this)">E: Compact Dense</button>
+  </div>
+</div>
+
+<div class="stage">
+
+<!-- A: CLEAN STANDARD -->
+<div class="opt on" id="opt-a">
+  <div class="opt-hdr"><h2>A: Clean Standard</h2></div>
+  <div class="opt-desc">Badge + stacked info. Urgency shown as a small icon line below the meta. No card background changes. Icons for clock (interview) and alert (deadline/stale). Clean and neutral — urgency doesn't dominate.</div>
+  <div class="opt-tags"><span class="tg">balanced</span><span class="tg">neutral cards</span><span class="tg">urgency subtle</span></div>
+  <div class="views">
+    <div style="flex:1;min-width:600px;">
+      <div class="view-label">Desktop</div>
+      <div class="desk-frame">
+        <div class="desk-cols">
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+            <div class="cd"><div class="av" style="background:#3b82f6;">S</div><div class="ct"><h4>Stripe</h4><div class="role">Sr Frontend</div><div class="meta"><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div></div>
+            <div class="cd"><div class="av" style="background:#3b82f6;">C</div><div class="ct"><h4>Cloudflare</h4><div class="role">Sys Engineer</div><div class="meta"><span class="days">1d</span><span class="tag">referral</span></div></div></div>
+            <div class="cd"><div class="av" style="background:#3b82f6;">M</div><div class="ct"><h4>Meta</h4><div class="role">Product Eng</div><div class="meta"><span class="days">8d</span><span class="stale" style="background:rgba(245,158,11,.1);color:#92400e;">stale</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span></div>
+            <div class="cd"><div class="av" style="background:#8b5cf6;">A</div><div class="ct"><h4>Airbnb</h4><div class="role">Staff Eng</div><div class="meta"><span class="days">9d</span></div></div></div>
+            <div class="cd"><div class="av" style="background:#8b5cf6;">S</div><div class="ct"><h4>Shopify</h4><div class="role">Sr SWE</div><div class="meta"><span class="days">4d</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+            <div class="cd"><div class="av" style="background:#f59e0b;">G</div><div class="ct"><h4>Google</h4><div class="role">SDE III</div><div class="hint" style="color:#f59e0b;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Today 2pm</div></div></div>
+            <div class="cd"><div class="av" style="background:#f59e0b;">N</div><div class="ct"><h4>Netflix</h4><div class="role">Sr SWE</div><div class="hint" style="color:#78716c;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Sys Design Thu</div></div></div>
+            <div class="cd"><div class="av" style="background:#f59e0b;">V</div><div class="ct"><h4>Vercel</h4><div class="role">FE Lead</div><div class="meta"><span class="days">10d</span><span class="tag">remote</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+            <div class="cd"><div class="av" style="background:#22c55e;">F</div><div class="ct"><h4>Figma</h4><div class="role">Sr Frontend</div><div class="hint" style="color:#22c55e;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Exp Apr 21</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="width:340px;flex-shrink:0;">
+      <div class="view-label">Mobile</div>
+      <div class="mob-frame">
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+          <div class="cdm"><div class="av" style="background:#f59e0b;">G</div><div class="ct"><h4>Google — SDE III</h4><div class="role">Mountain View · Hybrid</div><div class="hint" style="color:#f59e0b;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Technical today 2pm</div></div></div>
+          <div class="cdm"><div class="av" style="background:#f59e0b;">N</div><div class="ct"><h4>Netflix — Sr SWE</h4><div class="hint" style="color:#78716c;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>System Design Thu</div></div></div>
+          <div class="cdm"><div class="av" style="background:#f59e0b;">V</div><div class="ct"><h4>Vercel — FE Lead</h4><div class="meta"><span class="days">10d</span><span class="tag">remote</span><span class="tag">HM Fri</span></div></div></div>
+        </div>
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+          <div class="cdm"><div class="av" style="background:#22c55e;">F</div><div class="ct"><h4>Figma — Sr Frontend</h4><div class="role">$185K + RSUs</div><div class="hint" style="color:#22c55e;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Offer expires Apr 21</div></div></div>
+        </div>
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+          <div class="cdm"><div class="av" style="background:#3b82f6;">S</div><div class="ct"><h4>Stripe — Sr Frontend</h4><div class="meta"><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- B: TINTED URGENCY -->
+<div class="opt" id="opt-b">
+  <div class="opt-hdr"><h2>B: Tinted Urgency</h2></div>
+  <div class="opt-desc">Same badge layout, but cards with urgency get a subtle full-card background tint. Interview today = warm amber wash. Offer expiring = green wash. Stale = faint red wash. You spot urgent cards by their BACKGROUND, not by reading text. Instant pattern recognition.</div>
+  <div class="opt-tags"><span class="tg">instant visual scan</span><span class="tg">color = urgency</span><span class="tg">stale apps glow red</span></div>
+  <div class="views">
+    <div style="flex:1;min-width:600px;">
+      <div class="view-label">Desktop</div>
+      <div class="desk-frame">
+        <div class="desk-cols">
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+            <div class="cd tint-red"><div class="av" style="background:#3b82f6;">S</div><div class="ct"><h4>Stripe</h4><div class="role">Sr Frontend</div><div class="meta"><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.12);color:#ef4444;">stale</span></div></div></div>
+            <div class="cd"><div class="av" style="background:#3b82f6;">C</div><div class="ct"><h4>Cloudflare</h4><div class="role">Sys Engineer</div><div class="meta"><span class="days">1d</span><span class="tag">referral</span></div></div></div>
+            <div class="cd tint-red"><div class="av" style="background:#3b82f6;">M</div><div class="ct"><h4>Meta</h4><div class="role">Product Eng</div><div class="meta"><span class="days">8d</span><span class="stale" style="background:rgba(245,158,11,.12);color:#92400e;">stale</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span></div>
+            <div class="cd"><div class="av" style="background:#8b5cf6;">A</div><div class="ct"><h4>Airbnb</h4><div class="role">Staff Eng</div><div class="meta"><span class="days">9d</span></div></div></div>
+            <div class="cd"><div class="av" style="background:#8b5cf6;">S</div><div class="ct"><h4>Shopify</h4><div class="role">Sr SWE</div><div class="meta"><span class="days">4d</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+            <div class="cd tint-amber"><div class="av" style="background:#f59e0b;">G</div><div class="ct"><h4>Google</h4><div class="role">SDE III</div><div class="hint" style="color:#92400e;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Today 2pm</div></div></div>
+            <div class="cd"><div class="av" style="background:#f59e0b;">N</div><div class="ct"><h4>Netflix</h4><div class="role">Sr SWE</div><div class="hint" style="color:#78716c;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Thu</div></div></div>
+            <div class="cd"><div class="av" style="background:#f59e0b;">V</div><div class="ct"><h4>Vercel</h4><div class="role">FE Lead</div><div class="meta"><span class="days">10d</span><span class="tag">remote</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+            <div class="cd tint-green"><div class="av" style="background:#22c55e;">F</div><div class="ct"><h4>Figma</h4><div class="role">Sr Frontend</div><div class="hint" style="color:#15803d;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Exp Apr 21</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="width:340px;flex-shrink:0;">
+      <div class="view-label">Mobile</div>
+      <div class="mob-frame">
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+          <div class="cdm tint-amber"><div class="av" style="background:#f59e0b;">G</div><div class="ct"><h4>Google — SDE III</h4><div class="hint" style="color:#92400e;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Technical today 2pm</div></div></div>
+          <div class="cdm"><div class="av" style="background:#f59e0b;">N</div><div class="ct"><h4>Netflix — Sr SWE</h4><div class="hint" style="color:#78716c;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>System Design Thu</div></div></div>
+          <div class="cdm"><div class="av" style="background:#f59e0b;">V</div><div class="ct"><h4>Vercel — FE Lead</h4><div class="meta"><span class="days">10d</span><span class="tag">remote</span></div></div></div>
+        </div>
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+          <div class="cdm tint-green"><div class="av" style="background:#22c55e;">F</div><div class="ct"><h4>Figma — Sr Frontend</h4><div class="role">$185K + RSUs</div><div class="hint" style="color:#15803d;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Offer expires Apr 21</div></div></div>
+        </div>
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+          <div class="cdm tint-red"><div class="av" style="background:#3b82f6;">S</div><div class="ct"><h4>Stripe — Sr Frontend</h4><div class="meta"><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.12);color:#ef4444;">stale</span></div></div></div>
+          <div class="cdm"><div class="av" style="background:#3b82f6;">C</div><div class="ct"><h4>Cloudflare — Sys Eng</h4><div class="meta"><span class="days">1d</span><span class="tag">referral</span></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- C: RIGHT-ALIGNED DAYS -->
+<div class="opt" id="opt-c">
+  <div class="opt-hdr"><h2>C: Right-Aligned Meta</h2></div>
+  <div class="opt-desc">Badge + company/role stacked left, days counter pushed to the far right. Clean horizontal balance. Tags and urgency stay below. Desktop cards feel more like list items — good rhythm when scanning many cards vertically.</div>
+  <div class="opt-tags"><span class="tg">horizontal balance</span><span class="tg">days always visible</span><span class="tg">list-like rhythm</span></div>
+  <div class="views">
+    <div style="flex:1;min-width:600px;">
+      <div class="view-label">Desktop</div>
+      <div class="desk-frame">
+        <div class="desk-cols">
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+            <div class="cd"><div class="av" style="background:#3b82f6;">S</div><div class="ct"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h4>Stripe</h4><span class="days">12d</span></div><div class="role">Sr Frontend</div><div class="meta"><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div></div>
+            <div class="cd"><div class="av" style="background:#3b82f6;">C</div><div class="ct"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h4>Cloudflare</h4><span class="days">1d</span></div><div class="role">Sys Engineer</div><div class="meta"><span class="tag">referral</span></div></div></div>
+            <div class="cd"><div class="av" style="background:#3b82f6;">M</div><div class="ct"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h4>Meta</h4><span class="days">8d</span></div><div class="role">Product Eng</div><div class="meta"><span class="stale" style="background:rgba(245,158,11,.1);color:#92400e;">stale</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span></div>
+            <div class="cd"><div class="av" style="background:#8b5cf6;">A</div><div class="ct"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h4>Airbnb</h4><span class="days">9d</span></div><div class="role">Staff Eng</div></div></div>
+            <div class="cd"><div class="av" style="background:#8b5cf6;">S</div><div class="ct"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h4>Shopify</h4><span class="days">4d</span></div><div class="role">Sr SWE</div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+            <div class="cd"><div class="av" style="background:#f59e0b;">G</div><div class="ct"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h4>Google</h4><span class="days">6d</span></div><div class="role">SDE III</div><div class="hint" style="color:#f59e0b;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Today 2pm</div></div></div>
+            <div class="cd"><div class="av" style="background:#f59e0b;">N</div><div class="ct"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h4>Netflix</h4><span class="days">14d</span></div><div class="role">Sr SWE</div><div class="hint" style="color:#78716c;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Sys Design Thu</div></div></div>
+            <div class="cd"><div class="av" style="background:#f59e0b;">V</div><div class="ct"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h4>Vercel</h4><span class="days">10d</span></div><div class="role">FE Lead</div><div class="meta"><span class="tag">remote</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+            <div class="cd"><div class="av" style="background:#22c55e;">F</div><div class="ct"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h4>Figma</h4><span class="days">2d</span></div><div class="role">Sr Frontend</div><div class="hint" style="color:#22c55e;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Exp Apr 21</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="width:340px;flex-shrink:0;">
+      <div class="view-label">Mobile</div>
+      <div class="mob-frame">
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+          <div class="cdm"><div class="av" style="background:#f59e0b;">G</div><div class="ct"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h4>Google — SDE III</h4><span class="days" style="font-size:11px;">6d</span></div><div class="hint" style="color:#f59e0b;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Technical today 2pm</div></div></div>
+          <div class="cdm"><div class="av" style="background:#f59e0b;">N</div><div class="ct"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h4>Netflix — Sr SWE</h4><span class="days" style="font-size:11px;">14d</span></div><div class="hint" style="color:#78716c;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>System Design Thu</div></div></div>
+        </div>
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+          <div class="cdm"><div class="av" style="background:#22c55e;">F</div><div class="ct"><div style="display:flex;justify-content:space-between;align-items:baseline;"><h4>Figma — Sr Frontend</h4><span class="days" style="font-size:11px;">2d</span></div><div class="role">$185K + RSUs</div><div class="hint" style="color:#22c55e;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Offer expires Apr 21</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- D: BOTTOM DETAIL BAR -->
+<div class="opt" id="opt-d">
+  <div class="opt-hdr"><h2>D: Bottom Detail Bar</h2></div>
+  <div class="opt-desc">Badge + info on top section, then a thin divider with meta details below (days, tags, salary hint). Urgency hint in the bottom bar too. Two clear zones: identity (top) and context (bottom). Desktop cards are taller but more informative.</div>
+  <div class="opt-tags"><span class="tg">two zones</span><span class="tg">more context visible</span><span class="tg">slightly taller cards</span></div>
+  <div class="views">
+    <div style="flex:1;min-width:600px;">
+      <div class="view-label">Desktop</div>
+      <div class="desk-frame">
+        <div class="desk-cols">
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+            <div class="cd" style="flex-direction:column;gap:0;"><div style="display:flex;gap:8px;padding-bottom:6px;"><div class="av" style="background:#3b82f6;">S</div><div class="ct"><h4>Stripe</h4><div class="role">Sr Frontend</div></div></div><div style="display:flex;gap:4px;align-items:center;padding-top:5px;border-top:1px solid rgba(0,0,0,.04);font-size:9px;color:#a8a29e;"><span>12d</span><span style="color:#d4d4d4;">·</span><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;font-size:8px;padding:1px 4px;border-radius:3px;">stale</span></div></div>
+            <div class="cd" style="flex-direction:column;gap:0;"><div style="display:flex;gap:8px;padding-bottom:6px;"><div class="av" style="background:#3b82f6;">C</div><div class="ct"><h4>Cloudflare</h4><div class="role">Sys Engineer</div></div></div><div style="display:flex;gap:4px;align-items:center;padding-top:5px;border-top:1px solid rgba(0,0,0,.04);font-size:9px;color:#a8a29e;"><span>1d</span><span style="color:#d4d4d4;">·</span><span>referral</span></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+            <div class="cd tint-amber" style="flex-direction:column;gap:0;"><div style="display:flex;gap:8px;padding-bottom:6px;"><div class="av" style="background:#f59e0b;">G</div><div class="ct"><h4>Google</h4><div class="role">SDE III</div></div></div><div style="display:flex;gap:4px;align-items:center;padding-top:5px;border-top:1px solid rgba(0,0,0,.04);font-size:9px;color:#92400e;font-weight:600;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Today 2pm<span style="margin-left:auto;color:#a8a29e;font-weight:400;">6d</span></div></div>
+            <div class="cd" style="flex-direction:column;gap:0;"><div style="display:flex;gap:8px;padding-bottom:6px;"><div class="av" style="background:#f59e0b;">N</div><div class="ct"><h4>Netflix</h4><div class="role">Sr SWE</div></div></div><div style="display:flex;gap:4px;align-items:center;padding-top:5px;border-top:1px solid rgba(0,0,0,.04);font-size:9px;color:#78716c;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Sys Design Thu<span style="margin-left:auto;color:#a8a29e;">14d</span></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+            <div class="cd tint-green" style="flex-direction:column;gap:0;"><div style="display:flex;gap:8px;padding-bottom:6px;"><div class="av" style="background:#22c55e;">F</div><div class="ct"><h4>Figma</h4><div class="role">Sr Frontend</div></div></div><div style="display:flex;gap:4px;align-items:center;padding-top:5px;border-top:1px solid rgba(0,0,0,.04);font-size:9px;color:#15803d;font-weight:600;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Exp Apr 21<span style="margin-left:auto;color:#a8a29e;font-weight:400;">$185K</span></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span></div>
+            <div class="cd" style="flex-direction:column;gap:0;"><div style="display:flex;gap:8px;padding-bottom:6px;"><div class="av" style="background:#8b5cf6;">A</div><div class="ct"><h4>Airbnb</h4><div class="role">Staff Eng</div></div></div><div style="display:flex;gap:4px;align-items:center;padding-top:5px;border-top:1px solid rgba(0,0,0,.04);font-size:9px;color:#a8a29e;"><span>9d</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="width:340px;flex-shrink:0;">
+      <div class="view-label">Mobile</div>
+      <div class="mob-frame">
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+          <div class="cdm tint-amber" style="flex-direction:column;gap:0;"><div style="display:flex;gap:12px;padding-bottom:8px;"><div class="av" style="background:#f59e0b;">G</div><div class="ct"><h4>Google — SDE III</h4><div class="role">Mountain View</div></div></div><div style="display:flex;gap:6px;align-items:center;padding-top:8px;border-top:1px solid rgba(0,0,0,.04);font-size:11px;color:#92400e;font-weight:600;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Technical today 2pm<span style="margin-left:auto;color:#a8a29e;font-weight:400;">6d</span></div></div>
+          <div class="cdm" style="flex-direction:column;gap:0;"><div style="display:flex;gap:12px;padding-bottom:8px;"><div class="av" style="background:#f59e0b;">N</div><div class="ct"><h4>Netflix — Sr SWE</h4></div></div><div style="display:flex;gap:6px;align-items:center;padding-top:8px;border-top:1px solid rgba(0,0,0,.04);font-size:11px;color:#78716c;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Sys Design Thu<span style="margin-left:auto;color:#a8a29e;">14d</span></div></div>
+        </div>
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+          <div class="cdm tint-green" style="flex-direction:column;gap:0;"><div style="display:flex;gap:12px;padding-bottom:8px;"><div class="av" style="background:#22c55e;">F</div><div class="ct"><h4>Figma — Sr Frontend</h4><div class="role">$185K + RSUs</div></div></div><div style="display:flex;gap:6px;align-items:center;padding-top:8px;border-top:1px solid rgba(0,0,0,.04);font-size:11px;color:#15803d;font-weight:600;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Expires Apr 21</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- E: COMPACT DENSE -->
+<div class="opt" id="opt-e">
+  <div class="opt-hdr"><h2>E: Compact Dense</h2></div>
+  <div class="opt-desc">Same badge structure but everything smaller — 20px avatar, tighter padding, smaller text. Fits 10+ cards per column. Good when you have 30+ applications and need to see everything. Urgency via icon hints only, no tinting. Mobile stays normal-sized (touch targets).</div>
+  <div class="opt-tags"><span class="tg">maximum cards visible</span><span class="tg">30+ apps</span><span class="tg">desktop power-user</span></div>
+  <div class="views">
+    <div style="flex:1;min-width:600px;">
+      <div class="view-label">Desktop</div>
+      <div class="desk-frame">
+        <div class="desk-cols">
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+            <div class="cd compact"><div class="av" style="background:#3b82f6;width:20px;height:20px;border-radius:5px;font-size:9px;">S</div><div class="ct"><h4>Stripe</h4><div class="role">Sr Frontend</div><div class="meta"><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;font-size:7px;">stale</span></div></div></div>
+            <div class="cd compact"><div class="av" style="background:#3b82f6;width:20px;height:20px;border-radius:5px;font-size:9px;">C</div><div class="ct"><h4>Cloudflare</h4><div class="role">Sys Eng</div><div class="meta"><span class="days">1d</span></div></div></div>
+            <div class="cd compact"><div class="av" style="background:#3b82f6;width:20px;height:20px;border-radius:5px;font-size:9px;">M</div><div class="ct"><h4>Meta</h4><div class="role">Prod Eng</div><div class="meta"><span class="days">8d</span><span class="stale" style="background:rgba(245,158,11,.1);color:#92400e;font-size:7px;">stale</span></div></div></div>
+            <div class="cd compact"><div class="av" style="background:#3b82f6;width:20px;height:20px;border-radius:5px;font-size:9px;">D</div><div class="ct"><h4>Datadog</h4><div class="role">SRE</div><div class="meta"><span class="days">2d</span></div></div></div>
+            <div class="cd compact"><div class="av" style="background:#3b82f6;width:20px;height:20px;border-radius:5px;font-size:9px;">T</div><div class="ct"><h4>Twilio</h4><div class="role">Backend</div><div class="meta"><span class="days">5d</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">3</span></div>
+            <div class="cd compact"><div class="av" style="background:#8b5cf6;width:20px;height:20px;border-radius:5px;font-size:9px;">A</div><div class="ct"><h4>Airbnb</h4><div class="role">Staff Eng</div><div class="meta"><span class="days">9d</span></div></div></div>
+            <div class="cd compact"><div class="av" style="background:#8b5cf6;width:20px;height:20px;border-radius:5px;font-size:9px;">S</div><div class="ct"><h4>Shopify</h4><div class="role">Sr SWE</div><div class="meta"><span class="days">4d</span></div></div></div>
+            <div class="cd compact"><div class="av" style="background:#8b5cf6;width:20px;height:20px;border-radius:5px;font-size:9px;">L</div><div class="ct"><h4>Lyft</h4><div class="role">Platform</div><div class="meta"><span class="days">1d</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+            <div class="cd compact"><div class="av" style="background:#f59e0b;width:20px;height:20px;border-radius:5px;font-size:9px;">G</div><div class="ct"><h4>Google</h4><div class="role">SDE III</div><div class="hint" style="color:#f59e0b;font-size:8px;"><span class="ico" style="width:10px;height:10px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Today 2pm</div></div></div>
+            <div class="cd compact"><div class="av" style="background:#f59e0b;width:20px;height:20px;border-radius:5px;font-size:9px;">N</div><div class="ct"><h4>Netflix</h4><div class="role">Sr SWE</div><div class="meta"><span class="days">14d</span></div></div></div>
+            <div class="cd compact"><div class="av" style="background:#f59e0b;width:20px;height:20px;border-radius:5px;font-size:9px;">V</div><div class="ct"><h4>Vercel</h4><div class="role">FE Lead</div><div class="meta"><span class="days">10d</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+            <div class="cd compact"><div class="av" style="background:#22c55e;width:20px;height:20px;border-radius:5px;font-size:9px;">F</div><div class="ct"><h4>Figma</h4><div class="role">Sr FE</div><div class="hint" style="color:#22c55e;font-size:8px;"><span class="ico" style="width:10px;height:10px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Apr 21</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="width:340px;flex-shrink:0;">
+      <div class="view-label">Mobile (stays normal size for touch)</div>
+      <div class="mob-frame">
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+          <div class="cdm"><div class="av" style="background:#f59e0b;">G</div><div class="ct"><h4>Google — SDE III</h4><div class="hint" style="color:#f59e0b;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Technical today 2pm</div></div></div>
+          <div class="cdm"><div class="av" style="background:#f59e0b;">N</div><div class="ct"><h4>Netflix — Sr SWE</h4><div class="meta"><span class="days">14d</span></div></div></div>
+          <div class="cdm"><div class="av" style="background:#f59e0b;">V</div><div class="ct"><h4>Vercel — FE Lead</h4><div class="meta"><span class="days">10d</span><span class="tag">remote</span></div></div></div>
+        </div>
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+          <div class="cdm"><div class="av" style="background:#3b82f6;">S</div><div class="ct"><h4>Stripe — Sr Frontend</h4><div class="meta"><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function pick(id,btn){
+  document.querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.opt').forEach(o=>o.classList.remove('on'));
+  document.getElementById('opt-'+id).classList.add('on');
+}
+</script>
+</body>
+</html>

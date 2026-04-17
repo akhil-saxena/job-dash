@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — List / Table Variants</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;overflow-x:hidden;}
+:root{--font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',system-ui,sans-serif;}
+body{font-family:var(--font);background:#0a0a0a;color:#fff;-webkit-font-smoothing:antialiased;font-size:14px;}
+
+/* Top picker bar */
+.top{position:fixed;top:0;left:0;right:0;z-index:100;background:#111;border-bottom:1px solid #222;padding:12px 24px;display:flex;align-items:center;gap:12px;}
+.top h2{font-size:14px;font-weight:600;color:#666;}
+.top .pills{display:flex;gap:6px;}
+.top .pill{padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;border:1px solid #2a2a2a;background:transparent;color:#666;cursor:pointer;}
+.top .pill:hover{color:#aaa;border-color:#444;}
+.top .pill.on{background:#fff;color:#000;border-color:#fff;}
+
+.stage{margin-top:56px;padding:24px;}
+.pair{display:flex;gap:20px;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px;}
+.frame{border-radius:12px;overflow:hidden;border:1px solid #222;position:relative;box-shadow:0 16px 48px rgba(0,0,0,.5);}
+.frame.desktop{width:960px;height:640px;}
+.frame.mobile{width:375px;height:720px;border-radius:24px;}
+.frame-tag{position:absolute;top:8px;right:10px;font-size:9px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.5px;z-index:5;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:4px;}
+
+.bg{background:linear-gradient(145deg,#f5f3f0,#ece8e3);position:absolute;inset:0;}
+
+/* Sidebar (desktop) */
+.sb-mini{position:absolute;left:0;top:0;bottom:0;width:56px;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:4px;}
+.sb-mini .logo{width:30px;height:30px;background:rgba(0,0,0,.07);border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.sb-mini .logo span{width:8px;height:8px;background:#292524;border-radius:3px;}
+.sb-mini .ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.sb-mini .ic.act{background:rgba(255,255,255,.7);box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.sb-mini .ic div{width:14px;height:14px;background:rgba(0,0,0,.1);border-radius:3px;}
+.sb-mini .ic.act div{background:rgba(0,0,0,.25);}
+
+/* Header (desktop) */
+.hdr-inner{position:absolute;top:0;right:0;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;}
+.hdr-inner .t{font-size:15px;font-weight:700;color:#1c1917;}
+.hdr-inner .acts{display:flex;gap:6px;align-items:center;}
+.hdr-inner .ab{height:28px;padding:0 10px;background:#292524;color:#fff;border-radius:7px;font-size:11px;font-weight:600;border:none;}
+.hdr-inner .search{height:28px;padding:0 10px;border:1px solid rgba(0,0,0,.06);border-radius:7px;background:rgba(255,255,255,.5);font-size:11px;color:#a8a29e;display:flex;align-items:center;gap:4px;width:150px;}
+.hdr-inner .search .k{margin-left:auto;font-size:9px;background:rgba(0,0,0,.06);padding:1px 4px;border-radius:3px;}
+.hdr-inner .sm{width:28px;height:28px;border:1px solid rgba(0,0,0,.06);border-radius:7px;background:rgba(255,255,255,.5);}
+.hdr-inner .av{width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.08);}
+
+/* Mobile header + bottom bar */
+.mob-hdr{position:absolute;top:0;left:0;right:0;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:rgba(255,255,255,.7);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,0,0,.06);z-index:2;}
+.mob-hdr .t{font-size:16px;font-weight:700;color:#1c1917;}
+.mob-hdr .ab{height:28px;padding:0 10px;background:#292524;color:#fff;border-radius:7px;font-size:11px;font-weight:600;border:none;}
+.mob-bar{position:absolute;bottom:0;left:0;right:0;height:48px;background:rgba(255,255,255,.85);backdrop-filter:blur(16px);border-top:1px solid rgba(0,0,0,.06);display:flex;justify-content:space-around;align-items:center;z-index:2;}
+.mob-bar .mi{display:flex;flex-direction:column;align-items:center;gap:1px;}
+.mob-bar .mi div{width:18px;height:18px;background:rgba(0,0,0,.1);border-radius:4px;}
+.mob-bar .mi.act div{background:rgba(0,0,0,.25);}
+.mob-bar .mi span{font-size:8px;font-weight:600;color:#a8a29e;}
+.mob-bar .mi.act span{color:#292524;}
+
+/* Company badge */
+.badge{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;}
+.badge-m{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
+
+/* Status badges */
+.status-pill{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.status-pill.applied{background:rgba(59,130,246,.1);color:#3b82f6;}
+.status-pill.screening{background:rgba(139,92,246,.1);color:#8b5cf6;}
+.status-pill.interviewing{background:rgba(245,158,11,.1);color:#b45309;}
+.status-pill.offer{background:rgba(34,197,94,.1);color:#16a34a;}
+.status-pill.rejected{background:rgba(239,68,68,.1);color:#ef4444;}
+
+/* Status dot */
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+/* Priority dot */
+.pri-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+
+/* Filter chips (tab style) */
+.filter-bar{display:flex;align-items:center;gap:4px;padding:6px 0;margin-bottom:6px;}
+.filter-chip{font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;color:#78716c;cursor:pointer;background:transparent;border:none;font-family:var(--font);}
+.filter-chip:hover{background:rgba(0,0,0,.04);}
+.filter-chip.active{background:rgba(255,255,255,.7);color:#292524;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.filter-chip .cnt{font-size:9px;color:#a8a29e;margin-left:2px;}
+
+/* ===== L1: Glass Table ===== */
+.glass-table{width:100%;border-collapse:separate;border-spacing:0;}
+.glass-table thead th{font-size:10px;font-weight:600;color:#78716c;text-align:left;padding:6px 10px;border-bottom:1px solid rgba(0,0,0,.06);cursor:pointer;white-space:nowrap;user-select:none;}
+.glass-table thead th:hover{color:#57534e;}
+.glass-table thead th .sort-icon{display:inline-block;margin-left:2px;font-size:8px;color:#a8a29e;}
+.glass-table tbody tr{transition:background .1s;}
+.glass-table tbody tr:hover{background:rgba(255,255,255,.3);}
+.glass-table tbody td{font-size:11px;color:#292524;padding:8px 10px;border-bottom:1px solid rgba(0,0,0,.03);}
+.glass-table .company-cell{display:flex;align-items:center;gap:8px;font-weight:600;}
+.glass-table .role-cell{color:#78716c;}
+.glass-table .source-cell{font-size:10px;color:#a8a29e;}
+.glass-table .date-cell{font-size:10px;color:#a8a29e;white-space:nowrap;}
+.glass-table .days-cell{font-size:10px;color:#a8a29e;white-space:nowrap;}
+.glass-table .days-cell .stale{color:#ef4444;font-weight:600;}
+.glass-table-wrap{background:rgba(255,255,255,.5);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.5);border-radius:10px;overflow:hidden;}
+
+/* L1 mobile cards */
+.l1-card{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:10px;padding:12px;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.l1-card .info{flex:1;min-width:0;}
+.l1-card .info h4{font-size:14px;font-weight:600;color:#292524;margin-bottom:1px;}
+.l1-card .info .role{font-size:11px;color:#78716c;}
+.l1-card .right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.l1-card .right .days{font-size:11px;color:#a8a29e;}
+.l1-card .right .days.stale{color:#ef4444;font-weight:600;}
+
+/* ===== L2: Grouped List ===== */
+.group-section{margin-bottom:10px;}
+.group-hdr{display:flex;align-items:center;gap:6px;padding:6px 2px;margin-bottom:4px;}
+.group-hdr .dot{width:8px;height:8px;border-radius:50%;}
+.group-hdr .label{font-size:12px;font-weight:700;color:#57534e;}
+.group-hdr .count{font-size:10px;font-weight:600;color:#a8a29e;background:rgba(0,0,0,.04);padding:1px 6px;border-radius:6px;margin-left:2px;}
+
+.group-row{background:rgba(255,255,255,.55);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.4);border-radius:8px;padding:8px 12px;margin-bottom:4px;display:flex;align-items:center;gap:10px;transition:background .1s;}
+.group-row:hover{background:rgba(255,255,255,.75);}
+.group-row .info{flex:1;min-width:0;display:flex;align-items:center;gap:10px;}
+.group-row .info h4{font-size:12px;font-weight:600;color:#292524;white-space:nowrap;}
+.group-row .info .role{font-size:11px;color:#78716c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.group-row .meta{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.group-row .source{font-size:10px;color:#a8a29e;}
+.group-row .days{font-size:10px;color:#a8a29e;}
+.group-row .days.stale{color:#ef4444;font-weight:600;}
+
+/* L2 mobile */
+.group-card-m{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:10px;padding:10px 12px;margin-bottom:5px;display:flex;align-items:center;gap:10px;}
+.group-card-m .info{flex:1;min-width:0;}
+.group-card-m .info h4{font-size:13px;font-weight:600;color:#292524;}
+.group-card-m .info .role{font-size:11px;color:#78716c;}
+.group-card-m .right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.group-card-m .days{font-size:10px;color:#a8a29e;}
+.group-card-m .days.stale{color:#ef4444;font-weight:600;}
+
+/* ===== L3: Compact Rows ===== */
+.compact-wrap{background:rgba(255,255,255,.5);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.5);border-radius:10px;overflow:hidden;}
+.compact-row{display:flex;align-items:center;gap:8px;padding:6px 12px;font-size:11px;transition:background .1s;}
+.compact-row:nth-child(even){background:rgba(255,255,255,.15);}
+.compact-row:hover{background:rgba(255,255,255,.35);}
+.compact-row .company{font-weight:600;color:#292524;width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;}
+.compact-row .role{color:#78716c;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.compact-row .days{font-size:10px;color:#a8a29e;flex-shrink:0;width:32px;text-align:right;}
+.compact-row .days.stale{color:#ef4444;font-weight:600;}
+
+/* L3 mobile */
+.compact-wrap-m{background:rgba(255,255,255,.5);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.5);border-radius:12px;overflow:hidden;}
+.compact-row-m{display:flex;align-items:center;gap:10px;padding:12px 14px;font-size:13px;transition:background .1s;min-height:44px;}
+.compact-row-m:nth-child(even){background:rgba(255,255,255,.15);}
+.compact-row-m:hover{background:rgba(255,255,255,.35);}
+.compact-row-m .company{font-weight:600;color:#292524;white-space:nowrap;flex-shrink:0;}
+.compact-row-m .role{color:#78716c;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;}
+.compact-row-m .days{font-size:11px;color:#a8a29e;flex-shrink:0;}
+.compact-row-m .days.stale{color:#ef4444;font-weight:600;}
+
+/* Descriptions */
+.desc-area{max-width:1400px;margin:0 auto;padding:0 24px 64px;}
+.desc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.dc{background:#111;border:1px solid #222;border-radius:10px;padding:18px;}
+.dc h3{font-size:14px;font-weight:600;margin-bottom:6px;}
+.dc p{font-size:12px;color:#666;line-height:1.6;}
+.dc ul{margin-top:8px;font-size:12px;color:#888;line-height:1.8;list-style:none;}
+.dc ul li::before{content:"-> ";color:#444;}
+
+.opt{display:none;}.opt.on{display:block;}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h2>List / Table --</h2>
+  <div class="pills">
+    <button class="pill on" onclick="pick('l1',this)">L1: Glass Table</button>
+    <button class="pill" onclick="pick('l2',this)">L2: Grouped List</button>
+    <button class="pill" onclick="pick('l3',this)">L3: Compact Rows</button>
+  </div>
+</div>
+
+<div class="stage">
+
+<!-- ============================================ -->
+<!-- L1: GLASS TABLE                              -->
+<!-- ============================================ -->
+<div class="opt on" id="opt-l1">
+<div class="pair">
+  <!-- Desktop 960px -->
+  <div class="frame desktop">
+    <span class="frame-tag">Desktop 960px</span>
+    <div class="bg">
+      <!-- Sidebar -->
+      <div class="sb-mini">
+        <div class="logo"><span></span></div>
+        <div class="ic"><div></div></div>
+        <div class="ic act"><div></div></div>
+        <div class="ic"><div></div></div>
+        <div class="ic"><div></div></div>
+        <div style="flex:1;"></div>
+        <div class="ic"><div></div></div>
+      </div>
+      <!-- Header -->
+      <div class="hdr-inner" style="left:56px;">
+        <div class="t">List</div>
+        <div class="acts">
+          <div class="search">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search<span class="k">&#8984;K</span>
+          </div>
+          <button class="ab">+ Add</button>
+          <div class="sm"></div>
+          <div class="av"></div>
+        </div>
+      </div>
+      <!-- Content -->
+      <div style="position:absolute;left:56px;top:44px;right:0;bottom:0;padding:10px 14px;overflow-y:auto;">
+        <!-- Filter chips -->
+        <div class="filter-bar">
+          <button class="filter-chip active">All<span class="cnt">6</span></button>
+          <button class="filter-chip">Applied<span class="cnt">2</span></button>
+          <button class="filter-chip">Screening<span class="cnt">1</span></button>
+          <button class="filter-chip">Interviewing<span class="cnt">2</span></button>
+          <button class="filter-chip">Offer<span class="cnt">1</span></button>
+          <button class="filter-chip" style="opacity:.5;">Rejected</button>
+        </div>
+        <!-- Glass table -->
+        <div class="glass-table-wrap">
+          <table class="glass-table">
+            <thead>
+              <tr>
+                <th>Company <span class="sort-icon">&#9660;</span></th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Pri</th>
+                <th>Source</th>
+                <th>Applied</th>
+                <th>Days</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="company-cell"><div class="badge" style="background:#22c55e;">F</div>Figma</div></td>
+                <td class="role-cell">Senior Frontend</td>
+                <td><span class="status-pill offer">Offer</span></td>
+                <td><span class="pri-dot" style="background:#ef4444;"></span></td>
+                <td class="source-cell">Recruiter</td>
+                <td class="date-cell">Mar 28</td>
+                <td class="days-cell">19d</td>
+              </tr>
+              <tr>
+                <td><div class="company-cell"><div class="badge" style="background:#f59e0b;">G</div>Google</div></td>
+                <td class="role-cell">SDE III</td>
+                <td><span class="status-pill interviewing">Interviewing</span></td>
+                <td><span class="pri-dot" style="background:#ef4444;"></span></td>
+                <td class="source-cell">Referral</td>
+                <td class="date-cell">Apr 2</td>
+                <td class="days-cell">14d</td>
+              </tr>
+              <tr>
+                <td><div class="company-cell"><div class="badge" style="background:#3b82f6;">S</div>Stripe</div></td>
+                <td class="role-cell">Senior Frontend</td>
+                <td><span class="status-pill applied">Applied</span></td>
+                <td><span class="pri-dot" style="background:#ef4444;"></span></td>
+                <td class="source-cell">Website</td>
+                <td class="date-cell">Apr 4</td>
+                <td class="days-cell"><span class="stale">12d stale</span></td>
+              </tr>
+              <tr>
+                <td><div class="company-cell"><div class="badge" style="background:#f59e0b;">N</div>Netflix</div></td>
+                <td class="role-cell">Senior SWE</td>
+                <td><span class="status-pill interviewing">Interviewing</span></td>
+                <td><span class="pri-dot" style="background:#ef4444;"></span></td>
+                <td class="source-cell">LinkedIn</td>
+                <td class="date-cell">Apr 6</td>
+                <td class="days-cell">10d</td>
+              </tr>
+              <tr>
+                <td><div class="company-cell"><div class="badge" style="background:#8b5cf6;">A</div>Airbnb</div></td>
+                <td class="role-cell">Staff Engineer</td>
+                <td><span class="status-pill screening">Screening</span></td>
+                <td><span class="pri-dot" style="background:#f59e0b;"></span></td>
+                <td class="source-cell">Referral</td>
+                <td class="date-cell">Apr 8</td>
+                <td class="days-cell">8d</td>
+              </tr>
+              <tr>
+                <td><div class="company-cell"><div class="badge" style="background:#3b82f6;">C</div>Cloudflare</div></td>
+                <td class="role-cell">Systems Engineer</td>
+                <td><span class="status-pill applied">Applied</span></td>
+                <td><span class="pri-dot" style="background:#f59e0b;"></span></td>
+                <td class="source-cell">Website</td>
+                <td class="date-cell">Apr 14</td>
+                <td class="days-cell">2d</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile 375px -->
+  <div class="frame mobile">
+    <span class="frame-tag">Mobile 375px</span>
+    <div class="bg">
+      <div class="mob-hdr"><span class="t">List</span><button class="ab">+ Add</button></div>
+      <div style="position:absolute;top:48px;bottom:48px;left:0;right:0;overflow-y:auto;padding:10px 14px;">
+        <!-- Mobile filter chips -->
+        <div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:8px;margin-bottom:4px;">
+          <span class="filter-chip active" style="font-size:11px;padding:5px 12px;">All</span>
+          <span class="filter-chip" style="font-size:11px;padding:5px 12px;">Applied</span>
+          <span class="filter-chip" style="font-size:11px;padding:5px 12px;">Screening</span>
+          <span class="filter-chip" style="font-size:11px;padding:5px 12px;">Interviewing</span>
+          <span class="filter-chip" style="font-size:11px;padding:5px 12px;">Offer</span>
+        </div>
+        <!-- Mobile card list -->
+        <div class="l1-card">
+          <div class="badge-m" style="background:#22c55e;">F</div>
+          <div class="info"><h4>Figma</h4><div class="role">Senior Frontend</div></div>
+          <div class="right"><span class="status-pill offer" style="font-size:9px;padding:1px 6px;">Offer</span><span class="days">19d</span></div>
+        </div>
+        <div class="l1-card">
+          <div class="badge-m" style="background:#f59e0b;">G</div>
+          <div class="info"><h4>Google</h4><div class="role">SDE III</div></div>
+          <div class="right"><span class="status-pill interviewing" style="font-size:9px;padding:1px 6px;">Interview</span><span class="days">14d</span></div>
+        </div>
+        <div class="l1-card">
+          <div class="badge-m" style="background:#3b82f6;">S</div>
+          <div class="info"><h4>Stripe</h4><div class="role">Senior Frontend</div></div>
+          <div class="right"><span class="status-pill applied" style="font-size:9px;padding:1px 6px;">Applied</span><span class="days stale">12d</span></div>
+        </div>
+        <div class="l1-card">
+          <div class="badge-m" style="background:#f59e0b;">N</div>
+          <div class="info"><h4>Netflix</h4><div class="role">Senior SWE</div></div>
+          <div class="right"><span class="status-pill interviewing" style="font-size:9px;padding:1px 6px;">Interview</span><span class="days">10d</span></div>
+        </div>
+        <div class="l1-card">
+          <div class="badge-m" style="background:#8b5cf6;">A</div>
+          <div class="info"><h4>Airbnb</h4><div class="role">Staff Engineer</div></div>
+          <div class="right"><span class="status-pill screening" style="font-size:9px;padding:1px 6px;">Screening</span><span class="days">8d</span></div>
+        </div>
+        <div class="l1-card">
+          <div class="badge-m" style="background:#3b82f6;">C</div>
+          <div class="info"><h4>Cloudflare</h4><div class="role">Systems Engineer</div></div>
+          <div class="right"><span class="status-pill applied" style="font-size:9px;padding:1px 6px;">Applied</span><span class="days">2d</span></div>
+        </div>
+      </div>
+      <div class="mob-bar">
+        <div class="mi"><div></div><span>Board</span></div>
+        <div class="mi act"><div></div><span>List</span></div>
+        <div class="mi"><div></div><span>Cal</span></div>
+        <div class="mi"><div></div><span>Stats</span></div>
+        <div class="mi"><div></div><span>More</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- L2: GROUPED LIST                             -->
+<!-- ============================================ -->
+<div class="opt" id="opt-l2">
+<div class="pair">
+  <!-- Desktop 960px -->
+  <div class="frame desktop">
+    <span class="frame-tag">Desktop 960px</span>
+    <div class="bg">
+      <!-- Sidebar -->
+      <div class="sb-mini">
+        <div class="logo"><span></span></div>
+        <div class="ic"><div></div></div>
+        <div class="ic act"><div></div></div>
+        <div class="ic"><div></div></div>
+        <div class="ic"><div></div></div>
+        <div style="flex:1;"></div>
+        <div class="ic"><div></div></div>
+      </div>
+      <!-- Header -->
+      <div class="hdr-inner" style="left:56px;">
+        <div class="t">List</div>
+        <div class="acts">
+          <div class="search">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search<span class="k">&#8984;K</span>
+          </div>
+          <button class="ab">+ Add</button>
+          <div class="sm"></div>
+          <div class="av"></div>
+        </div>
+      </div>
+      <!-- Content -->
+      <div style="position:absolute;left:56px;top:44px;right:0;bottom:0;padding:10px 18px;overflow-y:auto;">
+        <!-- Offer group -->
+        <div class="group-section">
+          <div class="group-hdr">
+            <div class="dot" style="background:#22c55e;"></div>
+            <span class="label">Offer</span>
+            <span class="count">1</span>
+          </div>
+          <div class="group-row">
+            <div class="badge" style="background:#22c55e;">F</div>
+            <div class="info">
+              <h4>Figma</h4>
+              <span class="role">Senior Frontend</span>
+            </div>
+            <div class="meta">
+              <span class="pri-dot" style="background:#ef4444;"></span>
+              <span class="source">Recruiter</span>
+              <span class="days">19d</span>
+            </div>
+          </div>
+        </div>
+        <!-- Interviewing group -->
+        <div class="group-section">
+          <div class="group-hdr">
+            <div class="dot" style="background:#f59e0b;"></div>
+            <span class="label">Interviewing</span>
+            <span class="count">2</span>
+          </div>
+          <div class="group-row">
+            <div class="badge" style="background:#f59e0b;">G</div>
+            <div class="info">
+              <h4>Google</h4>
+              <span class="role">SDE III</span>
+            </div>
+            <div class="meta">
+              <span class="pri-dot" style="background:#ef4444;"></span>
+              <span class="source">Referral</span>
+              <span class="days">14d</span>
+            </div>
+          </div>
+          <div class="group-row">
+            <div class="badge" style="background:#f59e0b;">N</div>
+            <div class="info">
+              <h4>Netflix</h4>
+              <span class="role">Senior SWE</span>
+            </div>
+            <div class="meta">
+              <span class="pri-dot" style="background:#ef4444;"></span>
+              <span class="source">LinkedIn</span>
+              <span class="days">10d</span>
+            </div>
+          </div>
+        </div>
+        <!-- Screening group -->
+        <div class="group-section">
+          <div class="group-hdr">
+            <div class="dot" style="background:#8b5cf6;"></div>
+            <span class="label">Screening</span>
+            <span class="count">1</span>
+          </div>
+          <div class="group-row">
+            <div class="badge" style="background:#8b5cf6;">A</div>
+            <div class="info">
+              <h4>Airbnb</h4>
+              <span class="role">Staff Engineer</span>
+            </div>
+            <div class="meta">
+              <span class="pri-dot" style="background:#f59e0b;"></span>
+              <span class="source">Referral</span>
+              <span class="days">8d</span>
+            </div>
+          </div>
+        </div>
+        <!-- Applied group -->
+        <div class="group-section">
+          <div class="group-hdr">
+            <div class="dot" style="background:#3b82f6;"></div>
+            <span class="label">Applied</span>
+            <span class="count">2</span>
+          </div>
+          <div class="group-row">
+            <div class="badge" style="background:#3b82f6;">S</div>
+            <div class="info">
+              <h4>Stripe</h4>
+              <span class="role">Senior Frontend</span>
+            </div>
+            <div class="meta">
+              <span class="pri-dot" style="background:#ef4444;"></span>
+              <span class="source">Website</span>
+              <span class="days stale">12d stale</span>
+            </div>
+          </div>
+          <div class="group-row">
+            <div class="badge" style="background:#3b82f6;">C</div>
+            <div class="info">
+              <h4>Cloudflare</h4>
+              <span class="role">Systems Engineer</span>
+            </div>
+            <div class="meta">
+              <span class="pri-dot" style="background:#f59e0b;"></span>
+              <span class="source">Website</span>
+              <span class="days">2d</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile 375px -->
+  <div class="frame mobile">
+    <span class="frame-tag">Mobile 375px</span>
+    <div class="bg">
+      <div class="mob-hdr"><span class="t">List</span><button class="ab">+ Add</button></div>
+      <div style="position:absolute;top:48px;bottom:48px;left:0;right:0;overflow-y:auto;padding:10px 14px;">
+        <!-- Offer -->
+        <div class="group-section">
+          <div class="group-hdr">
+            <div class="dot" style="background:#22c55e;"></div>
+            <span class="label">Offer</span>
+            <span class="count">1</span>
+          </div>
+          <div class="group-card-m">
+            <div class="badge-m" style="background:#22c55e;">F</div>
+            <div class="info"><h4>Figma</h4><div class="role">Senior Frontend</div></div>
+            <div class="right"><span class="days">19d</span></div>
+          </div>
+        </div>
+        <!-- Interviewing -->
+        <div class="group-section">
+          <div class="group-hdr">
+            <div class="dot" style="background:#f59e0b;"></div>
+            <span class="label">Interviewing</span>
+            <span class="count">2</span>
+          </div>
+          <div class="group-card-m">
+            <div class="badge-m" style="background:#f59e0b;">G</div>
+            <div class="info"><h4>Google</h4><div class="role">SDE III</div></div>
+            <div class="right"><span class="days">14d</span></div>
+          </div>
+          <div class="group-card-m">
+            <div class="badge-m" style="background:#f59e0b;">N</div>
+            <div class="info"><h4>Netflix</h4><div class="role">Senior SWE</div></div>
+            <div class="right"><span class="days">10d</span></div>
+          </div>
+        </div>
+        <!-- Screening -->
+        <div class="group-section">
+          <div class="group-hdr">
+            <div class="dot" style="background:#8b5cf6;"></div>
+            <span class="label">Screening</span>
+            <span class="count">1</span>
+          </div>
+          <div class="group-card-m">
+            <div class="badge-m" style="background:#8b5cf6;">A</div>
+            <div class="info"><h4>Airbnb</h4><div class="role">Staff Engineer</div></div>
+            <div class="right"><span class="days">8d</span></div>
+          </div>
+        </div>
+        <!-- Applied -->
+        <div class="group-section">
+          <div class="group-hdr">
+            <div class="dot" style="background:#3b82f6;"></div>
+            <span class="label">Applied</span>
+            <span class="count">2</span>
+          </div>
+          <div class="group-card-m">
+            <div class="badge-m" style="background:#3b82f6;">S</div>
+            <div class="info"><h4>Stripe</h4><div class="role">Senior Frontend</div></div>
+            <div class="right"><span class="days stale">12d</span></div>
+          </div>
+          <div class="group-card-m">
+            <div class="badge-m" style="background:#3b82f6;">C</div>
+            <div class="info"><h4>Cloudflare</h4><div class="role">Systems Engineer</div></div>
+            <div class="right"><span class="days">2d</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="mob-bar">
+        <div class="mi"><div></div><span>Board</span></div>
+        <div class="mi act"><div></div><span>List</span></div>
+        <div class="mi"><div></div><span>Cal</span></div>
+        <div class="mi"><div></div><span>Stats</span></div>
+        <div class="mi"><div></div><span>More</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============================================ -->
+<!-- L3: COMPACT ROWS                             -->
+<!-- ============================================ -->
+<div class="opt" id="opt-l3">
+<div class="pair">
+  <!-- Desktop 960px -->
+  <div class="frame desktop">
+    <span class="frame-tag">Desktop 960px</span>
+    <div class="bg">
+      <!-- Sidebar -->
+      <div class="sb-mini">
+        <div class="logo"><span></span></div>
+        <div class="ic"><div></div></div>
+        <div class="ic act"><div></div></div>
+        <div class="ic"><div></div></div>
+        <div class="ic"><div></div></div>
+        <div style="flex:1;"></div>
+        <div class="ic"><div></div></div>
+      </div>
+      <!-- Header -->
+      <div class="hdr-inner" style="left:56px;">
+        <div class="t">List</div>
+        <div class="acts">
+          <div class="search">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search<span class="k">&#8984;K</span>
+          </div>
+          <button class="ab">+ Add</button>
+          <div class="sm"></div>
+          <div class="av"></div>
+        </div>
+      </div>
+      <!-- Content -->
+      <div style="position:absolute;left:56px;top:44px;right:0;bottom:0;padding:10px 14px;overflow-y:auto;">
+        <!-- Filter chips -->
+        <div class="filter-bar">
+          <button class="filter-chip active">All<span class="cnt">6</span></button>
+          <button class="filter-chip">Applied<span class="cnt">2</span></button>
+          <button class="filter-chip">Screening<span class="cnt">1</span></button>
+          <button class="filter-chip">Interviewing<span class="cnt">2</span></button>
+          <button class="filter-chip">Offer<span class="cnt">1</span></button>
+        </div>
+        <!-- Compact rows container -->
+        <div class="compact-wrap">
+          <!-- Column header row -->
+          <div class="compact-row" style="background:rgba(0,0,0,.02);padding:4px 12px;">
+            <div style="width:24px;"></div>
+            <div class="company" style="font-size:9px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.3px;">Company</div>
+            <div class="role" style="font-size:9px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.3px;">Role</div>
+            <div style="width:7px;flex-shrink:0;font-size:9px;font-weight:600;color:#a8a29e;"></div>
+            <div class="days" style="font-size:9px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.3px;">Days</div>
+          </div>
+          <div class="compact-row">
+            <div class="badge" style="background:#22c55e;width:24px;height:24px;font-size:10px;">F</div>
+            <div class="company">Figma</div>
+            <div class="role">Senior Frontend</div>
+            <span class="status-dot" style="background:#22c55e;"></span>
+            <div class="days">19d</div>
+          </div>
+          <div class="compact-row">
+            <div class="badge" style="background:#f59e0b;width:24px;height:24px;font-size:10px;">G</div>
+            <div class="company">Google</div>
+            <div class="role">SDE III</div>
+            <span class="status-dot" style="background:#f59e0b;"></span>
+            <div class="days">14d</div>
+          </div>
+          <div class="compact-row">
+            <div class="badge" style="background:#3b82f6;width:24px;height:24px;font-size:10px;">S</div>
+            <div class="company">Stripe</div>
+            <div class="role">Senior Frontend</div>
+            <span class="status-dot" style="background:#3b82f6;"></span>
+            <div class="days stale">12d</div>
+          </div>
+          <div class="compact-row">
+            <div class="badge" style="background:#f59e0b;width:24px;height:24px;font-size:10px;">N</div>
+            <div class="company">Netflix</div>
+            <div class="role">Senior SWE</div>
+            <span class="status-dot" style="background:#f59e0b;"></span>
+            <div class="days">10d</div>
+          </div>
+          <div class="compact-row">
+            <div class="badge" style="background:#8b5cf6;width:24px;height:24px;font-size:10px;">A</div>
+            <div class="company">Airbnb</div>
+            <div class="role">Staff Engineer</div>
+            <span class="status-dot" style="background:#8b5cf6;"></span>
+            <div class="days">8d</div>
+          </div>
+          <div class="compact-row">
+            <div class="badge" style="background:#3b82f6;width:24px;height:24px;font-size:10px;">C</div>
+            <div class="company">Cloudflare</div>
+            <div class="role">Systems Engineer</div>
+            <span class="status-dot" style="background:#3b82f6;"></span>
+            <div class="days">2d</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile 375px -->
+  <div class="frame mobile">
+    <span class="frame-tag">Mobile 375px</span>
+    <div class="bg">
+      <div class="mob-hdr"><span class="t">List</span><button class="ab">+ Add</button></div>
+      <div style="position:absolute;top:48px;bottom:48px;left:0;right:0;overflow-y:auto;padding:10px 14px;">
+        <!-- Filter chips -->
+        <div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:8px;margin-bottom:4px;">
+          <span class="filter-chip active" style="font-size:11px;padding:5px 12px;">All</span>
+          <span class="filter-chip" style="font-size:11px;padding:5px 12px;">Applied</span>
+          <span class="filter-chip" style="font-size:11px;padding:5px 12px;">Screening</span>
+          <span class="filter-chip" style="font-size:11px;padding:5px 12px;">Interview</span>
+          <span class="filter-chip" style="font-size:11px;padding:5px 12px;">Offer</span>
+        </div>
+        <div class="compact-wrap-m">
+          <div class="compact-row-m">
+            <div class="badge-m" style="background:#22c55e;width:32px;height:32px;font-size:13px;border-radius:8px;">F</div>
+            <div class="company">Figma</div>
+            <div class="role">Sr Frontend</div>
+            <span class="status-dot" style="background:#22c55e;"></span>
+            <div class="days">19d</div>
+          </div>
+          <div class="compact-row-m">
+            <div class="badge-m" style="background:#f59e0b;width:32px;height:32px;font-size:13px;border-radius:8px;">G</div>
+            <div class="company">Google</div>
+            <div class="role">SDE III</div>
+            <span class="status-dot" style="background:#f59e0b;"></span>
+            <div class="days">14d</div>
+          </div>
+          <div class="compact-row-m">
+            <div class="badge-m" style="background:#3b82f6;width:32px;height:32px;font-size:13px;border-radius:8px;">S</div>
+            <div class="company">Stripe</div>
+            <div class="role">Sr Frontend</div>
+            <span class="status-dot" style="background:#3b82f6;"></span>
+            <div class="days stale">12d</div>
+          </div>
+          <div class="compact-row-m">
+            <div class="badge-m" style="background:#f59e0b;width:32px;height:32px;font-size:13px;border-radius:8px;">N</div>
+            <div class="company">Netflix</div>
+            <div class="role">Sr SWE</div>
+            <span class="status-dot" style="background:#f59e0b;"></span>
+            <div class="days">10d</div>
+          </div>
+          <div class="compact-row-m">
+            <div class="badge-m" style="background:#8b5cf6;width:32px;height:32px;font-size:13px;border-radius:8px;">A</div>
+            <div class="company">Airbnb</div>
+            <div class="role">Staff Eng</div>
+            <span class="status-dot" style="background:#8b5cf6;"></span>
+            <div class="days">8d</div>
+          </div>
+          <div class="compact-row-m">
+            <div class="badge-m" style="background:#3b82f6;width:32px;height:32px;font-size:13px;border-radius:8px;">C</div>
+            <div class="company">Cloudflare</div>
+            <div class="role">Sys Eng</div>
+            <span class="status-dot" style="background:#3b82f6;"></span>
+            <div class="days">2d</div>
+          </div>
+        </div>
+      </div>
+      <div class="mob-bar">
+        <div class="mi"><div></div><span>Board</span></div>
+        <div class="mi act"><div></div><span>List</span></div>
+        <div class="mi"><div></div><span>Cal</span></div>
+        <div class="mi"><div></div><span>Stats</span></div>
+        <div class="mi"><div></div><span>More</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div><!-- /stage -->
+
+<!-- Description cards -->
+<div class="desc-area">
+  <div class="desc-grid">
+    <div class="dc">
+      <h3>L1: Glass Table</h3>
+      <p>Traditional table layout wrapped in a frosted glass container. Sortable column headers let users reorder by company, status, date, or days. Filter chips above act as quick status tabs.</p>
+      <ul>
+        <li>Most data-dense -- 7 columns visible at once</li>
+        <li>Sortable headers for flexible ordering</li>
+        <li>Filter chips double as status tab navigation</li>
+        <li>Mobile: switches to card list with badge + status pill</li>
+        <li>Best for power users who want spreadsheet-like scanning</li>
+      </ul>
+    </div>
+    <div class="dc">
+      <h3>L2: Grouped List</h3>
+      <p>Applications organized by status in collapsible sections. Each section header shows status name and count. Cards within sections are wide horizontal rows with badge, name, role, source, and days.</p>
+      <ul>
+        <li>Natural mental model -- grouped by pipeline stage</li>
+        <li>Section headers with counts give quick overview</li>
+        <li>Priority ordering: Offer first, then Interviewing, etc.</li>
+        <li>Mobile: same grouped layout, compact cards</li>
+        <li>Best for users who think in terms of pipeline stages</li>
+      </ul>
+    </div>
+    <div class="dc">
+      <h3>L3: Compact Rows</h3>
+      <p>Maximum density. No cards, no borders between items -- just alternating rows in a single glass container. Each row: badge, company, role, status dot, days. See all applications at a glance.</p>
+      <ul>
+        <li>Highest information density of all three variants</li>
+        <li>Status dot instead of pill -- minimal visual weight</li>
+        <li>Alternating row tints for scanability</li>
+        <li>Mobile: same rows but 44px min-height for tap targets</li>
+        <li>Best for users who want the most items visible at once</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+function pick(id,btn){
+  document.querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.opt').forEach(o=>o.classList.remove('on'));
+  document.getElementById('opt-'+id).classList.add('on');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — B+C Card Variants</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',system-ui,sans-serif;}
+body{font-family:var(--font);background:#0a0a0a;color:#fff;-webkit-font-smoothing:antialiased;font-size:14px;}
+
+.top{position:fixed;top:0;left:0;right:0;z-index:100;background:#111;border-bottom:1px solid #222;padding:12px 24px;display:flex;align-items:center;gap:12px;overflow-x:auto;}
+.top h2{font-size:14px;font-weight:600;color:#666;white-space:nowrap;}
+.pills{display:flex;gap:5px;}
+.pill{padding:7px 14px;border-radius:7px;font-size:11px;font-weight:600;border:1px solid #2a2a2a;background:transparent;color:#666;cursor:pointer;white-space:nowrap;}
+.pill:hover{color:#aaa;border-color:#444;}
+.pill.on{background:#fff;color:#000;border-color:#fff;}
+
+.stage{margin-top:56px;padding:24px;max-width:1400px;margin-left:auto;margin-right:auto;}
+.opt{display:none;}.opt.on{display:block;}
+.opt-hdr h2{font-size:16px;font-weight:700;margin-bottom:4px;}
+.opt-desc{font-size:12px;color:#555;line-height:1.6;max-width:700px;margin-bottom:16px;}
+.opt-tags{display:flex;gap:4px;margin-bottom:20px;}
+.tg{font-size:9px;padding:2px 6px;border-radius:3px;background:#1a1a1a;color:#555;}
+
+.views{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;}
+.view-label{font-size:10px;font-weight:600;color:#444;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+.desk-frame{background:linear-gradient(145deg,#f5f3f0,#ece8e3);border-radius:12px;border:1px solid #222;padding:14px;flex:1;min-width:600px;}
+.desk-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.col-hdr{display:flex;align-items:center;gap:4px;padding:3px 2px;margin-bottom:5px;font-size:10px;font-weight:600;color:#57534e;}
+.col-hdr .dot{width:6px;height:6px;border-radius:50%;}
+.col-hdr .cnt{margin-left:auto;font-size:8px;font-weight:600;color:#a8a29e;background:rgba(0,0,0,.04);padding:0 4px;border-radius:4px;}
+.mob-frame{background:linear-gradient(145deg,#f5f3f0,#ece8e3);border-radius:20px;border:1px solid #222;padding:14px;width:340px;flex-shrink:0;}
+.mob-sec{margin-bottom:10px;}
+.mob-sec-hdr{display:flex;align-items:center;gap:5px;padding:6px 0;font-size:12px;font-weight:600;color:#57534e;border-bottom:1px solid rgba(0,0,0,.04);margin-bottom:6px;}
+.mob-sec-hdr .dot{width:7px;height:7px;border-radius:50%;}
+.mob-sec-hdr .cnt{font-size:10px;color:#a8a29e;margin-left:4px;}
+
+/* Icons */
+.ico{width:12px;height:12px;flex-shrink:0;display:inline-flex;}
+.ico svg{width:100%;height:100%;}
+.ico-m{width:14px;height:14px;flex-shrink:0;display:inline-flex;}
+.ico-m svg{width:100%;height:100%;}
+
+/* Tint classes */
+.tint-a{background:rgba(245,158,11,.06) !important;border-color:rgba(245,158,11,.15) !important;}
+.tint-g{background:rgba(34,197,94,.06) !important;border-color:rgba(34,197,94,.15) !important;}
+.tint-r{background:rgba(239,68,68,.05) !important;border-color:rgba(239,68,68,.12) !important;}
+
+/* ========================================
+   BC1: Badge + right days + tint (clean)
+   ======================================== */
+.bc1{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:8px;padding:8px;margin-bottom:5px;display:flex;gap:8px;align-items:flex-start;cursor:default;transition:all .15s;}
+.bc1:hover{background:rgba(255,255,255,.8);box-shadow:0 2px 6px rgba(0,0,0,.04);}
+.bc1 .av{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0;margin-top:1px;}
+.bc1 .mid{flex:1;min-width:0;}
+.bc1 h4{font-size:11px;font-weight:600;color:#292524;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bc1 .role{font-size:10px;color:#78716c;}
+.bc1 .hint{display:flex;align-items:center;gap:3px;font-size:8px;font-weight:600;margin-top:3px;}
+.bc1 .tags{display:flex;gap:3px;margin-top:3px;flex-wrap:wrap;}
+.bc1 .tag{font-size:8px;padding:1px 4px;border-radius:3px;background:rgba(0,0,0,.04);color:#78716c;}
+.bc1 .stale{font-size:8px;padding:1px 4px;border-radius:3px;font-weight:600;}
+.bc1 .rt{flex-shrink:0;font-size:9px;color:#a8a29e;font-variant-numeric:tabular-nums;margin-top:2px;}
+/* Mobile */
+.bc1m{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:12px;padding:12px;margin-bottom:6px;display:flex;gap:12px;align-items:flex-start;cursor:default;transition:all .15s;}
+.bc1m:hover{background:rgba(255,255,255,.8);}
+.bc1m .av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0;}
+.bc1m .mid{flex:1;min-width:0;}
+.bc1m h4{font-size:14px;font-weight:600;color:#292524;margin-bottom:2px;}
+.bc1m .role{font-size:12px;color:#78716c;}
+.bc1m .hint{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;margin-top:5px;}
+.bc1m .tags{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;}
+.bc1m .tag{font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.04);color:#78716c;}
+.bc1m .stale{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;}
+.bc1m .rt{flex-shrink:0;font-size:11px;color:#a8a29e;font-variant-numeric:tabular-nums;margin-top:2px;}
+
+/* ========================================
+   BC2: Badge + inline right + divider hint
+   ======================================== */
+.bc2{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:8px;margin-bottom:5px;cursor:default;transition:all .15s;}
+.bc2:hover{background:rgba(255,255,255,.8);box-shadow:0 2px 6px rgba(0,0,0,.04);}
+.bc2 .main-row{display:flex;gap:8px;padding:8px;align-items:center;}
+.bc2 .av{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0;}
+.bc2 .mid{flex:1;min-width:0;}
+.bc2 h4{font-size:11px;font-weight:600;color:#292524;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bc2 .role{font-size:10px;color:#78716c;}
+.bc2 .rt{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:1px;}
+.bc2 .days{font-size:9px;color:#a8a29e;font-variant-numeric:tabular-nums;}
+.bc2 .stale{font-size:7px;padding:1px 3px;border-radius:3px;font-weight:600;}
+.bc2 .tag{font-size:7px;padding:1px 3px;border-radius:3px;background:rgba(0,0,0,.04);color:#78716c;}
+.bc2 .hint-bar{display:flex;align-items:center;gap:3px;padding:5px 8px;border-top:1px solid rgba(0,0,0,.04);font-size:8px;font-weight:600;}
+.bc2 .hint-bar .rt-days{margin-left:auto;font-size:8px;color:#a8a29e;font-weight:400;}
+/* Mobile */
+.bc2m{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:12px;margin-bottom:6px;cursor:default;transition:all .15s;}
+.bc2m:hover{background:rgba(255,255,255,.8);}
+.bc2m .main-row{display:flex;gap:12px;padding:12px;align-items:center;}
+.bc2m .av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0;}
+.bc2m .mid{flex:1;min-width:0;}
+.bc2m h4{font-size:14px;font-weight:600;color:#292524;}
+.bc2m .role{font-size:12px;color:#78716c;}
+.bc2m .rt{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+.bc2m .days{font-size:11px;color:#a8a29e;font-variant-numeric:tabular-nums;}
+.bc2m .stale{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600;}
+.bc2m .tag{font-size:9px;padding:2px 5px;border-radius:4px;background:rgba(0,0,0,.04);color:#78716c;}
+.bc2m .hint-bar{display:flex;align-items:center;gap:4px;padding:8px 12px;border-top:1px solid rgba(0,0,0,.04);font-size:11px;font-weight:600;}
+
+/* ========================================
+   BC3: Badge + top-line with days + tint
+   ======================================== */
+.bc3{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:8px;padding:8px;margin-bottom:5px;display:flex;gap:8px;cursor:default;transition:all .15s;}
+.bc3:hover{background:rgba(255,255,255,.8);box-shadow:0 2px 6px rgba(0,0,0,.04);}
+.bc3 .av{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0;margin-top:1px;}
+.bc3 .mid{flex:1;min-width:0;}
+.bc3 .top-l{display:flex;align-items:baseline;justify-content:space-between;gap:4px;}
+.bc3 h4{font-size:11px;font-weight:600;color:#292524;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bc3 .days{font-size:9px;color:#a8a29e;font-variant-numeric:tabular-nums;flex-shrink:0;}
+.bc3 .role{font-size:10px;color:#78716c;}
+.bc3 .meta{display:flex;gap:3px;margin-top:3px;align-items:center;flex-wrap:wrap;}
+.bc3 .tag{font-size:8px;padding:1px 4px;border-radius:3px;background:rgba(0,0,0,.04);color:#78716c;}
+.bc3 .stale{font-size:8px;padding:1px 4px;border-radius:3px;font-weight:600;}
+.bc3 .hint{display:flex;align-items:center;gap:3px;font-size:8px;font-weight:600;margin-top:3px;}
+/* Mobile */
+.bc3m{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:12px;padding:12px;margin-bottom:6px;display:flex;gap:12px;cursor:default;transition:all .15s;}
+.bc3m:hover{background:rgba(255,255,255,.8);}
+.bc3m .av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0;}
+.bc3m .mid{flex:1;min-width:0;}
+.bc3m .top-l{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-bottom:2px;}
+.bc3m h4{font-size:14px;font-weight:600;color:#292524;}
+.bc3m .days{font-size:11px;color:#a8a29e;font-variant-numeric:tabular-nums;flex-shrink:0;}
+.bc3m .role{font-size:12px;color:#78716c;}
+.bc3m .meta{display:flex;gap:4px;margin-top:5px;align-items:center;flex-wrap:wrap;}
+.bc3m .tag{font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.04);color:#78716c;}
+.bc3m .stale{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;}
+.bc3m .hint{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;margin-top:5px;}
+
+/* Clock & alert icons reused */
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h2>B+C Combos —</h2>
+  <div class="pills">
+    <button class="pill on" onclick="pick('bc1',this)">BC1: Tint + Days Right</button>
+    <button class="pill" onclick="pick('bc2',this)">BC2: Tint + Split Row</button>
+    <button class="pill" onclick="pick('bc3',this)">BC3: Tint + Inline Days</button>
+  </div>
+</div>
+
+<div class="stage">
+
+<!-- BC1: Badge, days far right, tinted urgency -->
+<div class="opt on" id="opt-bc1">
+  <div class="opt-hdr"><h2>BC1: Tint + Days Right</h2></div>
+  <div class="opt-desc">Badge left, company + role middle, days counter pushed to far right. Urgent cards get a background tint. Clean three-column layout inside each card: identity | info | time. Tags and hints below the role line.</div>
+  <div class="opt-tags"><span class="tg">balanced</span><span class="tg">days always scannable</span><span class="tg">tint for urgency</span></div>
+  <div class="views">
+    <div style="flex:1;min-width:600px;">
+      <div class="view-label">Desktop</div>
+      <div class="desk-frame"><div class="desk-cols">
+        <div>
+          <div class="col-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+          <div class="bc1 tint-r"><div class="av" style="background:#3b82f6;">S</div><div class="mid"><h4>Stripe</h4><div class="role">Sr Frontend</div><div class="tags"><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div><div class="rt">12d</div></div>
+          <div class="bc1"><div class="av" style="background:#3b82f6;">C</div><div class="mid"><h4>Cloudflare</h4><div class="role">Sys Engineer</div><div class="tags"><span class="tag">referral</span></div></div><div class="rt">1d</div></div>
+          <div class="bc1 tint-r"><div class="av" style="background:#3b82f6;">M</div><div class="mid"><h4>Meta</h4><div class="role">Product Eng</div><div class="tags"><span class="stale" style="background:rgba(245,158,11,.1);color:#92400e;">stale</span></div></div><div class="rt">8d</div></div>
+        </div>
+        <div>
+          <div class="col-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span></div>
+          <div class="bc1"><div class="av" style="background:#8b5cf6;">A</div><div class="mid"><h4>Airbnb</h4><div class="role">Staff Engineer</div></div><div class="rt">9d</div></div>
+          <div class="bc1"><div class="av" style="background:#8b5cf6;">S</div><div class="mid"><h4>Shopify</h4><div class="role">Senior SWE</div></div><div class="rt">4d</div></div>
+        </div>
+        <div>
+          <div class="col-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+          <div class="bc1 tint-a"><div class="av" style="background:#f59e0b;">G</div><div class="mid"><h4>Google</h4><div class="role">SDE III</div><div class="hint" style="color:#92400e;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Today 2pm</div></div><div class="rt">6d</div></div>
+          <div class="bc1"><div class="av" style="background:#f59e0b;">N</div><div class="mid"><h4>Netflix</h4><div class="role">Senior SWE</div><div class="hint" style="color:#78716c;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Sys Design Thu</div></div><div class="rt">14d</div></div>
+          <div class="bc1"><div class="av" style="background:#f59e0b;">V</div><div class="mid"><h4>Vercel</h4><div class="role">FE Lead</div><div class="tags"><span class="tag">remote</span></div></div><div class="rt">10d</div></div>
+        </div>
+        <div>
+          <div class="col-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+          <div class="bc1 tint-g"><div class="av" style="background:#22c55e;">F</div><div class="mid"><h4>Figma</h4><div class="role">Sr Frontend</div><div class="hint" style="color:#15803d;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Exp Apr 21</div></div><div class="rt">2d</div></div>
+        </div>
+      </div></div>
+    </div>
+    <div style="width:340px;flex-shrink:0;">
+      <div class="view-label">Mobile</div>
+      <div class="mob-frame">
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+          <div class="bc1m tint-a"><div class="av" style="background:#f59e0b;">G</div><div class="mid"><h4>Google — SDE III</h4><div class="role">Mountain View</div><div class="hint" style="color:#92400e;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Technical today 2pm</div></div><div class="rt">6d</div></div>
+          <div class="bc1m"><div class="av" style="background:#f59e0b;">N</div><div class="mid"><h4>Netflix — Sr SWE</h4><div class="hint" style="color:#78716c;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>System Design Thu</div></div><div class="rt">14d</div></div>
+          <div class="bc1m"><div class="av" style="background:#f59e0b;">V</div><div class="mid"><h4>Vercel — FE Lead</h4><div class="tags"><span class="tag">remote</span><span class="tag">HM Fri</span></div></div><div class="rt">10d</div></div>
+        </div>
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+          <div class="bc1m tint-g"><div class="av" style="background:#22c55e;">F</div><div class="mid"><h4>Figma — Sr Frontend</h4><div class="role">$185K + RSUs</div><div class="hint" style="color:#15803d;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Offer expires Apr 21</div></div><div class="rt">2d</div></div>
+        </div>
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+          <div class="bc1m tint-r"><div class="av" style="background:#3b82f6;">S</div><div class="mid"><h4>Stripe — Sr Frontend</h4><div class="tags"><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">12d stale</span></div></div><div class="rt">12d</div></div>
+          <div class="bc1m"><div class="av" style="background:#3b82f6;">C</div><div class="mid"><h4>Cloudflare — Sys Eng</h4><div class="tags"><span class="tag">referral</span></div></div><div class="rt">1d</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BC2: Badge, main row + separate hint bar below -->
+<div class="opt" id="opt-bc2">
+  <div class="opt-hdr"><h2>BC2: Tint + Split Row</h2></div>
+  <div class="opt-desc">Top row: badge + company/role + right-aligned days/tags. Bottom row (only on urgent cards): thin divider + icon hint line. Non-urgent cards have no bottom row — stays compact. Tinted backgrounds on urgent only. Two-zone feel like D but lighter.</div>
+  <div class="opt-tags"><span class="tg">two zones</span><span class="tg">compact when calm</span><span class="tg">expands when urgent</span></div>
+  <div class="views">
+    <div style="flex:1;min-width:600px;">
+      <div class="view-label">Desktop</div>
+      <div class="desk-frame"><div class="desk-cols">
+        <div>
+          <div class="col-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+          <div class="bc2 tint-r"><div class="main-row"><div class="av" style="background:#3b82f6;">S</div><div class="mid"><h4>Stripe</h4><div class="role">Sr Frontend</div></div><div class="rt"><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div></div>
+          <div class="bc2"><div class="main-row"><div class="av" style="background:#3b82f6;">C</div><div class="mid"><h4>Cloudflare</h4><div class="role">Sys Engineer</div></div><div class="rt"><span class="days">1d</span><span class="tag">referral</span></div></div></div>
+          <div class="bc2 tint-r"><div class="main-row"><div class="av" style="background:#3b82f6;">M</div><div class="mid"><h4>Meta</h4><div class="role">Product Eng</div></div><div class="rt"><span class="days">8d</span><span class="stale" style="background:rgba(245,158,11,.1);color:#92400e;">stale</span></div></div></div>
+        </div>
+        <div>
+          <div class="col-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span></div>
+          <div class="bc2"><div class="main-row"><div class="av" style="background:#8b5cf6;">A</div><div class="mid"><h4>Airbnb</h4><div class="role">Staff Eng</div></div><div class="rt"><span class="days">9d</span></div></div></div>
+          <div class="bc2"><div class="main-row"><div class="av" style="background:#8b5cf6;">S</div><div class="mid"><h4>Shopify</h4><div class="role">Sr SWE</div></div><div class="rt"><span class="days">4d</span></div></div></div>
+        </div>
+        <div>
+          <div class="col-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+          <div class="bc2 tint-a"><div class="main-row"><div class="av" style="background:#f59e0b;">G</div><div class="mid"><h4>Google</h4><div class="role">SDE III</div></div><div class="rt"><span class="days">6d</span></div></div><div class="hint-bar" style="color:#92400e;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Technical today 2pm</div></div>
+          <div class="bc2"><div class="main-row"><div class="av" style="background:#f59e0b;">N</div><div class="mid"><h4>Netflix</h4><div class="role">Sr SWE</div></div><div class="rt"><span class="days">14d</span></div></div><div class="hint-bar" style="color:#78716c;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Sys Design Thu</div></div>
+          <div class="bc2"><div class="main-row"><div class="av" style="background:#f59e0b;">V</div><div class="mid"><h4>Vercel</h4><div class="role">FE Lead</div></div><div class="rt"><span class="days">10d</span><span class="tag">remote</span></div></div></div>
+        </div>
+        <div>
+          <div class="col-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+          <div class="bc2 tint-g"><div class="main-row"><div class="av" style="background:#22c55e;">F</div><div class="mid"><h4>Figma</h4><div class="role">Sr Frontend</div></div><div class="rt"><span class="days">2d</span></div></div><div class="hint-bar" style="color:#15803d;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Offer expires Apr 21</div></div>
+        </div>
+      </div></div>
+    </div>
+    <div style="width:340px;flex-shrink:0;">
+      <div class="view-label">Mobile</div>
+      <div class="mob-frame">
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+          <div class="bc2m tint-a"><div class="main-row"><div class="av" style="background:#f59e0b;">G</div><div class="mid"><h4>Google — SDE III</h4><div class="role">Mountain View</div></div><div class="rt"><span class="days">6d</span></div></div><div class="hint-bar" style="color:#92400e;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Technical today 2pm</div></div>
+          <div class="bc2m"><div class="main-row"><div class="av" style="background:#f59e0b;">N</div><div class="mid"><h4>Netflix — Sr SWE</h4></div><div class="rt"><span class="days">14d</span></div></div><div class="hint-bar" style="color:#78716c;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>System Design Thu</div></div>
+          <div class="bc2m"><div class="main-row"><div class="av" style="background:#f59e0b;">V</div><div class="mid"><h4>Vercel — FE Lead</h4></div><div class="rt"><span class="days">10d</span><span class="tag">remote</span></div></div></div>
+        </div>
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+          <div class="bc2m tint-g"><div class="main-row"><div class="av" style="background:#22c55e;">F</div><div class="mid"><h4>Figma — Sr Frontend</h4><div class="role">$185K + RSUs</div></div><div class="rt"><span class="days">2d</span></div></div><div class="hint-bar" style="color:#15803d;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Offer expires Apr 21</div></div>
+        </div>
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+          <div class="bc2m tint-r"><div class="main-row"><div class="av" style="background:#3b82f6;">S</div><div class="mid"><h4>Stripe — Sr Frontend</h4></div><div class="rt"><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div></div>
+          <div class="bc2m"><div class="main-row"><div class="av" style="background:#3b82f6;">C</div><div class="mid"><h4>Cloudflare — Sys Eng</h4></div><div class="rt"><span class="days">1d</span><span class="tag">referral</span></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BC3: Badge + days inline in title row + tint -->
+<div class="opt" id="opt-bc3">
+  <div class="opt-hdr"><h2>BC3: Tint + Inline Days</h2></div>
+  <div class="opt-desc">Days counter sits right-aligned on the same line as company name (like C). Urgency tints the whole card (like B). Tags and hints go below. Simplest of the three — company and days share the top line, everything else flows naturally below.</div>
+  <div class="opt-tags"><span class="tg">simplest layout</span><span class="tg">name + days on one line</span><span class="tg">clean flow</span></div>
+  <div class="views">
+    <div style="flex:1;min-width:600px;">
+      <div class="view-label">Desktop</div>
+      <div class="desk-frame"><div class="desk-cols">
+        <div>
+          <div class="col-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+          <div class="bc3 tint-r"><div class="av" style="background:#3b82f6;">S</div><div class="mid"><div class="top-l"><h4>Stripe</h4><span class="days">12d</span></div><div class="role">Sr Frontend</div><div class="meta"><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div></div>
+          <div class="bc3"><div class="av" style="background:#3b82f6;">C</div><div class="mid"><div class="top-l"><h4>Cloudflare</h4><span class="days">1d</span></div><div class="role">Sys Engineer</div><div class="meta"><span class="tag">referral</span></div></div></div>
+          <div class="bc3 tint-r"><div class="av" style="background:#3b82f6;">M</div><div class="mid"><div class="top-l"><h4>Meta</h4><span class="days">8d</span></div><div class="role">Product Eng</div><div class="meta"><span class="stale" style="background:rgba(245,158,11,.1);color:#92400e;">stale</span></div></div></div>
+        </div>
+        <div>
+          <div class="col-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span></div>
+          <div class="bc3"><div class="av" style="background:#8b5cf6;">A</div><div class="mid"><div class="top-l"><h4>Airbnb</h4><span class="days">9d</span></div><div class="role">Staff Engineer</div></div></div>
+          <div class="bc3"><div class="av" style="background:#8b5cf6;">S</div><div class="mid"><div class="top-l"><h4>Shopify</h4><span class="days">4d</span></div><div class="role">Senior SWE</div></div></div>
+        </div>
+        <div>
+          <div class="col-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+          <div class="bc3 tint-a"><div class="av" style="background:#f59e0b;">G</div><div class="mid"><div class="top-l"><h4>Google</h4><span class="days">6d</span></div><div class="role">SDE III</div><div class="hint" style="color:#92400e;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Today 2pm</div></div></div>
+          <div class="bc3"><div class="av" style="background:#f59e0b;">N</div><div class="mid"><div class="top-l"><h4>Netflix</h4><span class="days">14d</span></div><div class="role">Senior SWE</div><div class="hint" style="color:#78716c;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Sys Design Thu</div></div></div>
+          <div class="bc3"><div class="av" style="background:#f59e0b;">V</div><div class="mid"><div class="top-l"><h4>Vercel</h4><span class="days">10d</span></div><div class="role">FE Lead</div><div class="meta"><span class="tag">remote</span></div></div></div>
+        </div>
+        <div>
+          <div class="col-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+          <div class="bc3 tint-g"><div class="av" style="background:#22c55e;">F</div><div class="mid"><div class="top-l"><h4>Figma</h4><span class="days">2d</span></div><div class="role">Sr Frontend</div><div class="hint" style="color:#15803d;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Exp Apr 21</div></div></div>
+        </div>
+      </div></div>
+    </div>
+    <div style="width:340px;flex-shrink:0;">
+      <div class="view-label">Mobile</div>
+      <div class="mob-frame">
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+          <div class="bc3m tint-a"><div class="av" style="background:#f59e0b;">G</div><div class="mid"><div class="top-l"><h4>Google — SDE III</h4><span class="days">6d</span></div><div class="role">Mountain View</div><div class="hint" style="color:#92400e;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Technical today 2pm</div></div></div>
+          <div class="bc3m"><div class="av" style="background:#f59e0b;">N</div><div class="mid"><div class="top-l"><h4>Netflix — Sr SWE</h4><span class="days">14d</span></div><div class="hint" style="color:#78716c;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>System Design Thu</div></div></div>
+          <div class="bc3m"><div class="av" style="background:#f59e0b;">V</div><div class="mid"><div class="top-l"><h4>Vercel — FE Lead</h4><span class="days">10d</span></div><div class="meta"><span class="tag">remote</span><span class="tag">HM Fri</span></div></div></div>
+        </div>
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+          <div class="bc3m tint-g"><div class="av" style="background:#22c55e;">F</div><div class="mid"><div class="top-l"><h4>Figma — Sr Frontend</h4><span class="days">2d</span></div><div class="role">$185K + RSUs</div><div class="hint" style="color:#15803d;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Offer expires Apr 21</div></div></div>
+        </div>
+        <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+          <div class="bc3m tint-r"><div class="av" style="background:#3b82f6;">S</div><div class="mid"><div class="top-l"><h4>Stripe — Sr Frontend</h4><span class="days">12d</span></div><div class="meta"><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div></div>
+          <div class="bc3m"><div class="av" style="background:#3b82f6;">C</div><div class="mid"><div class="top-l"><h4>Cloudflare — Sys Eng</h4><span class="days">1d</span></div><div class="meta"><span class="tag">referral</span></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function pick(id,btn){
+  document.querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.opt').forEach(o=>o.classList.remove('on'));
+  document.getElementById('opt-'+id).classList.add('on');
+}
+</script>
+</body>
+</html>

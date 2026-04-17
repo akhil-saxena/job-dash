@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — Kanban Final</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;overflow-x:hidden;}
+:root{--font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',system-ui,sans-serif;}
+body{font-family:var(--font);background:#0a0a0a;color:#fff;-webkit-font-smoothing:antialiased;font-size:14px;}
+
+.top{position:fixed;top:0;left:0;right:0;z-index:100;background:#111;border-bottom:1px solid #222;padding:12px 24px;display:flex;align-items:center;gap:12px;}
+.top h2{font-size:14px;font-weight:600;color:#666;}
+.top .pills{display:flex;gap:6px;}
+.top .pill{padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;border:1px solid #2a2a2a;background:transparent;color:#666;cursor:pointer;}
+.top .pill:hover{color:#aaa;border-color:#444;}
+.top .pill.on{background:#fff;color:#000;border-color:#fff;}
+
+.stage{margin-top:56px;padding:24px;}
+.pair{display:flex;gap:20px;justify-content:center;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px;}
+.frame{border-radius:12px;overflow:hidden;border:1px solid #222;position:relative;box-shadow:0 16px 48px rgba(0,0,0,.5);}
+.frame.desktop{width:1060px;height:640px;}
+.frame.mobile{width:375px;height:720px;border-radius:24px;}
+.frame-tag{position:absolute;top:8px;right:10px;font-size:9px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.5px;z-index:5;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:4px;}
+
+.bg{background:linear-gradient(145deg,#f5f3f0,#ece8e3);position:absolute;inset:0;}
+
+/* Sidebar */
+.sb-mini{position:absolute;left:0;top:0;bottom:0;width:56px;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:4px;}
+.sb-mini .logo{width:30px;height:30px;background:rgba(0,0,0,.07);border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.sb-mini .logo span{width:8px;height:8px;background:#292524;border-radius:3px;}
+.sb-mini .ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.sb-mini .ic.act{background:rgba(255,255,255,.7);box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.sb-mini .ic div{width:14px;height:14px;background:rgba(0,0,0,.1);border-radius:3px;}
+.sb-mini .ic.act div{background:rgba(0,0,0,.25);}
+
+/* Header */
+.hdr-inner{position:absolute;top:0;right:0;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;}
+.hdr-inner .t{font-size:15px;font-weight:700;color:#1c1917;}
+.hdr-inner .acts{display:flex;gap:6px;align-items:center;}
+.hdr-inner .ab{height:28px;padding:0 10px;background:#292524;color:#fff;border-radius:7px;font-size:11px;font-weight:600;border:none;}
+.hdr-inner .search{height:28px;padding:0 10px;border:1px solid rgba(0,0,0,.06);border-radius:7px;background:rgba(255,255,255,.5);font-size:11px;color:#a8a29e;display:flex;align-items:center;gap:4px;width:150px;}
+.hdr-inner .search .k{margin-left:auto;font-size:9px;background:rgba(0,0,0,.06);padding:1px 4px;border-radius:3px;}
+.hdr-inner .sm{width:28px;height:28px;border:1px solid rgba(0,0,0,.06);border-radius:7px;background:rgba(255,255,255,.5);}
+.hdr-inner .av{width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.08);}
+
+/* Mobile */
+.mob-hdr{position:absolute;top:0;left:0;right:0;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:rgba(255,255,255,.7);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,0,0,.06);z-index:2;}
+.mob-hdr .t{font-size:16px;font-weight:700;color:#1c1917;}
+.mob-hdr .ab{height:28px;padding:0 10px;background:#292524;color:#fff;border-radius:7px;font-size:11px;font-weight:600;border:none;}
+.mob-bar{position:absolute;bottom:0;left:0;right:0;height:48px;background:rgba(255,255,255,.85);backdrop-filter:blur(16px);border-top:1px solid rgba(0,0,0,.06);display:flex;justify-content:space-around;align-items:center;z-index:2;}
+.mob-bar .mi{display:flex;flex-direction:column;align-items:center;gap:1px;}
+.mob-bar .mi div{width:18px;height:18px;background:rgba(0,0,0,.1);border-radius:4px;}
+.mob-bar .mi.act div{background:rgba(0,0,0,.25);}
+.mob-bar .mi span{font-size:8px;font-weight:600;color:#a8a29e;}
+.mob-bar .mi.act span{color:#292524;}
+
+/* Kanban columns */
+.cols{display:grid;gap:8px;height:100%;}
+.col-hdr{display:flex;align-items:center;gap:5px;padding:4px 2px;margin-bottom:6px;font-size:11px;font-weight:600;color:#57534e;}
+.col-hdr .dot{width:7px;height:7px;border-radius:50%;}
+.col-hdr .cnt{margin-left:auto;font-size:9px;font-weight:600;color:#a8a29e;background:rgba(0,0,0,.04);padding:1px 5px;border-radius:6px;}
+
+/* Cards */
+.k-card{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:10px;padding:10px;margin-bottom:6px;cursor:default;transition:all .15s;}
+.k-card:hover{background:rgba(255,255,255,.8);box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.k-card h4{font-size:12px;font-weight:600;color:#292524;margin-bottom:1px;}
+.k-card .role{font-size:10px;color:#78716c;margin-bottom:5px;}
+.k-card .meta{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
+.k-card .pri{width:5px;height:5px;border-radius:50%;}
+.k-card .days{font-size:9px;color:#a8a29e;}
+.k-card .tag{font-size:8px;padding:1px 4px;border-radius:3px;background:rgba(0,0,0,.04);color:#78716c;}
+.k-card .stale{font-size:8px;padding:1px 4px;border-radius:3px;font-weight:600;}
+.k-card .upcoming{font-size:8px;font-weight:600;display:flex;align-items:center;gap:2px;}
+.col-dimmed{opacity:.4;}
+
+/* Mobile sections */
+.mob-section{margin-bottom:10px;}
+.mob-section-hdr{display:flex;align-items:center;gap:6px;padding:8px 0;font-size:13px;font-weight:600;color:#57534e;cursor:pointer;border-bottom:1px solid rgba(0,0,0,.04);}
+.mob-section-hdr .dot{width:8px;height:8px;border-radius:50%;}
+.mob-section-hdr .cnt{margin-left:4px;font-size:11px;color:#a8a29e;}
+.mob-section-hdr .arrow{margin-left:auto;font-size:11px;color:#a8a29e;transition:transform .15s;}
+.mob-section-cards{padding-top:6px;}
+
+/* Descriptions */
+.desc-area{max-width:1100px;margin:0 auto;padding:0 24px 64px;}
+.desc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.dc{background:#111;border:1px solid #222;border-radius:10px;padding:18px;}
+.dc h3{font-size:14px;font-weight:600;margin-bottom:6px;}
+.dc p{font-size:12px;color:#666;line-height:1.6;}
+.dc ul{margin-top:8px;font-size:12px;color:#888;line-height:1.8;list-style:none;}
+.dc ul li::before{content:"→ ";color:#444;}
+
+.opt{display:none;}.opt.on{display:block;}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h2>Kanban —</h2>
+  <div class="pills">
+    <button class="pill on" onclick="pick('a',this)">A: Pure Clean</button>
+    <button class="pill" onclick="pick('b',this)">B: With Urgency Hints</button>
+  </div>
+</div>
+
+<div class="stage">
+
+<!-- A: PURE CLEAN — no strip, just board -->
+<div class="opt on" id="opt-a">
+<div class="pair">
+  <div class="frame desktop">
+    <span class="frame-tag">Desktop</span>
+    <div class="bg">
+      <div class="sb-mini"><div class="logo"><span></span></div><div class="ic act"><div></div></div><div class="ic"><div></div></div><div class="ic"><div></div></div><div class="ic"><div></div></div><div style="flex:1;"></div><div class="ic"><div></div></div></div>
+      <div class="hdr-inner" style="left:56px;">
+        <div class="t">Board</div>
+        <div class="acts"><div class="search"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search<span class="k">⌘K</span></div><button class="ab">+ Add</button><div class="sm"></div><div class="av"></div></div>
+      </div>
+      <div style="position:absolute;left:56px;top:44px;right:0;bottom:0;padding:10px 14px;">
+        <div class="cols" style="grid-template-columns:repeat(6,1fr);">
+          <div>
+            <div class="col-hdr"><div class="dot" style="background:#6b7280"></div>Wishlist<span class="cnt">2</span></div>
+            <div class="k-card"><h4>Notion</h4><div class="role">Product Engineer</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">3d</span><span class="tag">remote</span></div></div>
+            <div class="k-card"><h4>Linear</h4><div class="role">Full Stack</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">1d</span><span class="tag">startup</span></div></div>
+          </div>
+          <div>
+            <div class="col-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+            <div class="k-card"><h4>Stripe</h4><div class="role">Senior Frontend</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div>
+            <div class="k-card"><h4>Cloudflare</h4><div class="role">Systems Engineer</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">1d</span><span class="tag">referral</span></div></div>
+            <div class="k-card"><h4>Meta</h4><div class="role">Product Engineer</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">8d</span><span class="stale" style="background:rgba(245,158,11,.1);color:#92400e;">stale</span></div></div>
+          </div>
+          <div>
+            <div class="col-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span></div>
+            <div class="k-card"><h4>Airbnb</h4><div class="role">Staff Engineer</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">9d</span></div></div>
+            <div class="k-card"><h4>Shopify</h4><div class="role">Senior SWE</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">4d</span></div></div>
+          </div>
+          <div>
+            <div class="col-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+            <div class="k-card"><h4>Google</h4><div class="role">SDE III</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">6d</span></div></div>
+            <div class="k-card"><h4>Netflix</h4><div class="role">Senior SWE</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">14d</span></div></div>
+            <div class="k-card"><h4>Vercel</h4><div class="role">Frontend Lead</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">10d</span></div></div>
+          </div>
+          <div>
+            <div class="col-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+            <div class="k-card"><h4>Figma</h4><div class="role">Senior Frontend</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">2d</span></div></div>
+          </div>
+          <div class="col-dimmed">
+            <div class="col-hdr"><div class="dot" style="background:#ef4444"></div>Rejected<span class="cnt">3</span></div>
+            <div class="k-card"><h4>Coinbase</h4><div class="role">Backend Lead</div><div class="meta"><span class="days">After screen</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="frame mobile">
+    <span class="frame-tag">Mobile</span>
+    <div class="bg">
+      <div class="mob-hdr"><span class="t">Board</span><button class="ab">+ Add</button></div>
+      <div style="position:absolute;top:48px;bottom:48px;left:0;right:0;overflow-y:auto;padding:10px 14px;">
+        <div class="mob-section"><div class="mob-section-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span><span class="arrow">▾</span></div><div class="mob-section-cards">
+          <div class="k-card"><h4>Google — SDE III</h4><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">6d</span></div></div>
+          <div class="k-card"><h4>Netflix — Senior SWE</h4><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">14d</span></div></div>
+          <div class="k-card"><h4>Vercel — Frontend Lead</h4><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">10d</span></div></div>
+        </div></div>
+        <div class="mob-section"><div class="mob-section-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span><span class="arrow">▾</span></div><div class="mob-section-cards">
+          <div class="k-card"><h4>Figma — Senior Frontend</h4><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">2d</span></div></div>
+        </div></div>
+        <div class="mob-section"><div class="mob-section-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span><span class="arrow">▾</span></div><div class="mob-section-cards">
+          <div class="k-card"><h4>Stripe — Sr Frontend</h4><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div>
+          <div class="k-card"><h4>Cloudflare — Sys Eng</h4><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">1d</span><span class="tag">referral</span></div></div>
+          <div class="k-card"><h4>Meta — Product Eng</h4><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">8d</span><span class="stale" style="background:rgba(245,158,11,.1);color:#92400e;">stale</span></div></div>
+        </div></div>
+        <div class="mob-section"><div class="mob-section-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span><span class="arrow">▸</span></div></div>
+        <div class="mob-section"><div class="mob-section-hdr"><div class="dot" style="background:#6b7280"></div>Wishlist<span class="cnt">2</span><span class="arrow">▸</span></div></div>
+        <div class="mob-section" style="opacity:.4;"><div class="mob-section-hdr"><div class="dot" style="background:#ef4444"></div>Rejected<span class="cnt">3</span><span class="arrow">▸</span></div></div>
+      </div>
+      <div class="mob-bar"><div class="mi act"><div></div><span>Board</span></div><div class="mi"><div></div><span>List</span></div><div class="mi"><div></div><span>Cal</span></div><div class="mi"><div></div><span>Stats</span></div><div class="mi"><div></div><span>More</span></div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- B: WITH URGENCY HINTS on cards (no strip, but cards show time-sensitive info) -->
+<div class="opt" id="opt-b">
+<div class="pair">
+  <div class="frame desktop">
+    <span class="frame-tag">Desktop</span>
+    <div class="bg">
+      <div class="sb-mini"><div class="logo"><span></span></div><div class="ic act"><div></div></div><div class="ic"><div></div></div><div class="ic"><div></div></div><div class="ic"><div></div></div><div style="flex:1;"></div><div class="ic"><div></div></div></div>
+      <div class="hdr-inner" style="left:56px;">
+        <div class="t">Board</div>
+        <div class="acts"><div class="search"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search<span class="k">⌘K</span></div><button class="ab">+ Add</button><div class="sm"></div><div class="av"></div></div>
+      </div>
+      <div style="position:absolute;left:56px;top:44px;right:0;bottom:0;padding:10px 14px;">
+        <div class="cols" style="grid-template-columns:repeat(6,1fr);">
+          <div>
+            <div class="col-hdr"><div class="dot" style="background:#6b7280"></div>Wishlist<span class="cnt">2</span></div>
+            <div class="k-card"><h4>Notion</h4><div class="role">Product Engineer</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">3d</span><span class="tag">remote</span></div></div>
+            <div class="k-card"><h4>Linear</h4><div class="role">Full Stack</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">1d</span><span class="tag">startup</span></div></div>
+          </div>
+          <div>
+            <div class="col-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+            <div class="k-card"><h4>Stripe</h4><div class="role">Senior Frontend</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div>
+            <div class="k-card"><h4>Cloudflare</h4><div class="role">Systems Engineer</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">1d</span><span class="tag">referral</span></div></div>
+            <div class="k-card"><h4>Meta</h4><div class="role">Product Engineer</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">8d</span><span class="stale" style="background:rgba(245,158,11,.1);color:#92400e;">stale</span></div></div>
+          </div>
+          <div>
+            <div class="col-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span></div>
+            <div class="k-card"><h4>Airbnb</h4><div class="role">Staff Engineer</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">9d</span></div></div>
+            <div class="k-card"><h4>Shopify</h4><div class="role">Senior SWE</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">4d</span></div></div>
+          </div>
+          <div>
+            <div class="col-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+            <div class="k-card" style="border-left:3px solid #f59e0b;">
+              <h4>Google</h4><div class="role">SDE III</div>
+              <div class="upcoming" style="color:#f59e0b;margin-top:4px;">◉ Technical today 2pm</div>
+              <div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">6d</span></div>
+            </div>
+            <div class="k-card"><h4>Netflix</h4><div class="role">Senior SWE</div>
+              <div class="upcoming" style="color:#78716c;margin-top:4px;">◉ Sys Design Thu</div>
+              <div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">14d</span></div>
+            </div>
+            <div class="k-card"><h4>Vercel</h4><div class="role">Frontend Lead</div>
+              <div class="upcoming" style="color:#78716c;margin-top:4px;">◉ HM call Fri</div>
+              <div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">10d</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="col-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+            <div class="k-card" style="border-left:3px solid #22c55e;">
+              <h4>Figma</h4><div class="role">Senior Frontend</div>
+              <div class="upcoming" style="color:#22c55e;margin-top:4px;">⏰ Expires Apr 21</div>
+              <div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">2d</span></div>
+            </div>
+          </div>
+          <div class="col-dimmed">
+            <div class="col-hdr"><div class="dot" style="background:#ef4444"></div>Rejected<span class="cnt">3</span></div>
+            <div class="k-card"><h4>Coinbase</h4><div class="role">Backend Lead</div><div class="meta"><span class="days">After screen</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="frame mobile">
+    <span class="frame-tag">Mobile</span>
+    <div class="bg">
+      <div class="mob-hdr"><span class="t">Board</span><button class="ab">+ Add</button></div>
+      <div style="position:absolute;top:48px;bottom:48px;left:0;right:0;overflow-y:auto;padding:10px 14px;">
+        <div class="mob-section"><div class="mob-section-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span><span class="arrow">▾</span></div><div class="mob-section-cards">
+          <div class="k-card" style="border-left:3px solid #f59e0b;"><h4>Google — SDE III</h4><div class="upcoming" style="color:#f59e0b;margin:3px 0;">◉ Technical today 2pm</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">6d</span></div></div>
+          <div class="k-card"><h4>Netflix — Senior SWE</h4><div class="upcoming" style="color:#78716c;margin:3px 0;">◉ Sys Design Thu</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">14d</span></div></div>
+          <div class="k-card"><h4>Vercel — Frontend Lead</h4><div class="upcoming" style="color:#78716c;margin:3px 0;">◉ HM call Fri</div><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">10d</span></div></div>
+        </div></div>
+        <div class="mob-section"><div class="mob-section-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span><span class="arrow">▾</span></div><div class="mob-section-cards">
+          <div class="k-card" style="border-left:3px solid #22c55e;"><h4>Figma — Senior Frontend</h4><div class="upcoming" style="color:#22c55e;margin:3px 0;">⏰ Offer expires Apr 21</div><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">2d</span></div></div>
+        </div></div>
+        <div class="mob-section"><div class="mob-section-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span><span class="arrow">▾</span></div><div class="mob-section-cards">
+          <div class="k-card"><h4>Stripe — Sr Frontend</h4><div class="meta"><span class="pri" style="background:#ef4444"></span><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div>
+          <div class="k-card"><h4>Cloudflare — Sys Eng</h4><div class="meta"><span class="pri" style="background:#f59e0b"></span><span class="days">1d</span><span class="tag">referral</span></div></div>
+        </div></div>
+        <div class="mob-section"><div class="mob-section-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span><span class="arrow">▸</span></div></div>
+        <div class="mob-section"><div class="mob-section-hdr"><div class="dot" style="background:#6b7280"></div>Wishlist<span class="cnt">2</span><span class="arrow">▸</span></div></div>
+      </div>
+      <div class="mob-bar"><div class="mi act"><div></div><span>Board</span></div><div class="mi"><div></div><span>List</span></div><div class="mi"><div></div><span>Cal</span></div><div class="mi"><div></div><span>Stats</span></div><div class="mi"><div></div><span>More</span></div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+
+<div class="desc-area">
+  <div class="desc-grid">
+    <div class="dc">
+      <h3>A: Pure Clean</h3>
+      <p>Just the board. No strip, no stats, no alerts above. The kanban IS the overview. Cards show company, role, priority dot, days, tags, and stale badges. Nothing else.</p>
+      <ul>
+        <li>Maximum vertical space for cards</li>
+        <li>Cleanest possible look</li>
+        <li>Urgency visible only through stale badges and days count</li>
+        <li>Mobile: collapsible sections sorted by priority (Interviewing first)</li>
+      </ul>
+    </div>
+    <div class="dc">
+      <h3>B: Urgency Hints</h3>
+      <p>Same clean board, but cards with time-sensitive events show them inline. Google card shows "◉ Technical today 2pm". Figma shows "⏰ Expires Apr 21". Active cards get a colored left border. No strip or stats anywhere — urgency lives ON the cards.</p>
+      <ul>
+        <li>Same clean layout as A</li>
+        <li>Upcoming interviews visible without clicking into detail</li>
+        <li>Offer deadlines visible at a glance</li>
+        <li>Only cards with events show the extra line — others stay compact</li>
+        <li>Colored left border = something happening soon</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+function pick(id,btn){
+  document.querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.opt').forEach(o=>o.classList.remove('on'));
+  document.getElementById('opt-'+id).classList.add('on');
+}
+</script>
+</body>
+</html>

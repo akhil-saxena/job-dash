@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — Final Card Design</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',system-ui,sans-serif;}
+body{font-family:var(--font);background:#0a0a0a;color:#fff;-webkit-font-smoothing:antialiased;font-size:14px;}
+
+h1{font-size:18px;font-weight:700;text-align:center;margin:24px 0 4px;}
+.sub{text-align:center;font-size:12px;color:#555;margin-bottom:24px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.5;}
+
+.views{display:flex;gap:24px;justify-content:center;align-items:flex-start;flex-wrap:wrap;padding:0 24px 48px;}
+.view-label{font-size:10px;font-weight:600;color:#444;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+.desk-frame{background:linear-gradient(145deg,#f5f3f0,#ece8e3);border-radius:12px;border:1px solid #222;padding:14px;flex:1;min-width:620px;max-width:900px;}
+.desk-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.col-hdr{display:flex;align-items:center;gap:4px;padding:3px 2px;margin-bottom:5px;font-size:10px;font-weight:600;color:#57534e;}
+.col-hdr .dot{width:6px;height:6px;border-radius:50%;}
+.col-hdr .cnt{margin-left:auto;font-size:8px;font-weight:600;color:#a8a29e;background:rgba(0,0,0,.04);padding:0 4px;border-radius:4px;}
+.col-dim{opacity:.4;}
+.mob-frame{background:linear-gradient(145deg,#f5f3f0,#ece8e3);border-radius:20px;border:1px solid #222;padding:14px;width:340px;flex-shrink:0;}
+.mob-sec{margin-bottom:10px;}
+.mob-sec-hdr{display:flex;align-items:center;gap:5px;padding:6px 0;font-size:12px;font-weight:600;color:#57534e;border-bottom:1px solid rgba(0,0,0,.04);margin-bottom:6px;}
+.mob-sec-hdr .dot{width:7px;height:7px;border-radius:50%;}
+.mob-sec-hdr .cnt{font-size:10px;color:#a8a29e;margin-left:4px;}
+.mob-sec-hdr .arrow{margin-left:auto;font-size:10px;color:#a8a29e;}
+
+.ico{width:12px;height:12px;flex-shrink:0;display:inline-flex;}
+.ico svg{width:100%;height:100%;}
+.ico-m{width:14px;height:14px;flex-shrink:0;display:inline-flex;}
+.ico-m svg{width:100%;height:100%;}
+
+/* Tints */
+.t-a{background:rgba(245,158,11,.06) !important;border-color:rgba(245,158,11,.15) !important;}
+.t-g{background:rgba(34,197,94,.06) !important;border-color:rgba(34,197,94,.15) !important;}
+.t-r{background:rgba(239,68,68,.05) !important;border-color:rgba(239,68,68,.12) !important;}
+
+/* ===== DESKTOP CARD ===== */
+.c{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:8px;margin-bottom:5px;cursor:default;transition:all .15s;}
+.c:hover{background:rgba(255,255,255,.8);box-shadow:0 2px 6px rgba(0,0,0,.04);}
+.c .row{display:flex;gap:8px;padding:8px;align-items:center;}
+.c .av{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0;}
+.c .mid{flex:1;min-width:0;}
+.c h4{font-size:11px;font-weight:600;color:#292524;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.c .role{font-size:10px;color:#78716c;}
+.c .rt{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:1px;}
+.c .days{font-size:9px;color:#a8a29e;font-variant-numeric:tabular-nums;}
+.c .days.warn{color:#ef4444;font-weight:600;}
+.c .tag{font-size:7px;padding:1px 3px;border-radius:3px;background:rgba(0,0,0,.04);color:#78716c;}
+.c .hint{display:flex;align-items:center;gap:3px;padding:5px 8px;border-top:1px solid rgba(0,0,0,.04);font-size:8px;font-weight:600;}
+
+/* ===== MOBILE CARD ===== */
+.cm{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:12px;margin-bottom:6px;cursor:default;transition:all .15s;}
+.cm:hover{background:rgba(255,255,255,.8);}
+.cm .row{display:flex;gap:12px;padding:12px;align-items:center;}
+.cm .av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0;}
+.cm .mid{flex:1;min-width:0;}
+.cm h4{font-size:14px;font-weight:600;color:#292524;}
+.cm .role{font-size:12px;color:#78716c;margin-top:1px;}
+.cm .rt{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+.cm .days{font-size:11px;color:#a8a29e;font-variant-numeric:tabular-nums;}
+.cm .days.warn{color:#ef4444;font-weight:600;}
+.cm .tag{font-size:9px;padding:2px 5px;border-radius:4px;background:rgba(0,0,0,.04);color:#78716c;}
+.cm .hint{display:flex;align-items:center;gap:4px;padding:8px 12px;border-top:1px solid rgba(0,0,0,.04);font-size:11px;font-weight:600;}
+
+/* Rules box */
+.rules{max-width:900px;margin:0 auto 48px;padding:0 24px;}
+.rules-box{background:#111;border:1px solid #222;border-radius:12px;padding:24px;}
+.rules-box h3{font-size:14px;margin-bottom:12px;}
+.rules-box table{width:100%;border-collapse:collapse;font-size:12px;}
+.rules-box th{text-align:left;padding:6px 10px;color:#666;font-weight:600;border-bottom:1px solid #222;}
+.rules-box td{padding:6px 10px;color:#888;border-bottom:1px solid #1a1a1a;}
+.rules-box td:first-child{color:#ccc;font-weight:600;white-space:nowrap;}
+</style>
+</head>
+<body>
+
+<h1>Final Card: BC2 — No Redundant Labels</h1>
+<div class="sub">Tint = urgency. Hint bar = what to do. Days count = how long. No "stale" text when the card is already red-tinted. No double-signaling.</div>
+
+<div class="views">
+  <div style="flex:1;min-width:620px;max-width:900px;">
+    <div class="view-label">Desktop — 4 columns</div>
+    <div class="desk-frame"><div class="desk-cols">
+      <div>
+        <div class="col-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+        <!-- Stale: red tint, days in red, NO "stale" badge -->
+        <div class="c t-r"><div class="row"><div class="av" style="background:#3b82f6;">S</div><div class="mid"><h4>Stripe</h4><div class="role">Sr Frontend</div></div><div class="rt"><span class="days warn">12d</span></div></div></div>
+        <!-- Normal: no tint, no hint -->
+        <div class="c"><div class="row"><div class="av" style="background:#3b82f6;">C</div><div class="mid"><h4>Cloudflare</h4><div class="role">Sys Engineer</div></div><div class="rt"><span class="days">1d</span><span class="tag">referral</span></div></div></div>
+        <!-- Stale-ish: amber tint, days in normal -->
+        <div class="c t-r"><div class="row"><div class="av" style="background:#3b82f6;">M</div><div class="mid"><h4>Meta</h4><div class="role">Product Eng</div></div><div class="rt"><span class="days warn">8d</span></div></div></div>
+        <!-- Normal -->
+        <div class="c"><div class="row"><div class="av" style="background:#3b82f6;">D</div><div class="mid"><h4>Datadog</h4><div class="role">SRE</div></div><div class="rt"><span class="days">2d</span></div></div></div>
+      </div>
+      <div>
+        <div class="col-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span></div>
+        <div class="c"><div class="row"><div class="av" style="background:#8b5cf6;">A</div><div class="mid"><h4>Airbnb</h4><div class="role">Staff Eng</div></div><div class="rt"><span class="days">9d</span></div></div></div>
+        <div class="c"><div class="row"><div class="av" style="background:#8b5cf6;">S</div><div class="mid"><h4>Shopify</h4><div class="role">Sr SWE</div></div><div class="rt"><span class="days">4d</span></div></div></div>
+      </div>
+      <div>
+        <div class="col-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+        <!-- Urgent: amber tint + hint bar with clock icon -->
+        <div class="c t-a"><div class="row"><div class="av" style="background:#f59e0b;">G</div><div class="mid"><h4>Google</h4><div class="role">SDE III</div></div><div class="rt"><span class="days">6d</span></div></div><div class="hint" style="color:#92400e;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Technical today 2pm</div></div>
+        <!-- Has interview but not today: no tint, hint bar in muted -->
+        <div class="c"><div class="row"><div class="av" style="background:#f59e0b;">N</div><div class="mid"><h4>Netflix</h4><div class="role">Sr SWE</div></div><div class="rt"><span class="days">14d</span></div></div><div class="hint" style="color:#78716c;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Sys Design Thu</div></div>
+        <!-- No interview scheduled: compact, no hint -->
+        <div class="c"><div class="row"><div class="av" style="background:#f59e0b;">V</div><div class="mid"><h4>Vercel</h4><div class="role">FE Lead</div></div><div class="rt"><span class="days">10d</span><span class="tag">remote</span></div></div></div>
+      </div>
+      <div>
+        <div class="col-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+        <!-- Offer expiring: green tint + hint bar with alert icon -->
+        <div class="c t-g"><div class="row"><div class="av" style="background:#22c55e;">F</div><div class="mid"><h4>Figma</h4><div class="role">Sr Frontend</div></div><div class="rt"><span class="days">2d</span></div></div><div class="hint" style="color:#15803d;"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Expires Apr 21</div></div>
+        <div style="height:16px;"></div>
+        <div class="col-hdr col-dim"><div class="dot" style="background:#ef4444"></div>Rejected<span class="cnt">3</span></div>
+        <div class="c" style="opacity:.4;"><div class="row"><div class="av" style="background:#ef4444;">C</div><div class="mid"><h4>Coinbase</h4><div class="role">Backend Lead</div></div></div></div>
+      </div>
+    </div></div>
+  </div>
+  <div style="width:340px;flex-shrink:0;">
+    <div class="view-label">Mobile</div>
+    <div class="mob-frame">
+      <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span><span class="arrow">&#9662;</span></div>
+        <div class="cm t-a"><div class="row"><div class="av" style="background:#f59e0b;">G</div><div class="mid"><h4>Google — SDE III</h4><div class="role">Mountain View</div></div><div class="rt"><span class="days">6d</span></div></div><div class="hint" style="color:#92400e;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Technical today 2pm</div></div>
+        <div class="cm"><div class="row"><div class="av" style="background:#f59e0b;">N</div><div class="mid"><h4>Netflix — Sr SWE</h4></div><div class="rt"><span class="days">14d</span></div></div><div class="hint" style="color:#78716c;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>System Design Thu</div></div>
+        <div class="cm"><div class="row"><div class="av" style="background:#f59e0b;">V</div><div class="mid"><h4>Vercel — FE Lead</h4></div><div class="rt"><span class="days">10d</span><span class="tag">remote</span></div></div></div>
+      </div>
+      <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span><span class="arrow">&#9662;</span></div>
+        <div class="cm t-g"><div class="row"><div class="av" style="background:#22c55e;">F</div><div class="mid"><h4>Figma — Sr Frontend</h4><div class="role">$185K + RSUs</div></div><div class="rt"><span class="days">2d</span></div></div><div class="hint" style="color:#15803d;"><span class="ico-m"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>Offer expires Apr 21</div></div>
+      </div>
+      <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span><span class="arrow">&#9662;</span></div>
+        <div class="cm t-r"><div class="row"><div class="av" style="background:#3b82f6;">S</div><div class="mid"><h4>Stripe — Sr Frontend</h4></div><div class="rt"><span class="days warn">12d</span></div></div></div>
+        <div class="cm"><div class="row"><div class="av" style="background:#3b82f6;">C</div><div class="mid"><h4>Cloudflare — Sys Eng</h4></div><div class="rt"><span class="days">1d</span><span class="tag">referral</span></div></div></div>
+        <div class="cm t-r"><div class="row"><div class="av" style="background:#3b82f6;">M</div><div class="mid"><h4>Meta — Product Eng</h4></div><div class="rt"><span class="days warn">8d</span></div></div></div>
+      </div>
+      <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span><span class="arrow">&#9656;</span></div></div>
+      <div class="mob-sec"><div class="mob-sec-hdr"><div class="dot" style="background:#6b7280"></div>Wishlist<span class="cnt">2</span><span class="arrow">&#9656;</span></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="rules">
+  <div class="rules-box">
+    <h3>Card Rendering Rules</h3>
+    <table>
+      <thead><tr><th>Condition</th><th>Tint</th><th>Hint Bar</th><th>Days Treatment</th></tr></thead>
+      <tbody>
+        <tr><td>Normal (no urgency)</td><td>None</td><td>None — compact card</td><td>Muted gray</td></tr>
+        <tr><td>Interview today/tomorrow</td><td>Amber wash</td><td>Clock icon + time</td><td>Normal</td></tr>
+        <tr><td>Interview this week</td><td>None</td><td>Clock icon + day (muted)</td><td>Normal</td></tr>
+        <tr><td>Stale (7+ days, no update)</td><td>Red wash</td><td>None — tint says it</td><td>Red + bold</td></tr>
+        <tr><td>Offer expiring</td><td>Green wash</td><td>Alert icon + date</td><td>Normal</td></tr>
+        <tr><td>Rejected/Withdrawn</td><td>None</td><td>None</td><td>None, card at 40% opacity</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:16px;font-size:11px;color:#555;line-height:1.6;">
+      <strong style="color:#888;">No double-signaling:</strong> Tint = urgency exists. Hint bar = what to do about it. Days count = how long it's been. Never show a "stale" text badge when the card is already red-tinted — that's redundant. The tint IS the label.
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

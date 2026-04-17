@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — Hero Section v2</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',system-ui,sans-serif;}
+body{font-family:var(--font);background:#0a0a0a;color:#fff;-webkit-font-smoothing:antialiased;font-size:14px;padding:24px 24px 80px;}
+
+h1{font-size:20px;font-weight:700;margin-bottom:4px;}
+.sub{font-size:12px;color:#555;margin-bottom:24px;max-width:700px;line-height:1.5;}
+.section{margin-bottom:48px;border-bottom:1px solid #1a1a1a;padding-bottom:40px;}
+.section:last-child{border-bottom:none;}
+
+.variants{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:900px){.variants{grid-template-columns:1fr;}}
+.vc{background:#111;border:1px solid #222;border-radius:12px;padding:18px;display:flex;flex-direction:column;}
+.vc .label{font-size:10px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.vc .note{font-size:10px;color:#444;margin-top:10px;line-height:1.5;}
+
+/* Preview frames */
+.desk{background:linear-gradient(145deg,#f5f3f0,#ece8e3);border-radius:10px;padding:0;overflow:hidden;}
+.mob{background:linear-gradient(145deg,#f5f3f0,#ece8e3);border-radius:16px;padding:0;overflow:hidden;max-width:375px;}
+
+/* Hero glass bar */
+.hero{background:rgba(255,255,255,.5);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.4);padding:16px 20px;}
+
+/* Shared elements */
+.badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;display:inline-flex;align-items:center;}
+.b-int{background:rgba(245,158,11,.12);color:#92400e;}
+.sel{height:28px;padding:0 8px;border:1px solid rgba(0,0,0,.1);border-radius:6px;font-size:11px;font-weight:600;font-family:var(--font);cursor:pointer;}
+.sel-status{background:rgba(245,158,11,.1);color:#92400e;}
+.sel-pri{background:rgba(239,68,68,.08);color:#ef4444;}
+.btn-o{height:28px;padding:0 10px;background:transparent;color:#57534e;border:1px solid rgba(0,0,0,.08);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);display:inline-flex;align-items:center;gap:3px;}
+.btn-g{height:28px;padding:0 10px;background:rgba(0,0,0,.04);color:#57534e;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);}
+.meta-pill{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:#57534e;padding:3px 8px;background:rgba(0,0,0,.03);border-radius:6px;}
+.meta-pill svg{width:12px;height:12px;color:#a8a29e;}
+.back{font-size:12px;color:#a8a29e;cursor:pointer;margin-bottom:8px;display:inline-flex;align-items:center;gap:4px;}
+
+/* Content area placeholder */
+.content-ph{padding:16px 20px;}
+.tab-bar{display:flex;gap:0;border-bottom:1px solid rgba(0,0,0,.06);margin-bottom:12px;}
+.tab{padding:8px 14px;font-size:12px;font-weight:600;color:#a8a29e;border-bottom:2px solid transparent;}
+.tab.on{color:#292524;border-bottom-color:#292524;}
+</style>
+</head>
+<body>
+
+<h1>Hero Section — Rethought</h1>
+<div class="sub">
+  <strong>In hero:</strong> Company, role, status (editable dropdown), salary, location type, days, pin/archive.<br>
+  <strong>Not in hero:</strong> Tags (overview tab), source (overview), applied date (overview), posting URL (overview).<br>
+  <strong>Rule:</strong> Everything in the hero is either identity (who) or decision-critical (what stage, how much, where).
+</div>
+
+<!-- H-A: CLEAN ROWS -->
+<div class="section">
+  <h2 style="font-size:15px;font-weight:700;margin-bottom:16px;">3 Hero Variants — Desktop + Mobile</h2>
+
+  <div style="margin-bottom:32px;">
+    <div style="font-size:12px;font-weight:600;color:#888;margin-bottom:8px;">A: Dropdowns + Info Pills</div>
+    <div style="font-size:11px;color:#555;margin-bottom:12px;">Status and priority as editable dropdowns. Salary, location, days as subtle info pills. Actions right-aligned. Clean separation between editable (dropdowns) and read (pills).</div>
+    <div class="variants">
+      <div class="vc"><div class="label">Desktop</div>
+        <div class="desk">
+          <div class="hero">
+            <div class="back"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg> Back</div>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">
+              <div>
+                <div style="font-size:22px;font-weight:700;color:#1c1917;line-height:1.2;">Google</div>
+                <div style="font-size:14px;color:#78716c;margin-top:2px;">SDE III</div>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <select class="sel sel-status"><option>Interviewing</option><option>Applied</option><option>Screening</option><option>Offer</option><option>Rejected</option></select>
+                <select class="sel sel-pri"><option>High</option><option>Medium</option><option>Low</option></select>
+                <button class="btn-o"><svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg></button>
+                <button class="btn-g" style="color:#ef4444;">Archive</button>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <span class="meta-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Hybrid · Mountain View</span>
+              <span class="meta-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>$180K – $240K</span>
+              <span class="meta-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>11d in pipeline</span>
+            </div>
+          </div>
+          <div class="content-ph">
+            <div class="tab-bar"><div class="tab on">Overview</div><div class="tab">Interviews (3)</div><div class="tab">JD</div><div class="tab">Docs (2)</div><div class="tab">Timeline</div></div>
+            <div style="font-size:11px;color:#a8a29e;text-align:center;padding:20px;">Tab content here...</div>
+          </div>
+        </div>
+      </div>
+      <div class="vc"><div class="label">Mobile</div>
+        <div class="mob">
+          <div class="hero" style="padding:12px 14px;">
+            <div class="back" style="font-size:11px;margin-bottom:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg> Back</div>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;">
+              <div>
+                <div style="font-size:18px;font-weight:700;color:#1c1917;">Google</div>
+                <div style="font-size:13px;color:#78716c;">SDE III</div>
+              </div>
+              <div style="display:flex;gap:4px;">
+                <select class="sel sel-status" style="font-size:10px;height:26px;"><option>Interviewing</option></select>
+                <button class="btn-o" style="height:26px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg></button>
+              </div>
+            </div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <span class="meta-pill" style="font-size:10px;padding:2px 6px;">Hybrid · MV</span>
+              <span class="meta-pill" style="font-size:10px;padding:2px 6px;">$180-240K</span>
+              <span class="meta-pill" style="font-size:10px;padding:2px 6px;">11d</span>
+              <span class="meta-pill" style="font-size:10px;padding:2px 6px;background:rgba(239,68,68,.06);color:#ef4444;">High</span>
+            </div>
+          </div>
+          <div class="content-ph" style="padding:10px 14px;">
+            <div class="tab-bar" style="overflow-x:auto;scrollbar-width:none;"><div class="tab on" style="font-size:11px;padding:6px 10px;">Overview</div><div class="tab" style="font-size:11px;padding:6px 10px;">Interviews</div><div class="tab" style="font-size:11px;padding:6px 10px;">JD</div><div class="tab" style="font-size:11px;padding:6px 10px;">Docs</div><div class="tab" style="font-size:11px;padding:6px 10px;">Timeline</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#555;margin-top:8px;line-height:1.5;"><strong style="color:#888;">Why:</strong> Status + priority are dropdowns (you change them). Salary/location/days are read-only pills with icons (you glance at them). Clear separation between actions and info. No tags cluttering the hero — those live in Overview.</div>
+  </div>
+
+  <!-- H-B: BADGE HEADER WITH INLINE EDIT -->
+  <div style="margin-bottom:32px;">
+    <div style="font-size:12px;font-weight:600;color:#888;margin-bottom:8px;">B: Badge Header + Inline Meta</div>
+    <div style="font-size:11px;color:#555;margin-bottom:12px;">Company badge (initial square) gives visual identity. Meta displayed as plain text (not pills). Status dropdown is color-tinted. More compact vertical space — all on roughly 2 lines.</div>
+    <div class="variants">
+      <div class="vc"><div class="label">Desktop</div>
+        <div class="desk">
+          <div class="hero">
+            <div class="back"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg> Back</div>
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;">
+              <div style="width:44px;height:44px;border-radius:12px;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:#fff;flex-shrink:0;">G</div>
+              <div style="flex:1;">
+                <div style="display:flex;align-items:baseline;gap:8px;">
+                  <span style="font-size:20px;font-weight:700;color:#1c1917;">Google</span>
+                  <span style="font-size:14px;color:#78716c;">SDE III</span>
+                </div>
+                <div style="font-size:12px;color:#78716c;margin-top:2px;">Hybrid · Mountain View, CA · $180K–$240K · 11d</div>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <select class="sel sel-status"><option>Interviewing</option></select>
+                <select class="sel sel-pri"><option>High</option></select>
+                <button class="btn-o"><svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg></button>
+                <button class="btn-g" style="color:#ef4444;">Archive</button>
+              </div>
+            </div>
+          </div>
+          <div class="content-ph">
+            <div class="tab-bar"><div class="tab on">Overview</div><div class="tab">Interviews (3)</div><div class="tab">JD</div><div class="tab">Docs (2)</div><div class="tab">Timeline</div></div>
+            <div style="font-size:11px;color:#a8a29e;text-align:center;padding:20px;">Tab content here...</div>
+          </div>
+        </div>
+      </div>
+      <div class="vc"><div class="label">Mobile</div>
+        <div class="mob">
+          <div class="hero" style="padding:12px 14px;">
+            <div class="back" style="font-size:11px;margin-bottom:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg> Back</div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+              <div style="width:36px;height:36px;border-radius:10px;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0;">G</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:16px;font-weight:700;color:#1c1917;">Google — SDE III</div>
+                <div style="font-size:11px;color:#78716c;">Hybrid · MV · $180-240K · 11d</div>
+              </div>
+              <select class="sel sel-status" style="font-size:10px;height:26px;flex-shrink:0;"><option>Interviewing</option></select>
+            </div>
+          </div>
+          <div class="content-ph" style="padding:10px 14px;">
+            <div class="tab-bar" style="overflow-x:auto;scrollbar-width:none;"><div class="tab on" style="font-size:11px;padding:6px 10px;">Overview</div><div class="tab" style="font-size:11px;padding:6px 10px;">Interviews</div><div class="tab" style="font-size:11px;padding:6px 10px;">JD</div><div class="tab" style="font-size:11px;padding:6px 10px;">Docs</div><div class="tab" style="font-size:11px;padding:6px 10px;">Timeline</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#555;margin-top:8px;line-height:1.5;"><strong style="color:#888;">Why:</strong> Company badge carries over from kanban cards — you recognize it. Meta as plain text (not pills) is lighter. Everything fits in roughly 2 lines on desktop. Most compact hero that's still fully editable.</div>
+  </div>
+
+  <!-- H-C: TWO-ROW STRUCTURED -->
+  <div style="margin-bottom:32px;">
+    <div style="font-size:12px;font-weight:600;color:#888;margin-bottom:8px;">C: Two-Row Structured</div>
+    <div style="font-size:11px;color:#555;margin-bottom:12px;">Row 1: name + actions. Row 2: all decision-critical info as equally-weighted items in a structured grid. Each item has a label above and value below. Everything scannable, everything editable on click.</div>
+    <div class="variants">
+      <div class="vc"><div class="label">Desktop</div>
+        <div class="desk">
+          <div class="hero">
+            <div class="back"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg> Back</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div style="font-size:22px;font-weight:700;color:#1c1917;">Google — SDE III</div>
+              <div style="display:flex;gap:6px;">
+                <button class="btn-o"><svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg> Pinned</button>
+                <button class="btn-g" style="color:#ef4444;">Archive</button>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:12px;background:rgba(255,255,255,.3);border-radius:8px;">
+              <div>
+                <div style="font-size:9px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Status</div>
+                <select class="sel sel-status" style="width:100%;"><option>Interviewing</option><option>Applied</option><option>Screening</option><option>Offer</option></select>
+              </div>
+              <div>
+                <div style="font-size:9px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Priority</div>
+                <select class="sel sel-pri" style="width:100%;"><option>High</option><option>Medium</option><option>Low</option></select>
+              </div>
+              <div>
+                <div style="font-size:9px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Location</div>
+                <div style="font-size:13px;font-weight:600;color:#292524;">Hybrid · MV</div>
+              </div>
+              <div>
+                <div style="font-size:9px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Salary</div>
+                <div style="font-size:13px;font-weight:600;color:#292524;">$180-240K</div>
+              </div>
+              <div>
+                <div style="font-size:9px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Pipeline</div>
+                <div style="font-size:13px;font-weight:600;color:#292524;">11 days</div>
+              </div>
+            </div>
+          </div>
+          <div class="content-ph">
+            <div class="tab-bar"><div class="tab on">Overview</div><div class="tab">Interviews (3)</div><div class="tab">JD</div><div class="tab">Docs (2)</div><div class="tab">Timeline</div></div>
+            <div style="font-size:11px;color:#a8a29e;text-align:center;padding:20px;">Tab content here...</div>
+          </div>
+        </div>
+      </div>
+      <div class="vc"><div class="label">Mobile</div>
+        <div class="mob">
+          <div class="hero" style="padding:12px 14px;">
+            <div class="back" style="font-size:11px;margin-bottom:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg> Back</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div style="font-size:17px;font-weight:700;color:#1c1917;">Google — SDE III</div>
+              <button class="btn-o" style="height:26px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg></button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px;background:rgba(255,255,255,.3);border-radius:8px;">
+              <div>
+                <div style="font-size:8px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Status</div>
+                <select class="sel sel-status" style="width:100%;font-size:10px;height:26px;"><option>Interviewing</option></select>
+              </div>
+              <div>
+                <div style="font-size:8px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Priority</div>
+                <select class="sel sel-pri" style="width:100%;font-size:10px;height:26px;"><option>High</option></select>
+              </div>
+              <div>
+                <div style="font-size:8px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Location</div>
+                <div style="font-size:12px;font-weight:600;color:#292524;">Hybrid · MV</div>
+              </div>
+              <div>
+                <div style="font-size:8px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Salary</div>
+                <div style="font-size:12px;font-weight:600;color:#292524;">$180-240K</div>
+              </div>
+            </div>
+          </div>
+          <div class="content-ph" style="padding:10px 14px;">
+            <div class="tab-bar" style="overflow-x:auto;scrollbar-width:none;"><div class="tab on" style="font-size:11px;padding:6px 10px;">Overview</div><div class="tab" style="font-size:11px;padding:6px 10px;">Interviews</div><div class="tab" style="font-size:11px;padding:6px 10px;">JD</div><div class="tab" style="font-size:11px;padding:6px 10px;">Docs</div><div class="tab" style="font-size:11px;padding:6px 10px;">Timeline</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#555;margin-top:8px;line-height:1.5;"><strong style="color:#888;">Why:</strong> Everything structured in a grid with labels. Status + priority are dropdowns, location + salary + days are read values. The grid creates a "dashboard strip" feel — all key info at equal weight. Mobile goes 2x2 grid. Most structured and scannable.</div>
+  </div>
+
+  <!-- COMPARISON SUMMARY -->
+  <div style="background:#111;border:1px solid #222;border-radius:10px;padding:20px;">
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px;">Comparison</div>
+    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+      <thead><tr style="color:#666;"><th style="text-align:left;padding:6px 8px;border-bottom:1px solid #222;">Aspect</th><th style="padding:6px 8px;border-bottom:1px solid #222;">A: Pills</th><th style="padding:6px 8px;border-bottom:1px solid #222;">B: Badge</th><th style="padding:6px 8px;border-bottom:1px solid #222;">C: Grid</th></tr></thead>
+      <tbody style="color:#888;">
+        <tr><td style="padding:6px 8px;color:#ccc;font-weight:600;">Status editable</td><td style="padding:6px 8px;text-align:center;">Dropdown</td><td style="padding:6px 8px;text-align:center;">Dropdown</td><td style="padding:6px 8px;text-align:center;">Dropdown</td></tr>
+        <tr><td style="padding:6px 8px;color:#ccc;font-weight:600;">Priority editable</td><td style="padding:6px 8px;text-align:center;">Dropdown</td><td style="padding:6px 8px;text-align:center;">Dropdown</td><td style="padding:6px 8px;text-align:center;">Dropdown</td></tr>
+        <tr><td style="padding:6px 8px;color:#ccc;font-weight:600;">Vertical space</td><td style="padding:6px 8px;text-align:center;">~90px</td><td style="padding:6px 8px;text-align:center;">~60px</td><td style="padding:6px 8px;text-align:center;">~110px</td></tr>
+        <tr><td style="padding:6px 8px;color:#ccc;font-weight:600;">Visual identity</td><td style="padding:6px 8px;text-align:center;">Text only</td><td style="padding:6px 8px;text-align:center;">Company badge</td><td style="padding:6px 8px;text-align:center;">Text only</td></tr>
+        <tr><td style="padding:6px 8px;color:#ccc;font-weight:600;">Info layout</td><td style="padding:6px 8px;text-align:center;">Icon pills</td><td style="padding:6px 8px;text-align:center;">Plain text</td><td style="padding:6px 8px;text-align:center;">Labeled grid</td></tr>
+        <tr><td style="padding:6px 8px;color:#ccc;font-weight:600;">Mobile feel</td><td style="padding:6px 8px;text-align:center;">Pills wrap</td><td style="padding:6px 8px;text-align:center;">Compact 2-line</td><td style="padding:6px 8px;text-align:center;">2x2 grid</td></tr>
+        <tr><td style="padding:6px 8px;color:#ccc;font-weight:600;">Tags in hero</td><td style="padding:6px 8px;text-align:center;">No</td><td style="padding:6px 8px;text-align:center;">No</td><td style="padding:6px 8px;text-align:center;">No</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>

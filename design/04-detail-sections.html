@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — Detail Page Sections</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',system-ui,sans-serif;--mono:'SF Mono','Menlo','Monaco',monospace;}
+body{font-family:var(--font);background:#0a0a0a;color:#fff;-webkit-font-smoothing:antialiased;font-size:14px;padding:24px 24px 80px;}
+
+h1{font-size:20px;font-weight:700;margin-bottom:4px;}
+.sub{font-size:12px;color:#555;margin-bottom:32px;max-width:700px;line-height:1.5;}
+.section{margin-bottom:56px;border-bottom:1px solid #1a1a1a;padding-bottom:48px;}
+.section:last-child{border-bottom:none;}
+.section>h2{font-size:16px;font-weight:700;margin-bottom:4px;}
+.section>.desc{font-size:11px;color:#555;margin-bottom:20px;max-width:600px;line-height:1.5;}
+
+.variants{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:1000px){.variants{grid-template-columns:1fr;}}
+.vc{background:#111;border:1px solid #222;border-radius:12px;padding:18px;display:flex;flex-direction:column;}
+.vc .label{font-size:10px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.vc .pv{background:linear-gradient(145deg,#f5f3f0,#ece8e3);border-radius:10px;padding:16px;min-height:100px;}
+.vc .note{font-size:10px;color:#444;margin-top:10px;line-height:1.4;}
+
+/* Shared glass */
+.g{background:rgba(255,255,255,.55);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:10px;}
+.g2{background:rgba(255,255,255,.4);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.4);border-radius:8px;}
+
+/* Badges */
+.badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;display:inline-flex;align-items:center;}
+.b-interview{background:rgba(245,158,11,.12);color:#92400e;}
+.b-done{background:rgba(34,197,94,.12);color:#15803d;}
+.b-sched{background:rgba(245,158,11,.12);color:#92400e;}
+
+/* Buttons */
+.btn-f{height:28px;padding:0 10px;background:#292524;color:#fff;border-radius:6px;font-size:11px;font-weight:600;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:3px;font-family:var(--font);}
+.btn-o{height:28px;padding:0 10px;background:transparent;color:#292524;border:1px solid rgba(0,0,0,.1);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:3px;font-family:var(--font);}
+.btn-g{height:28px;padding:0 10px;background:rgba(0,0,0,.04);color:#57534e;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);}
+
+/* Inputs */
+.inp{width:100%;height:32px;padding:0 10px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.5);font-size:12px;color:#292524;outline:none;font-family:var(--font);}
+.txta{width:100%;padding:8px 10px;border:1px solid rgba(0,0,0,.06);border-radius:10px;background:rgba(255,255,255,.5);font-size:12px;color:#292524;outline:none;font-family:var(--font);resize:vertical;min-height:60px;line-height:1.5;}
+.fl{font-size:9px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.md-h{font-size:8px;color:#a8a29e;margin-top:2px;}
+.md-h code{font-family:var(--mono);font-size:8px;background:rgba(0,0,0,.04);padding:0 2px;border-radius:2px;}
+
+/* Tags */
+.tag{font-size:9px;padding:2px 6px;border-radius:99px;background:rgba(0,0,0,.04);color:#78716c;font-weight:500;display:inline-flex;align-items:center;}
+
+/* Stars SVG */
+.stars{display:flex;gap:1px;}
+.star{width:14px;height:14px;}
+.star-on{fill:#f59e0b;stroke:none;}
+.star-off{fill:none;stroke:#d6d3d1;stroke-width:1.5;}
+
+/* Icons */
+.ico{width:12px;height:12px;flex-shrink:0;display:inline-flex;}
+.ico svg{width:100%;height:100%;}
+</style>
+</head>
+<body>
+
+<h1>Detail Page — Section by Section</h1>
+<div class="sub">D1 (Hero + Tabs) is chosen. Now iterate on each section. 3 variants per section. All glass aesthetic, real data, desktop proportions.</div>
+
+<!-- ============ HERO SECTION ============ -->
+<div class="section">
+  <h2>1. Hero Section</h2>
+  <div class="desc">The sticky top area — company, status, actions, meta. Always visible. Sets the context for everything below.</div>
+  <div class="variants">
+    <div class="vc"><div class="label">H1: Full Meta Row</div><div class="pv">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+        <div>
+          <div style="font-size:20px;font-weight:700;color:#1c1917;">Google</div>
+          <div style="font-size:13px;color:#78716c;">SDE III · Mountain View, CA (Hybrid)</div>
+        </div>
+        <div style="display:flex;gap:4px;">
+          <select style="height:28px;padding:0 8px;border:1px solid rgba(0,0,0,.1);border-radius:6px;background:rgba(245,158,11,.1);color:#92400e;font-size:11px;font-weight:600;font-family:var(--font);cursor:pointer;"><option>Interviewing</option></select>
+          <button class="btn-o"><svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
+          <button class="btn-o" style="color:#ef4444;">Archive</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:#78716c;">
+        <span><strong style="color:#292524;">High</strong> priority</span>
+        <span>via <strong style="color:#292524;">LinkedIn</strong></span>
+        <span>Applied <strong style="color:#292524;">Apr 5</strong></span>
+        <span><strong style="color:#292524;">$180-240K</strong> USD</span>
+        <span><strong style="color:#292524;">11d</strong> in pipeline</span>
+        <span style="display:flex;gap:3px;"><span class="tag">FAANG</span><span class="tag">hybrid</span></span>
+      </div>
+    </div><div class="note">Everything on display. Company big, meta row wraps. Status dropdown + pin + archive right-aligned. Most information dense.</div></div>
+
+    <div class="vc"><div class="label">H2: Compact Header</div><div class="pv">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+        <div style="width:40px;height:40px;border-radius:12px;background:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:#fff;">G</div>
+        <div style="flex:1;">
+          <div style="font-size:18px;font-weight:700;color:#1c1917;">Google — SDE III</div>
+          <div style="font-size:12px;color:#78716c;">Mountain View, CA · Hybrid · 11d</div>
+        </div>
+        <span class="badge b-interview">Interviewing</span>
+      </div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+        <span class="tag">High</span><span class="tag">LinkedIn</span><span class="tag">$180-240K</span><span class="tag">FAANG</span><span class="tag">hybrid</span>
+        <span style="margin-left:auto;display:flex;gap:4px;"><button class="btn-o" style="height:24px;font-size:10px;">Edit</button><button class="btn-g" style="height:24px;font-size:10px;color:#ef4444;">Archive</button></span>
+      </div>
+    </div><div class="note">Company badge + inline title. Status as a badge (not dropdown). All meta as tags. Compact — takes less vertical space. Edit button opens editing mode.</div></div>
+
+    <div class="vc"><div class="label">H3: Two-Line Minimal</div><div class="pv">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div style="font-size:18px;font-weight:700;color:#1c1917;">Google — SDE III</div>
+        <div style="display:flex;gap:4px;align-items:center;">
+          <select style="height:26px;padding:0 8px;border:1px solid rgba(0,0,0,.1);border-radius:6px;background:rgba(245,158,11,.1);color:#92400e;font-size:10px;font-weight:600;font-family:var(--font);"><option>Interviewing</option></select>
+          <span style="font-size:11px;color:#a8a29e;">11d</span>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#78716c;">Mountain View · Hybrid · $180-240K · High · LinkedIn · <span class="tag" style="font-size:8px;">FAANG</span></div>
+    </div><div class="note">Just two lines. Title + status on line 1, everything else crammed into line 2. Absolute minimum space. Meta details available in overview tab.</div></div>
+  </div>
+</div>
+
+<!-- ============ OVERVIEW TAB ============ -->
+<div class="section">
+  <h2>2. Overview Tab</h2>
+  <div class="desc">Editable fields, notes, company research. Where you update application data and write notes.</div>
+  <div class="variants">
+    <div class="vc"><div class="label">O1: Two-Column Grid</div><div class="pv">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <div style="margin-bottom:10px;"><div class="fl">Posting URL</div><input class="inp" value="careers.google.com/jobs/123" style="color:#3b82f6;font-size:11px;" /></div>
+          <div style="margin-bottom:10px;"><div class="fl">Location</div><div style="display:flex;gap:4px;"><select class="inp" style="flex:1;font-size:11px;padding:0 6px;"><option>Hybrid</option></select><input class="inp" style="flex:2;font-size:11px;" value="Mountain View" /></div></div>
+          <div><div class="fl">Salary</div><div style="display:flex;gap:4px;align-items:center;"><input class="inp" style="width:70px;font-size:11px;" value="180K" /><span style="color:#a8a29e;font-size:10px;">–</span><input class="inp" style="width:70px;font-size:11px;" value="240K" /><span style="font-size:10px;color:#a8a29e;">USD</span></div></div>
+        </div>
+        <div>
+          <div class="fl">Notes <span style="color:#22c55e;font-weight:400;text-transform:none;letter-spacing:0;">Saved</span></div>
+          <textarea class="txta" style="min-height:120px;font-size:11px;">Referred by **James Chen** from Cloud Networking.
+
+Prep:
+- Distributed systems
+- API design
+- Google-scale infra</textarea>
+          <div class="md-h"><code>**bold**</code> <code>- lists</code> <code>`code`</code> markdown</div>
+        </div>
+      </div>
+      <div class="g2" style="margin-top:12px;padding:10px;">
+        <div class="fl">Company Research — Google <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#78716c;">shared across apps</span></div>
+        <textarea class="txta" style="min-height:50px;font-size:11px;">Glassdoor 4.4/5. Cloud division growing. Red: layoffs. Green: well-funded.</textarea>
+      </div>
+    </div><div class="note">Current. Fields left, notes right. Company research below spanning full width. Good balance of editing + reading.</div></div>
+
+    <div class="vc"><div class="label">O2: Single Column Sections</div><div class="pv">
+      <div class="g2" style="padding:10px;margin-bottom:8px;">
+        <div class="fl">Key Details</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:11px;">
+          <div><span style="color:#a8a29e;">URL</span><div style="color:#3b82f6;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">careers.google.com</div></div>
+          <div><span style="color:#a8a29e;">Location</span><div style="font-weight:600;">Hybrid · MV</div></div>
+          <div><span style="color:#a8a29e;">Salary</span><div style="font-weight:600;">$180-240K</div></div>
+        </div>
+      </div>
+      <div style="margin-bottom:8px;">
+        <div class="fl">Notes</div>
+        <textarea class="txta" style="min-height:100px;font-size:11px;">Referred by **James Chen**. Prep: distributed systems, API design.</textarea>
+        <div class="md-h"><code>**bold**</code> <code>- lists</code> markdown</div>
+      </div>
+      <div class="g2" style="padding:10px;">
+        <div class="fl">Company Research — Google</div>
+        <textarea class="txta" style="min-height:40px;font-size:11px;">Glassdoor 4.4/5. Cloud growing.</textarea>
+      </div>
+    </div><div class="note">Everything stacks. Key details as a compact read-only card (click to edit). Notes and research below. Simpler, works identical on mobile.</div></div>
+
+    <div class="vc"><div class="label">O3: Inline Editable</div><div class="pv">
+      <div style="font-size:11px;line-height:2;">
+        <div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.04);">
+          <span style="width:60px;color:#a8a29e;flex-shrink:0;">URL</span>
+          <span style="color:#3b82f6;font-weight:600;">careers.google.com/jobs/123</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.04);">
+          <span style="width:60px;color:#a8a29e;flex-shrink:0;">Location</span>
+          <span style="font-weight:600;">Hybrid · Mountain View, CA</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.04);">
+          <span style="width:60px;color:#a8a29e;flex-shrink:0;">Salary</span>
+          <span style="font-weight:600;">$180K – $240K USD</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:3px 0;">
+          <span style="width:60px;color:#a8a29e;flex-shrink:0;">Equity</span>
+          <span style="color:#a8a29e;">Click to add</span>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <div class="fl">Notes</div>
+        <textarea class="txta" style="min-height:80px;font-size:11px;">Referred by **James Chen**. Prep: distributed systems, API design.</textarea>
+        <div class="md-h"><code>**bold**</code> markdown</div>
+      </div>
+    </div><div class="note">Notion-style. Fields displayed as label:value rows. Click any value to edit inline. No visible input borders until focused. Cleanest read mode.</div></div>
+  </div>
+</div>
+
+<!-- ============ INTERVIEWS TAB ============ -->
+<div class="section">
+  <h2>3. Interviews Tab</h2>
+  <div class="desc">Round list, Q&A pairs, star ratings. The most content-heavy tab.</div>
+  <div class="variants">
+    <div class="vc"><div class="label">I1: Accordion Cards</div><div class="pv">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><span style="font-size:12px;font-weight:600;">3 rounds</span><button class="btn-f" style="height:26px;font-size:10px;">+ Add Round</button></div>
+      <!-- Round 1 expanded -->
+      <div class="g" style="margin-bottom:6px;overflow:hidden;">
+        <div style="padding:10px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <div style="width:24px;height:24px;border-radius:50%;background:rgba(34,197,94,.12);color:#15803d;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;">1</div>
+          <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#292524;">Phone Screen</div><div style="font-size:10px;color:#78716c;">Apr 8 · 30m · James Chen</div></div>
+          <span class="badge b-done">Done</span>
+          <div class="stars"><svg class="star" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-off" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg></div>
+        </div>
+        <div style="padding:10px 12px;border-top:1px solid rgba(0,0,0,.04);background:rgba(255,255,255,.2);">
+          <div class="g2" style="padding:8px;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;margin-bottom:4px;"><span style="font-size:9px;font-weight:600;color:#78716c;">Q1</span><span style="margin-left:auto;font-size:9px;color:#a8a29e;cursor:pointer;">x</span></div>
+            <div class="fl">Question</div>
+            <textarea class="txta" style="min-height:28px;font-size:11px;">Tell me about a complex project</textarea>
+            <div class="fl" style="margin-top:6px;">Answer</div>
+            <textarea class="txta" style="min-height:36px;font-size:11px;">Led **cloud migration** — 4 teams, 6 months, zero downtime</textarea>
+            <div class="md-h"><code>**bold**</code> <code>- lists</code></div>
+          </div>
+          <div style="padding:6px 0;border:1px dashed rgba(0,0,0,.08);border-radius:6px;text-align:center;font-size:10px;color:#a8a29e;cursor:pointer;">+ Add Q&A</div>
+          <div style="margin-top:8px;border-top:1px solid rgba(0,0,0,.04);padding-top:6px;">
+            <div class="fl">Experience Notes</div>
+            <textarea class="txta" style="min-height:30px;font-size:11px;">Positive vibe. *"Strong culture fit"*</textarea>
+          </div>
+        </div>
+      </div>
+      <!-- Round 2 collapsed -->
+      <div class="g" style="margin-bottom:6px;"><div style="padding:10px 12px;display:flex;align-items:center;gap:8px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:rgba(34,197,94,.12);color:#15803d;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;">2</div>
+        <div style="flex:1;"><div style="font-size:12px;font-weight:600;">Technical</div><div style="font-size:10px;color:#78716c;">Apr 12 · 60m</div></div>
+        <span class="badge b-done">Done</span>
+        <div class="stars"><svg class="star" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-off" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-off" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg></div>
+      </div></div>
+      <!-- Round 3 upcoming -->
+      <div class="g" style="border-color:rgba(245,158,11,.3);"><div style="padding:10px 12px;display:flex;align-items:center;gap:8px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:rgba(245,158,11,.12);color:#92400e;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;">3</div>
+        <div style="flex:1;"><div style="font-size:12px;font-weight:600;">Bar Raiser</div><div style="font-size:10px;color:#78716c;">Apr 22 · 45m · TBD</div></div>
+        <span class="badge b-sched">Scheduled</span>
+      </div></div>
+    </div><div class="note">Current approach. Click to expand/collapse. Q&A pairs as bordered cards inside. Full star SVGs. Add Q&A button per round. Experience notes at bottom of each expanded round.</div></div>
+
+    <div class="vc"><div class="label">I2: Timeline Progression</div><div class="pv">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><span style="font-size:12px;font-weight:600;">3 rounds</span><button class="btn-f" style="height:26px;font-size:10px;">+ Add Round</button></div>
+      <div style="position:relative;padding-left:28px;">
+        <div style="position:absolute;left:11px;top:0;bottom:0;width:2px;background:rgba(0,0,0,.06);"></div>
+        <!-- R1 -->
+        <div style="position:relative;margin-bottom:16px;">
+          <div style="position:absolute;left:-28px;top:0;width:24px;height:24px;border-radius:50%;background:rgba(34,197,94,.12);color:#15803d;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;z-index:1;">1</div>
+          <div class="g" style="padding:10px;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+              <span style="font-size:12px;font-weight:600;color:#292524;">Phone Screen</span>
+              <span class="badge b-done" style="font-size:9px;">Done</span>
+              <div class="stars" style="margin-left:auto;"><svg class="star" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-off" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg></div>
+            </div>
+            <div style="font-size:10px;color:#78716c;margin-bottom:6px;">Apr 8 · 30m · James Chen</div>
+            <div style="font-size:11px;color:#57534e;padding-left:8px;border-left:2px solid rgba(0,0,0,.06);margin-bottom:4px;">Q: Tell me about a complex project<br>A: Led cloud migration — 4 teams, 6 months</div>
+            <div style="font-size:10px;color:#78716c;font-style:italic;">Positive vibe. "Strong culture fit"</div>
+          </div>
+        </div>
+        <!-- R2 -->
+        <div style="position:relative;margin-bottom:16px;">
+          <div style="position:absolute;left:-28px;top:0;width:24px;height:24px;border-radius:50%;background:rgba(34,197,94,.12);color:#15803d;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;z-index:1;">2</div>
+          <div class="g" style="padding:10px;">
+            <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;font-weight:600;">Technical</span><span class="badge b-done" style="font-size:9px;">Done</span><div class="stars" style="margin-left:auto;"><svg class="star" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-off" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" viewBox="0 0 24 24"><polygon class="star-off" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg></div></div>
+            <div style="font-size:10px;color:#78716c;">Apr 12 · 60m · Sarah Kim</div>
+          </div>
+        </div>
+        <!-- R3 upcoming -->
+        <div style="position:relative;">
+          <div style="position:absolute;left:-28px;top:0;width:24px;height:24px;border-radius:50%;background:rgba(245,158,11,.12);color:#92400e;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;z-index:1;">3</div>
+          <div class="g" style="padding:10px;border-color:rgba(245,158,11,.3);">
+            <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;font-weight:600;">Bar Raiser</span><span class="badge b-sched" style="font-size:9px;">Scheduled</span></div>
+            <div style="font-size:10px;color:#78716c;">Apr 22 · 45m · TBD</div>
+          </div>
+        </div>
+      </div>
+    </div><div class="note">Rounds connected by a vertical timeline line. Shows progression visually. Q&A inline (not in separate cards). Each round is a glass card hanging off the timeline. Feels like a journey.</div></div>
+
+    <div class="vc"><div class="label">I3: Inline Expandable</div><div class="pv">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><span style="font-size:12px;font-weight:600;">3 rounds</span><button class="btn-f" style="height:26px;font-size:10px;">+ Add</button></div>
+      <!-- Compact list, click to expand inline -->
+      <div style="border-bottom:1px solid rgba(0,0,0,.04);padding:8px 0;display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <div style="width:20px;height:20px;border-radius:50%;background:rgba(34,197,94,.12);color:#15803d;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;">1</div>
+        <span style="font-size:12px;font-weight:600;color:#292524;flex:1;">Phone Screen</span>
+        <span style="font-size:10px;color:#78716c;">Apr 8</span>
+        <div class="stars"><svg class="star" style="width:12px;height:12px;" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" style="width:12px;height:12px;" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" style="width:12px;height:12px;" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" style="width:12px;height:12px;" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" style="width:12px;height:12px;" viewBox="0 0 24 24"><polygon class="star-off" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg></div>
+        <span style="font-size:10px;color:#a8a29e;">&#9662;</span>
+      </div>
+      <div style="border-bottom:1px solid rgba(0,0,0,.04);padding:8px 0;display:flex;align-items:center;gap:8px;">
+        <div style="width:20px;height:20px;border-radius:50%;background:rgba(34,197,94,.12);color:#15803d;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;">2</div>
+        <span style="font-size:12px;font-weight:600;color:#292524;flex:1;">Technical</span>
+        <span style="font-size:10px;color:#78716c;">Apr 12</span>
+        <div class="stars"><svg class="star" style="width:12px;height:12px;" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" style="width:12px;height:12px;" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" style="width:12px;height:12px;" viewBox="0 0 24 24"><polygon class="star-on" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" style="width:12px;height:12px;" viewBox="0 0 24 24"><polygon class="star-off" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg><svg class="star" style="width:12px;height:12px;" viewBox="0 0 24 24"><polygon class="star-off" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg></div>
+        <span style="font-size:10px;color:#a8a29e;">&#9656;</span>
+      </div>
+      <div style="padding:8px 0;display:flex;align-items:center;gap:8px;color:#92400e;">
+        <div style="width:20px;height:20px;border-radius:50%;background:rgba(245,158,11,.12);color:#92400e;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;">3</div>
+        <span style="font-size:12px;font-weight:600;flex:1;">Bar Raiser</span>
+        <span style="font-size:10px;">Apr 22</span>
+        <span class="badge b-sched" style="font-size:9px;">Sched</span>
+      </div>
+    </div><div class="note">Minimal rows when collapsed — just number, name, date, stars, chevron. Click to expand Q&A inline (no card border, just indented content). Most compact overview when all collapsed. Good for 5+ rounds.</div></div>
+  </div>
+</div>
+
+<!-- ============ JD / DOCS / TIMELINE ============ -->
+<div class="section">
+  <h2>4. JD Snapshot</h2>
+  <div class="desc">Saved job description. Read-only by default, editable on click.</div>
+  <div class="variants">
+    <div class="vc"><div class="label">J1: Rendered Glass Card</div><div class="pv">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><div><div style="font-size:12px;font-weight:600;">Saved Apr 5</div><div style="font-size:10px;color:#a8a29e;">v1</div></div><div style="display:flex;gap:4px;"><button class="btn-o" style="height:24px;font-size:10px;">Re-scrape</button><button class="btn-g" style="height:24px;font-size:10px;">Edit</button></div></div>
+      <div class="g" style="padding:14px;font-size:12px;line-height:1.7;color:#292524;">
+        <div style="font-size:15px;font-weight:700;margin-bottom:2px;">SWE III, Cloud Networking</div>
+        <div style="color:#78716c;margin-bottom:10px;">Google · Mountain View</div>
+        <div style="margin-bottom:6px;"><strong>About:</strong> Build infrastructure powering Google Cloud's networking stack at global scale.</div>
+        <div style="margin-bottom:3px;"><strong>Requirements:</strong></div>
+        <ul style="padding-left:16px;margin-bottom:6px;"><li>5+ years SWE</li><li>Distributed systems</li><li>Go, C++, or Java</li></ul>
+      </div>
+    </div><div class="note">Rendered markdown in a glass card. Feels like reading the actual posting. Edit button switches to textarea mode. Re-scrape fetches URL again.</div></div>
+
+    <div class="vc"><div class="label">J2: Split View + Raw</div><div class="pv">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div><div class="fl">Rendered</div><div class="g" style="padding:10px;font-size:11px;line-height:1.6;"><strong>SWE III, Cloud</strong><br>Build infra for Google Cloud...<br><br><strong>Reqs:</strong> 5+ yrs, distributed sys...</div></div>
+        <div><div class="fl">Markdown Source</div><textarea class="txta" style="min-height:100px;font-size:10px;font-family:var(--mono);">## SWE III, Cloud
+
+Build infra for Google Cloud...
+
+**Reqs:**
+- 5+ years SWE
+- Distributed systems</textarea></div>
+      </div>
+    </div><div class="note">Side-by-side: rendered left, raw markdown right. Power-user — see both. Good for editing. Takes more space.</div></div>
+
+    <div class="vc"><div class="label">J3: Toggle Read/Edit</div><div class="pv">
+      <div style="display:flex;gap:4px;margin-bottom:8px;">
+        <button class="btn-g" style="height:24px;font-size:10px;background:rgba(0,0,0,.06);">Read</button>
+        <button class="btn-g" style="height:24px;font-size:10px;">Edit</button>
+        <span style="margin-left:auto;font-size:10px;color:#a8a29e;">Saved Apr 5 · v1</span>
+      </div>
+      <div class="g" style="padding:12px;font-size:11px;line-height:1.7;">
+        <strong style="font-size:14px;">SWE III, Cloud Networking</strong><br>
+        <span style="color:#78716c;">Google · Mountain View</span><br><br>
+        Build infrastructure powering Google Cloud's networking stack.<br><br>
+        <strong>Requirements:</strong> 5+ yrs SWE, distributed systems, Go/C++/Java
+      </div>
+    </div><div class="note">Toggle between Read (rendered) and Edit (textarea) modes. Only one visible at a time. Clean, focused. Version info inline.</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>5. Documents + Timeline</h2>
+  <div class="desc">Already locked from component showcase: glass cards for docs, glass card rows for timeline. Upload button expands to drop zone on drag.</div>
+  <div class="variants">
+    <div class="vc"><div class="label">Docs: Glass Cards + Adaptive Upload</div><div class="pv">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><span style="font-size:12px;font-weight:600;">2 docs</span><button class="btn-f" style="height:26px;font-size:10px;">Upload</button></div>
+      <div class="g" style="padding:10px;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+        <div style="width:32px;height:32px;border-radius:8px;background:rgba(59,130,246,.1);display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div><div style="font-size:11px;font-weight:600;">Resume_Akhil_2026.pdf</div><div style="font-size:10px;color:#a8a29e;">142 KB</div></div>
+      </div>
+      <div class="g" style="padding:10px;display:flex;align-items:center;gap:8px;">
+        <div style="width:32px;height:32px;border-radius:8px;background:rgba(139,92,246,.1);display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div><div style="font-size:11px;font-weight:600;">Cover_Letter_Google.pdf</div><div style="font-size:10px;color:#a8a29e;">89 KB</div></div>
+      </div>
+    </div><div class="note">Locked design. Glass cards per file. Upload button at top; expands to full dashed drop zone when you drag a file over the page.</div></div>
+
+    <div class="vc"><div class="label">Timeline: Glass Card Events</div><div class="pv">
+      <div class="g" style="padding:8px 10px;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+        <div style="width:6px;height:6px;border-radius:50%;background:#f59e0b;flex-shrink:0;"></div>
+        <span style="font-size:11px;font-weight:600;flex:1;">Bar Raiser scheduled</span>
+        <span style="font-size:10px;color:#a8a29e;">Apr 18</span>
+      </div>
+      <div class="g" style="padding:8px 10px;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+        <div style="width:6px;height:6px;border-radius:50%;background:#f59e0b;flex-shrink:0;"></div>
+        <span style="font-size:11px;font-weight:600;flex:1;">Moved to Interviewing</span>
+        <span style="font-size:10px;color:#a8a29e;">Apr 12</span>
+      </div>
+      <div class="g" style="padding:8px 10px;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+        <div style="width:6px;height:6px;border-radius:50%;background:#3b82f6;flex-shrink:0;"></div>
+        <span style="font-size:11px;font-weight:600;flex:1;">Created</span>
+        <span style="font-size:10px;color:#a8a29e;">Apr 5</span>
+      </div>
+    </div><div class="note">Locked design. Each event in its own glass card row. Colored dot + text + date. Consistent with everything else.</div></div>
+
+    <div class="vc"><div class="label">Tab Bar: Underline</div><div class="pv">
+      <div style="display:flex;gap:0;border-bottom:1px solid rgba(0,0,0,.06);">
+        <div style="padding:8px 14px;font-size:12px;font-weight:600;color:#292524;border-bottom:2px solid #292524;">Overview</div>
+        <div style="padding:8px 14px;font-size:12px;font-weight:600;color:#a8a29e;">Interviews (3)</div>
+        <div style="padding:8px 14px;font-size:12px;font-weight:600;color:#a8a29e;">JD</div>
+        <div style="padding:8px 14px;font-size:12px;font-weight:600;color:#a8a29e;">Docs (2)</div>
+        <div style="padding:8px 14px;font-size:12px;font-weight:600;color:#a8a29e;">Timeline</div>
+      </div>
+    </div><div class="note">Locked. Underline tab bar. Counts in tab labels. Horizontal scroll on mobile.</div></div>
+  </div>
+</div>
+
+</body>
+</html>

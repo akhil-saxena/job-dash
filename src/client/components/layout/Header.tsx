@@ -1,5 +1,6 @@
-import { useMatches, useRouter } from "@tanstack/react-router";
-import { Sun, Moon, Monitor } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { useMatches, useRouter, Link } from "@tanstack/react-router";
+import { Sun, Moon, Monitor, User, Settings, LogOut } from "lucide-react";
 import { SearchBar } from "@/client/components/design-system/SearchBar";
 import { Button } from "@/client/components/design-system/Button";
 import { useTheme } from "@/client/hooks/useTheme";
@@ -62,47 +63,53 @@ export function Header() {
 	const router = useRouter();
 	const { mode, setMode } = useTheme();
 	const { data: session } = authClient.useSession();
+	const [menuOpen, setMenuOpen] = useState(false);
+	const menuRef = useRef<HTMLDivElement>(null);
 
-	// Get the deepest matched route path to determine page title
+	// Close dropdown when clicking outside
+	useEffect(() => {
+		function handleClick(e: MouseEvent) {
+			if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+				setMenuOpen(false);
+			}
+		}
+		if (menuOpen) document.addEventListener("mousedown", handleClick);
+		return () => document.removeEventListener("mousedown", handleClick);
+	}, [menuOpen]);
+
 	const currentPath = matches[matches.length - 1]?.fullPath ?? "/";
 	const pageTitle = getPageTitle(currentPath);
 
 	const { setOpen: openQuickAdd } = useQuickAdd();
 	const ThemeIcon = MODE_ICONS[mode];
 	const userName = session?.user?.name ?? "User";
+	const userEmail = session?.user?.email ?? "";
 	const userInitial = userName.charAt(0).toUpperCase();
 	const avatarColor = getCompanyColor(userName);
 
 	async function handleSignOut() {
+		setMenuOpen(false);
 		await authClient.signOut();
 		router.navigate({ to: "/login" });
 	}
 
 	return (
 		<header className="flex items-center gap-3 border-b border-black/[0.06] px-4 py-3 dark:border-white/[0.08] md:px-6">
-			{/* Page title */}
 			<h1 className="text-lg font-semibold text-text-primary dark:text-dark-accent">
 				{pageTitle}
 			</h1>
 
-			{/* Spacer */}
 			<div className="flex-1" />
 
-			{/* Search bar -- display-only for Phase 3 */}
 			<div className="hidden w-64 sm:block lg:w-80">
-				<SearchBar
-					variant="glass"
-					placeholder="Search applications..."
-				/>
+				<SearchBar variant="glass" placeholder="Search applications..." />
 			</div>
 
-			{/* + Add button -- opens QuickAddModal */}
 			<Button variant="filled" size="sm" onClick={() => openQuickAdd(true)}>
 				<span className="hidden sm:inline">+ Add Application</span>
 				<span className="sm:hidden">+ Add</span>
 			</Button>
 
-			{/* Theme toggle */}
 			<button
 				type="button"
 				onClick={() => setMode(NEXT_MODE[mode])}
@@ -112,16 +119,64 @@ export function Header() {
 				<ThemeIcon size={18} />
 			</button>
 
-			{/* User avatar -- sign out on click */}
-			<button
-				type="button"
-				onClick={handleSignOut}
-				className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white transition-opacity hover:opacity-80"
-				style={{ backgroundColor: avatarColor }}
-				aria-label={`Signed in as ${userName}. Click to sign out.`}
-			>
-				{userInitial}
-			</button>
+			{/* User avatar with dropdown */}
+			<div className="relative" ref={menuRef}>
+				<button
+					type="button"
+					onClick={() => setMenuOpen(!menuOpen)}
+					className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white transition-opacity hover:opacity-80"
+					style={{ backgroundColor: avatarColor }}
+					aria-label="Account menu"
+				>
+					{userInitial}
+				</button>
+
+				{menuOpen && (
+					<div className="absolute right-0 top-10 z-50 w-56 overflow-hidden rounded-[var(--radius-modal)] border border-white/50 bg-white/80 shadow-lg backdrop-blur-xl dark:border-white/[0.08] dark:bg-[var(--dark-card)]/90">
+						{/* User info */}
+						<div className="border-b border-black/[0.06] px-4 py-3 dark:border-white/[0.06]">
+							<div className="text-sm font-semibold text-text-primary dark:text-dark-accent">
+								{userName}
+							</div>
+							<div className="text-xs text-text-secondary dark:text-dark-accent/50">
+								{userEmail}
+							</div>
+						</div>
+
+						{/* Menu items */}
+						<div className="py-1">
+							<Link
+								to="/settings"
+								onClick={() => setMenuOpen(false)}
+								className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-black/[0.04] dark:text-dark-accent/60 dark:hover:bg-white/[0.06]"
+							>
+								<User size={16} />
+								Profile
+							</Link>
+							<Link
+								to="/settings"
+								onClick={() => setMenuOpen(false)}
+								className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-black/[0.04] dark:text-dark-accent/60 dark:hover:bg-white/[0.06]"
+							>
+								<Settings size={16} />
+								Settings
+							</Link>
+						</div>
+
+						{/* Sign out */}
+						<div className="border-t border-black/[0.06] py-1 dark:border-white/[0.06]">
+							<button
+								type="button"
+								onClick={handleSignOut}
+								className="flex w-full items-center gap-3 px-4 py-2 text-sm text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-500/[0.08]"
+							>
+								<LogOut size={16} />
+								Sign out
+							</button>
+						</div>
+					</div>
+				)}
+			</div>
 		</header>
 	);
 }

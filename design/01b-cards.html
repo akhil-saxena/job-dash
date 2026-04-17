@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — Card Designs (Desktop + Mobile)</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',system-ui,sans-serif;--mono:'SF Mono','Menlo','Monaco',monospace;}
+body{font-family:var(--font);background:#0a0a0a;color:#fff;-webkit-font-smoothing:antialiased;font-size:14px;}
+
+.top{position:fixed;top:0;left:0;right:0;z-index:100;background:#111;border-bottom:1px solid #222;padding:12px 24px;display:flex;align-items:center;gap:12px;}
+.top h2{font-size:14px;font-weight:600;color:#666;}
+.top .pills{display:flex;gap:6px;}
+.top .pill{padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;border:1px solid #2a2a2a;background:transparent;color:#666;cursor:pointer;}
+.top .pill:hover{color:#aaa;border-color:#444;}
+.top .pill.on{background:#fff;color:#000;border-color:#fff;}
+
+.stage{margin-top:56px;padding:24px;max-width:1400px;margin-left:auto;margin-right:auto;}
+
+.option{margin-bottom:48px;border-bottom:1px solid #1a1a1a;padding-bottom:40px;}
+.option:last-child{border-bottom:none;}
+.opt-hdr{display:flex;align-items:baseline;gap:12px;margin-bottom:4px;}
+.opt-hdr h2{font-size:16px;font-weight:700;}
+.opt-hdr .num{font-size:12px;color:#444;font-weight:600;}
+.opt-desc{font-size:12px;color:#555;line-height:1.5;max-width:600px;margin-bottom:16px;}
+.opt-tags{display:flex;gap:4px;margin-bottom:20px;}
+.opt-tags .tg{font-size:9px;padding:2px 6px;border-radius:3px;background:#1a1a1a;color:#555;}
+
+.views{display:flex;gap:24px;align-items:flex-start;}
+.view-label{font-size:10px;font-weight:600;color:#444;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+
+/* Desktop frame — shows 4 columns side by side */
+.desk-frame{background:linear-gradient(145deg,#f5f3f0,#ece8e3);border-radius:12px;border:1px solid #222;padding:14px;flex:1;min-width:0;}
+.desk-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.desk-col-hdr{display:flex;align-items:center;gap:4px;padding:3px 2px;margin-bottom:5px;font-size:10px;font-weight:600;color:#57534e;}
+.desk-col-hdr .dot{width:6px;height:6px;border-radius:50%;}
+.desk-col-hdr .cnt{margin-left:auto;font-size:8px;font-weight:600;color:#a8a29e;background:rgba(0,0,0,.04);padding:0 4px;border-radius:4px;}
+.desk-col.dimmed{opacity:.4;}
+
+/* Mobile frame — shows full-width sections */
+.mob-frame{background:linear-gradient(145deg,#f5f3f0,#ece8e3);border-radius:20px;border:1px solid #222;padding:14px;width:340px;flex-shrink:0;}
+.mob-section{margin-bottom:10px;}
+.mob-sec-hdr{display:flex;align-items:center;gap:5px;padding:6px 0;font-size:12px;font-weight:600;color:#57534e;border-bottom:1px solid rgba(0,0,0,.04);margin-bottom:6px;}
+.mob-sec-hdr .dot{width:7px;height:7px;border-radius:50%;}
+.mob-sec-hdr .cnt{margin-left:4px;font-size:10px;color:#a8a29e;}
+
+/* ===== CARD STYLE 1: Minimal Row ===== */
+.c1{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:8px;padding:7px 9px;margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.c1 h4{font-size:11px;font-weight:600;color:#292524;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.c1 .pri{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.c1 .days{font-size:9px;color:#a8a29e;flex-shrink:0;}
+.c1 .stale{font-size:8px;padding:0 3px;border-radius:3px;font-weight:600;flex-shrink:0;}
+.c1.urgent{border-left:3px solid #f59e0b;padding-left:6px;}
+.c1 .hint{font-size:8px;font-weight:600;color:#f59e0b;flex-shrink:0;}
+/* Mobile variant: wider, shows role */
+.c1m{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:10px;padding:10px 12px;margin-bottom:5px;display:flex;align-items:center;gap:10px;}
+.c1m .left{flex:1;min-width:0;}
+.c1m h4{font-size:14px;font-weight:600;color:#292524;}
+.c1m .role{font-size:11px;color:#78716c;}
+.c1m .rt{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.c1m .pri{width:6px;height:6px;border-radius:50%;}
+.c1m .days{font-size:10px;color:#a8a29e;}
+.c1m.urgent{border-left:3px solid #f59e0b;padding-left:9px;}
+.c1m .hint{font-size:10px;font-weight:600;color:#f59e0b;margin-top:2px;}
+
+/* ===== CARD STYLE 2: Side Bar ===== */
+.c2{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:8px;margin-bottom:5px;display:flex;overflow:hidden;}
+.c2 .bar{width:3px;flex-shrink:0;}
+.c2 .body{padding:8px 9px;flex:1;min-width:0;}
+.c2 .top-line{display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:1px;}
+.c2 h4{font-size:11px;font-weight:600;color:#292524;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.c2 .days{font-size:9px;color:#a8a29e;flex-shrink:0;}
+.c2 .role{font-size:10px;color:#78716c;}
+.c2 .meta{display:flex;gap:3px;margin-top:3px;align-items:center;flex-wrap:wrap;}
+.c2 .tag{font-size:8px;padding:1px 4px;border-radius:3px;background:rgba(0,0,0,.04);color:#78716c;}
+.c2 .stale{font-size:8px;padding:1px 4px;border-radius:3px;font-weight:600;}
+.c2 .hint{font-size:8px;font-weight:600;margin-top:3px;}
+/* Mobile */
+.c2m{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:12px;margin-bottom:6px;display:flex;overflow:hidden;}
+.c2m .bar{width:4px;flex-shrink:0;}
+.c2m .body{padding:12px 14px;flex:1;min-width:0;}
+.c2m .top-line{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:2px;}
+.c2m h4{font-size:14px;font-weight:600;color:#292524;}
+.c2m .days{font-size:11px;color:#a8a29e;flex-shrink:0;}
+.c2m .role{font-size:12px;color:#78716c;}
+.c2m .meta{display:flex;gap:4px;margin-top:6px;align-items:center;flex-wrap:wrap;}
+.c2m .tag{font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.04);color:#78716c;}
+.c2m .stale{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;}
+.c2m .hint{font-size:11px;font-weight:600;margin-top:6px;}
+
+/* ===== CARD STYLE 3: Company Badge ===== */
+.c3{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:8px;padding:8px;margin-bottom:5px;display:flex;gap:8px;}
+.c3 .av{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0;margin-top:1px;}
+.c3 .cnt{flex:1;min-width:0;}
+.c3 h4{font-size:11px;font-weight:600;color:#292524;margin-bottom:1px;}
+.c3 .role{font-size:10px;color:#78716c;margin-bottom:3px;}
+.c3 .meta{display:flex;gap:3px;align-items:center;flex-wrap:wrap;}
+.c3 .pri{width:5px;height:5px;border-radius:50%;}
+.c3 .days{font-size:9px;color:#a8a29e;}
+.c3 .tag{font-size:8px;padding:1px 4px;border-radius:3px;background:rgba(0,0,0,.04);color:#78716c;}
+.c3 .stale{font-size:8px;padding:1px 4px;border-radius:3px;font-weight:600;}
+.c3 .hint{font-size:8px;font-weight:600;margin-top:3px;}
+/* Mobile */
+.c3m{background:rgba(255,255,255,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:12px;padding:12px;margin-bottom:6px;display:flex;gap:12px;}
+.c3m .av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0;}
+.c3m .cnt{flex:1;min-width:0;}
+.c3m h4{font-size:15px;font-weight:600;color:#292524;margin-bottom:2px;}
+.c3m .role{font-size:12px;color:#78716c;margin-bottom:4px;}
+.c3m .meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.c3m .pri{width:6px;height:6px;border-radius:50%;}
+.c3m .days{font-size:11px;color:#a8a29e;}
+.c3m .tag{font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.04);color:#78716c;}
+.c3m .stale{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;}
+.c3m .hint{font-size:11px;font-weight:600;margin-top:6px;}
+
+.opt{display:none;}.opt.on{display:block;}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h2>Cards —</h2>
+  <div class="pills">
+    <button class="pill on" onclick="pick('a',this)">1: Minimal Row</button>
+    <button class="pill" onclick="pick('b',this)">2: Side Bar</button>
+    <button class="pill" onclick="pick('c',this)">3: Company Badge</button>
+  </div>
+</div>
+
+<div class="stage">
+
+<!-- 1: MINIMAL ROW -->
+<div class="opt on" id="opt-a">
+<div class="option">
+  <div class="opt-hdr"><h2>Minimal Row</h2></div>
+  <div class="opt-desc">Desktop: tight single-line cards — company name, priority dot, days count. Urgency cards get left border + hint text. Maximum density, see 8-10 per column.<br>Mobile: expands to two-line — adds role and bigger touch targets.</div>
+  <div class="opt-tags"><span class="tg">highest density</span><span class="tg">scan-friendly</span><span class="tg">role hidden on desktop</span></div>
+  <div class="views">
+    <div style="flex:1;min-width:0;">
+      <div class="view-label">Desktop — in kanban columns</div>
+      <div class="desk-frame">
+        <div class="desk-cols">
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+            <div class="c1"><span class="pri" style="background:#ef4444"></span><h4>Stripe</h4><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div>
+            <div class="c1"><span class="pri" style="background:#f59e0b"></span><h4>Cloudflare</h4><span class="days">1d</span></div>
+            <div class="c1"><span class="pri" style="background:#f59e0b"></span><h4>Meta</h4><span class="days">8d</span><span class="stale" style="background:rgba(245,158,11,.1);color:#92400e;">stale</span></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span></div>
+            <div class="c1"><span class="pri" style="background:#ef4444"></span><h4>Airbnb</h4><span class="days">9d</span></div>
+            <div class="c1"><span class="pri" style="background:#f59e0b"></span><h4>Shopify</h4><span class="days">4d</span></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+            <div class="c1 urgent"><h4>Google</h4><span class="hint">today 2pm</span><span class="days">6d</span></div>
+            <div class="c1"><span class="pri" style="background:#ef4444"></span><h4>Netflix</h4><span class="days">14d</span></div>
+            <div class="c1"><span class="pri" style="background:#f59e0b"></span><h4>Vercel</h4><span class="days">10d</span></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+            <div class="c1" style="border-left:3px solid #22c55e;padding-left:6px;"><h4>Figma</h4><span class="hint" style="color:#22c55e;">exp Apr 21</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="width:340px;flex-shrink:0;">
+      <div class="view-label">Mobile — full-width sections</div>
+      <div class="mob-frame">
+        <div class="mob-section"><div class="mob-sec-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+          <div class="c1m urgent"><div class="left"><h4>Google — SDE III</h4><div class="hint">◉ Technical today 2pm</div></div><div class="rt"><span class="pri" style="background:#ef4444"></span><span class="days">6d</span></div></div>
+          <div class="c1m"><div class="left"><h4>Netflix — Senior SWE</h4><div class="role">System Design Thu</div></div><div class="rt"><span class="pri" style="background:#ef4444"></span><span class="days">14d</span></div></div>
+          <div class="c1m"><div class="left"><h4>Vercel — Frontend Lead</h4><div class="role">HM call Fri</div></div><div class="rt"><span class="pri" style="background:#f59e0b"></span><span class="days">10d</span></div></div>
+        </div>
+        <div class="mob-section"><div class="mob-sec-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+          <div class="c1m" style="border-left:3px solid #22c55e;padding-left:9px;"><div class="left"><h4>Figma — Senior Frontend</h4><div class="hint" style="color:#22c55e;">⏰ Offer expires Apr 21</div></div><div class="rt"><span class="days">2d</span></div></div>
+        </div>
+        <div class="mob-section"><div class="mob-sec-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+          <div class="c1m"><div class="left"><h4>Stripe — Sr Frontend</h4><div class="role">No response</div></div><div class="rt"><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;font-size:10px;padding:2px 6px;border-radius:4px;">12d</span></div></div>
+          <div class="c1m"><div class="left"><h4>Cloudflare — Sys Eng</h4><div class="role">Referred by Amit K.</div></div><div class="rt"><span class="days">1d</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 2: SIDE BAR -->
+<div class="opt" id="opt-b">
+<div class="option">
+  <div class="opt-hdr"><h2>Side Bar</h2></div>
+  <div class="opt-desc">Desktop: colored bar on left edge — color is always the status color. Two-line layout (company + days top, role + tags bottom). Urgency hint as a third line.<br>Mobile: same bar, bigger padding, full-width. Bar becomes a strong visual anchor for scanning.</div>
+  <div class="opt-tags"><span class="tg">strong visual rhythm</span><span class="tg">status always visible</span><span class="tg">two-line balanced</span></div>
+  <div class="views">
+    <div style="flex:1;min-width:0;">
+      <div class="view-label">Desktop — in kanban columns</div>
+      <div class="desk-frame">
+        <div class="desk-cols">
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+            <div class="c2"><div class="bar" style="background:#3b82f6;"></div><div class="body"><div class="top-line"><h4>Stripe</h4><span class="days">12d</span></div><div class="role">Sr Frontend</div><div class="meta"><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div></div>
+            <div class="c2"><div class="bar" style="background:#3b82f6;"></div><div class="body"><div class="top-line"><h4>Cloudflare</h4><span class="days">1d</span></div><div class="role">Sys Engineer</div><div class="meta"><span class="tag">referral</span></div></div></div>
+            <div class="c2"><div class="bar" style="background:#3b82f6;"></div><div class="body"><div class="top-line"><h4>Meta</h4><span class="days">8d</span></div><div class="role">Product Eng</div><div class="meta"><span class="stale" style="background:rgba(245,158,11,.1);color:#92400e;">stale</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span></div>
+            <div class="c2"><div class="bar" style="background:#8b5cf6;"></div><div class="body"><div class="top-line"><h4>Airbnb</h4><span class="days">9d</span></div><div class="role">Staff Engineer</div></div></div>
+            <div class="c2"><div class="bar" style="background:#8b5cf6;"></div><div class="body"><div class="top-line"><h4>Shopify</h4><span class="days">4d</span></div><div class="role">Senior SWE</div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+            <div class="c2"><div class="bar" style="background:#f59e0b;"></div><div class="body"><div class="top-line"><h4>Google</h4><span class="days">6d</span></div><div class="role">SDE III</div><div class="hint" style="color:#f59e0b;">◉ Technical today 2pm</div></div></div>
+            <div class="c2"><div class="bar" style="background:#f59e0b;"></div><div class="body"><div class="top-line"><h4>Netflix</h4><span class="days">14d</span></div><div class="role">Senior SWE</div><div class="meta"><span class="tag">sys design thu</span></div></div></div>
+            <div class="c2"><div class="bar" style="background:#f59e0b;"></div><div class="body"><div class="top-line"><h4>Vercel</h4><span class="days">10d</span></div><div class="role">FE Lead</div><div class="meta"><span class="tag">remote</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+            <div class="c2"><div class="bar" style="background:#22c55e;"></div><div class="body"><div class="top-line"><h4>Figma</h4><span class="days">2d</span></div><div class="role">Sr Frontend</div><div class="hint" style="color:#22c55e;">⏰ Expires Apr 21</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="width:340px;flex-shrink:0;">
+      <div class="view-label">Mobile — full-width sections</div>
+      <div class="mob-frame">
+        <div class="mob-section"><div class="mob-sec-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+          <div class="c2m"><div class="bar" style="background:#f59e0b;"></div><div class="body"><div class="top-line"><h4>Google — SDE III</h4><span class="days">6d</span></div><div class="role">Mountain View · Hybrid</div><div class="hint" style="color:#f59e0b;">◉ Technical today 2pm</div></div></div>
+          <div class="c2m"><div class="bar" style="background:#f59e0b;"></div><div class="body"><div class="top-line"><h4>Netflix — Senior SWE</h4><span class="days">14d</span></div><div class="role">Remote</div><div class="meta"><span class="tag">sys design thu</span></div></div></div>
+          <div class="c2m"><div class="bar" style="background:#f59e0b;"></div><div class="body"><div class="top-line"><h4>Vercel — Frontend Lead</h4><span class="days">10d</span></div><div class="meta"><span class="tag">remote</span><span class="tag">HM fri</span></div></div></div>
+        </div>
+        <div class="mob-section"><div class="mob-sec-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+          <div class="c2m"><div class="bar" style="background:#22c55e;"></div><div class="body"><div class="top-line"><h4>Figma — Sr Frontend</h4><span class="days">2d</span></div><div class="role">$185K + RSUs</div><div class="hint" style="color:#22c55e;">⏰ Offer expires Apr 21</div></div></div>
+        </div>
+        <div class="mob-section"><div class="mob-sec-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+          <div class="c2m"><div class="bar" style="background:#3b82f6;"></div><div class="body"><div class="top-line"><h4>Stripe — Sr Frontend</h4><span class="days">12d</span></div><div class="meta"><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale · no response</span></div></div></div>
+          <div class="c2m"><div class="bar" style="background:#3b82f6;"></div><div class="body"><div class="top-line"><h4>Cloudflare — Sys Eng</h4><span class="days">1d</span></div><div class="meta"><span class="tag">referral</span></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 3: COMPANY BADGE -->
+<div class="opt" id="opt-c">
+<div class="option">
+  <div class="opt-hdr"><h2>Company Badge</h2></div>
+  <div class="opt-desc">Desktop: colored initial square gives each card unique visual identity. Easy to spot specific companies while scanning. Status color on the badge.<br>Mobile: bigger badge (36px), becomes a strong anchor. Company name + role next to it. Most personality of the three.</div>
+  <div class="opt-tags"><span class="tg">visual identity</span><span class="tg">spot companies fast</span><span class="tg">most personality</span></div>
+  <div class="views">
+    <div style="flex:1;min-width:0;">
+      <div class="view-label">Desktop — in kanban columns</div>
+      <div class="desk-frame">
+        <div class="desk-cols">
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+            <div class="c3"><div class="av" style="background:#3b82f6;">S</div><div class="cnt"><h4>Stripe</h4><div class="role">Sr Frontend</div><div class="meta"><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div></div>
+            <div class="c3"><div class="av" style="background:#3b82f6;">C</div><div class="cnt"><h4>Cloudflare</h4><div class="role">Sys Engineer</div><div class="meta"><span class="days">1d</span><span class="tag">referral</span></div></div></div>
+            <div class="c3"><div class="av" style="background:#3b82f6;">M</div><div class="cnt"><h4>Meta</h4><div class="role">Product Eng</div><div class="meta"><span class="days">8d</span><span class="stale" style="background:rgba(245,158,11,.1);color:#92400e;">stale</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#8b5cf6"></div>Screening<span class="cnt">2</span></div>
+            <div class="c3"><div class="av" style="background:#8b5cf6;">A</div><div class="cnt"><h4>Airbnb</h4><div class="role">Staff Eng</div><div class="meta"><span class="days">9d</span></div></div></div>
+            <div class="c3"><div class="av" style="background:#8b5cf6;">S</div><div class="cnt"><h4>Shopify</h4><div class="role">Senior SWE</div><div class="meta"><span class="days">4d</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+            <div class="c3"><div class="av" style="background:#f59e0b;">G</div><div class="cnt"><h4>Google</h4><div class="role">SDE III</div><div class="hint" style="color:#f59e0b;">◉ today 2pm</div></div></div>
+            <div class="c3"><div class="av" style="background:#f59e0b;">N</div><div class="cnt"><h4>Netflix</h4><div class="role">Senior SWE</div><div class="meta"><span class="days">14d</span></div></div></div>
+            <div class="c3"><div class="av" style="background:#f59e0b;">V</div><div class="cnt"><h4>Vercel</h4><div class="role">FE Lead</div><div class="meta"><span class="days">10d</span><span class="tag">remote</span></div></div></div>
+          </div>
+          <div>
+            <div class="desk-col-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+            <div class="c3"><div class="av" style="background:#22c55e;">F</div><div class="cnt"><h4>Figma</h4><div class="role">Sr Frontend</div><div class="hint" style="color:#22c55e;">⏰ exp Apr 21</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="width:340px;flex-shrink:0;">
+      <div class="view-label">Mobile — full-width sections</div>
+      <div class="mob-frame">
+        <div class="mob-section"><div class="mob-sec-hdr"><div class="dot" style="background:#f59e0b"></div>Interviewing<span class="cnt">3</span></div>
+          <div class="c3m"><div class="av" style="background:#f59e0b;">G</div><div class="cnt"><h4>Google — SDE III</h4><div class="role">Mountain View · Hybrid</div><div class="hint" style="color:#f59e0b;">◉ Technical today 2pm</div></div></div>
+          <div class="c3m"><div class="av" style="background:#f59e0b;">N</div><div class="cnt"><h4>Netflix — Senior SWE</h4><div class="role">Remote</div><div class="meta"><span class="days">14d</span><span class="tag">sys design thu</span></div></div></div>
+          <div class="c3m"><div class="av" style="background:#f59e0b;">V</div><div class="cnt"><h4>Vercel — Frontend Lead</h4><div class="meta"><span class="days">10d</span><span class="tag">remote</span><span class="tag">HM fri</span></div></div></div>
+        </div>
+        <div class="mob-section"><div class="mob-sec-hdr"><div class="dot" style="background:#22c55e"></div>Offer<span class="cnt">1</span></div>
+          <div class="c3m"><div class="av" style="background:#22c55e;">F</div><div class="cnt"><h4>Figma — Sr Frontend</h4><div class="role">$185K + RSUs</div><div class="hint" style="color:#22c55e;">⏰ Offer expires Apr 21</div></div></div>
+        </div>
+        <div class="mob-section"><div class="mob-sec-hdr"><div class="dot" style="background:#3b82f6"></div>Applied<span class="cnt">5</span></div>
+          <div class="c3m"><div class="av" style="background:#3b82f6;">S</div><div class="cnt"><h4>Stripe — Sr Frontend</h4><div class="meta"><span class="days">12d</span><span class="stale" style="background:rgba(239,68,68,.1);color:#ef4444;">stale</span></div></div></div>
+          <div class="c3m"><div class="av" style="background:#3b82f6;">C</div><div class="cnt"><h4>Cloudflare — Sys Eng</h4><div class="meta"><span class="days">1d</span><span class="tag">referral</span></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+
+<script>
+function pick(id,btn){
+  document.querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.opt').forEach(o=>o.classList.remove('on'));
+  document.getElementById('opt-'+id).classList.add('on');
+}
+</script>
+</body>
+</html>

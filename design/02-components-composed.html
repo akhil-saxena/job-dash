@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — Component Showcase: Composed</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',system-ui,sans-serif;--mono:'SF Mono','Menlo','Monaco',monospace;}
+body{font-family:var(--font);background:#0a0a0a;color:#fff;-webkit-font-smoothing:antialiased;font-size:14px;padding:24px 24px 80px;}
+
+h1{font-size:20px;font-weight:700;margin-bottom:4px;}
+.sub{font-size:12px;color:#555;margin-bottom:32px;}
+.section{margin-bottom:48px;}
+.section h2{font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.section h2 .ct{font-size:11px;color:#444;font-weight:600;}
+.section .desc{font-size:11px;color:#555;margin-bottom:16px;}
+.variants{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+@media(max-width:1100px){.variants{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:700px){.variants{grid-template-columns:repeat(2,1fr);}}
+.var-card{background:#111;border:1px solid #222;border-radius:10px;padding:16px;display:flex;flex-direction:column;}
+.var-card .label{font-size:10px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.var-card .preview{background:linear-gradient(145deg,#f5f3f0,#ece8e3);border-radius:8px;padding:14px;min-height:80px;}
+.var-card .note{font-size:10px;color:#444;margin-top:8px;line-height:1.4;}
+
+/* Shared atoms (from your picks) */
+.badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;display:inline-flex;align-items:center;}
+.badge-f{background:rgba(245,158,11,.12);color:#92400e;} /* filled */
+.badge-o{border:1.5px solid rgba(245,158,11,.3);color:#f59e0b;background:transparent;} /* outlined */
+.badge-d{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;color:#57534e;padding:0;} /* dot */
+.badge-d::before{content:'';width:6px;height:6px;border-radius:50%;display:inline-block;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;font-family:var(--font);font-weight:600;cursor:pointer;border:none;border-radius:6px;font-size:12px;}
+.btn-f{height:30px;padding:0 12px;background:#292524;color:#fff;}
+.btn-o{height:30px;padding:0 12px;background:transparent;color:#292524;border:1px solid rgba(0,0,0,.12);}
+.btn-g{height:30px;padding:0 12px;background:rgba(0,0,0,.04);color:#292524;}
+.inp{width:100%;height:34px;padding:0 10px;border:1px solid rgba(0,0,0,.1);border-radius:10px;background:rgba(255,255,255,.5);font-size:12px;color:#292524;outline:none;font-family:var(--font);}
+.txta{width:100%;padding:8px 10px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.5);font-size:12px;color:#292524;outline:none;font-family:var(--font);resize:vertical;min-height:60px;line-height:1.5;}
+.ico{width:12px;height:12px;flex-shrink:0;display:inline-flex;}
+.ico svg{width:100%;height:100%;}
+.md-h{font-size:9px;color:#a8a29e;margin-top:3px;display:flex;align-items:center;gap:4px;}
+.md-h code{font-family:var(--mono);font-size:8px;background:rgba(0,0,0,.04);padding:1px 3px;border-radius:2px;}
+.fi-label{font-size:10px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+
+/* ===== INTERVIEW ROUND CARD ===== */
+/* R1: Accordion */
+.r1{background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:10px;overflow:hidden;margin-bottom:6px;}
+.r1 .head{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;}
+.r1 .num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;}
+.r1 .info{flex:1;min-width:0;}
+.r1 .info h4{font-size:12px;font-weight:600;color:#292524;}
+.r1 .info p{font-size:10px;color:#78716c;}
+.r1 .stars{font-size:11px;}
+
+/* R2: Cards inline */
+.r2{display:flex;gap:8px;margin-bottom:6px;}
+.r2 .card{background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.5);border-radius:10px;padding:10px;flex:1;min-width:0;}
+.r2 .card h4{font-size:11px;font-weight:600;color:#292524;margin-bottom:1px;}
+.r2 .card p{font-size:10px;color:#78716c;}
+
+/* R3: Timeline style */
+.r3-item{display:flex;gap:10px;position:relative;padding-bottom:12px;}
+.r3-item .line{position:absolute;left:11px;top:24px;bottom:0;width:2px;background:rgba(0,0,0,.06);}
+.r3-item:last-child .line{display:none;}
+.r3-item .num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;z-index:1;}
+.r3-item .info{flex:1;}
+.r3-item .info h4{font-size:12px;font-weight:600;color:#292524;}
+.r3-item .info p{font-size:10px;color:#78716c;}
+
+/* R4: Table rows */
+.r4{width:100%;border-collapse:collapse;font-size:11px;}
+.r4 th{text-align:left;padding:6px 8px;font-size:9px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid rgba(0,0,0,.06);}
+.r4 td{padding:6px 8px;border-bottom:1px solid rgba(0,0,0,.03);color:#292524;}
+.r4 td:first-child{font-weight:600;}
+
+/* R5: Minimal list */
+.r5-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,.04);font-size:11px;}
+.r5-item:last-child{border-bottom:none;}
+.r5-item .n{font-size:10px;font-weight:600;color:#a8a29e;width:16px;flex-shrink:0;}
+.r5-item .name{font-weight:600;color:#292524;flex:1;}
+.r5-item .det{color:#78716c;}
+
+/* ===== Q&A PAIR ===== */
+.qa1{border:1px solid rgba(0,0,0,.06);border-radius:10px;padding:10px;margin-bottom:6px;background:rgba(255,255,255,.3);}
+.qa2{margin-bottom:8px;padding-left:12px;border-left:2px solid rgba(0,0,0,.08);}
+.qa3{margin-bottom:8px;background:rgba(255,255,255,.4);border-radius:8px;padding:10px;}
+.qa3 .q{font-size:12px;font-weight:600;color:#292524;margin-bottom:6px;}
+.qa4{margin-bottom:8px;}
+.qa4 .q-row{display:flex;gap:8px;margin-bottom:4px;}
+.qa4 .q-label{font-size:9px;font-weight:600;color:#a8a29e;width:12px;flex-shrink:0;padding-top:8px;}
+.qa5{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+
+/* ===== TIMELINE ===== */
+.tl-a .item{position:relative;padding-left:20px;margin-bottom:14px;}
+.tl-a .item .line{position:absolute;left:3px;top:0;bottom:-14px;width:2px;background:rgba(0,0,0,.06);}
+.tl-a .item:last-child .line{display:none;}
+.tl-a .item .dot{position:absolute;left:0;top:4px;width:8px;height:8px;border-radius:50%;}
+.tl-a .item h4{font-size:11px;font-weight:600;color:#292524;}
+.tl-a .item p{font-size:10px;color:#a8a29e;}
+
+.tl-b .item{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,.04);}
+.tl-b .item:last-child{border-bottom:none;}
+.tl-b .item .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.tl-b .item .info{flex:1;}
+.tl-b .item h4{font-size:11px;font-weight:600;color:#292524;}
+.tl-b .item .time{font-size:10px;color:#a8a29e;flex-shrink:0;}
+
+.tl-c .item{display:flex;gap:10px;padding:8px 0;}
+.tl-c .item .date-col{width:48px;flex-shrink:0;text-align:right;font-size:10px;color:#a8a29e;font-variant-numeric:tabular-nums;}
+.tl-c .item .bar{width:3px;border-radius:2px;flex-shrink:0;}
+.tl-c .item .info{flex:1;}
+.tl-c .item h4{font-size:11px;font-weight:600;color:#292524;}
+.tl-c .item p{font-size:10px;color:#78716c;}
+
+.tl-d .item{background:rgba(255,255,255,.4);border-radius:8px;padding:8px 10px;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.tl-d .item .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.tl-d .item h4{font-size:11px;font-weight:600;color:#292524;flex:1;}
+.tl-d .item .time{font-size:10px;color:#a8a29e;}
+
+.tl-e .item{padding:4px 0;font-size:11px;color:#78716c;}
+.tl-e .item span{color:#292524;font-weight:600;}
+.tl-e .item .time{color:#a8a29e;margin-left:4px;}
+
+/* ===== DOCUMENT ITEM ===== */
+.doc1{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid rgba(0,0,0,.04);}
+.doc1:last-child{border-bottom:none;}
+.doc1 .icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.doc1 .info{flex:1;min-width:0;}
+.doc1 .info h4{font-size:11px;font-weight:600;color:#292524;}
+.doc1 .info p{font-size:10px;color:#a8a29e;}
+
+.doc2{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,.04);}
+.doc2:last-child{border-bottom:none;}
+.doc2 .bar{width:3px;height:24px;border-radius:2px;flex-shrink:0;}
+.doc2 .info{flex:1;}
+.doc2 .info h4{font-size:11px;font-weight:600;color:#292524;}
+.doc2 .info p{font-size:10px;color:#a8a29e;}
+
+.doc3{background:rgba(255,255,255,.4);border-radius:8px;padding:10px;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.doc3 .icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.doc3 .info{flex:1;}
+.doc3 .info h4{font-size:12px;font-weight:600;color:#292524;}
+.doc3 .info p{font-size:10px;color:#a8a29e;}
+
+.doc4{display:flex;align-items:center;gap:8px;padding:8px 0;}
+.doc4 .type{font-size:9px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;width:48px;flex-shrink:0;}
+.doc4 h4{font-size:11px;font-weight:600;color:#292524;flex:1;}
+.doc4 .size{font-size:10px;color:#a8a29e;}
+
+.doc5{padding:8px;border:1px dashed rgba(0,0,0,.1);border-radius:8px;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.doc5 .icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(0,0,0,.04);}
+.doc5 .info{flex:1;}
+.doc5 .info h4{font-size:11px;font-weight:600;color:#292524;}
+.doc5 .info p{font-size:10px;color:#a8a29e;}
+
+/* ===== TABLE ROW ===== */
+.trow{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid rgba(0,0,0,.04);font-size:11px;}
+.trow:last-child{border-bottom:none;}
+.trow .av{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;flex-shrink:0;}
+.trow .name{font-weight:600;color:#292524;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.trow .role{color:#78716c;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.trow .days{color:#a8a29e;font-variant-numeric:tabular-nums;flex-shrink:0;width:24px;text-align:right;}
+
+/* ===== MODAL ===== */
+.modal-frame{background:rgba(255,255,255,.9);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.6);border-radius:14px;padding:16px;box-shadow:0 12px 36px rgba(0,0,0,.08);max-width:220px;}
+.modal-frame h3{font-size:14px;font-weight:700;color:#292524;margin-bottom:10px;}
+.modal-frame .field{margin-bottom:8px;}
+
+/* ===== UPLOAD ZONE ===== */
+.uz1{padding:20px;border:2px dashed rgba(0,0,0,.1);border-radius:12px;text-align:center;color:#a8a29e;font-size:11px;}
+.uz2{padding:16px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.3);text-align:center;color:#a8a29e;font-size:11px;}
+.uz3{padding:16px;background:rgba(0,0,0,.02);border-radius:10px;text-align:center;color:#a8a29e;font-size:11px;display:flex;align-items:center;justify-content:center;gap:6px;}
+.uz4{padding:20px;border:2px dashed rgba(0,0,0,.08);border-radius:16px;text-align:center;color:#78716c;font-size:12px;font-weight:600;}
+.uz5{padding:12px 16px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:transparent;display:flex;align-items:center;gap:8px;color:#78716c;font-size:11px;}
+
+/* ===== TAB BAR ===== */
+.tabs{display:flex;gap:0;}
+.tab{padding:8px 14px;font-size:12px;font-weight:600;color:#a8a29e;cursor:pointer;border-bottom:2px solid transparent;}
+.tab.on{color:#292524;border-bottom-color:#292524;}
+.tabs2 .tab{border-bottom:none;border-radius:6px;}
+.tabs2 .tab.on{background:rgba(0,0,0,.04);color:#292524;}
+.tabs3 .tab{border-bottom:none;padding:6px 12px;border-radius:99px;}
+.tabs3 .tab.on{background:#292524;color:#fff;}
+.tabs4 .tab{border-bottom:none;padding:8px 14px;}
+.tabs4 .tab.on{color:#292524;}
+.tabs4 .tab.on::after{content:'';display:block;height:2px;background:#292524;border-radius:1px;margin-top:4px;}
+.tabs5 .tab{border-bottom:none;padding:6px 10px;font-size:11px;}
+.tabs5 .tab.on{color:#292524;font-weight:700;}
+</style>
+</head>
+<body>
+
+<h1>Component Showcase — Composed Elements</h1>
+<div class="sub">Larger components built from the atoms you picked. 5 variants each.</div>
+
+<!-- INTERVIEW ROUND CARD -->
+<div class="section">
+  <h2>Interview Round <span class="ct">detail page, interviews tab</span></h2>
+  <div class="desc">How each interview round is displayed — expandable with Q&A inside</div>
+  <div class="variants">
+    <div class="var-card"><div class="label">1. Accordion card</div><div class="preview">
+      <div class="r1"><div class="head"><div class="num" style="background:rgba(34,197,94,.12);color:#15803d;">1</div><div class="info"><h4>Phone Screen</h4><p>Apr 8 · 30m · James Chen</p></div><span class="badge badge-f" style="background:rgba(34,197,94,.12);color:#15803d;">Done</span><div class="stars"><span style="color:#f59e0b;">****</span><span style="color:#d4d4d4;">*</span></div></div></div>
+      <div class="r1" style="border-color:rgba(245,158,11,.3);"><div class="head"><div class="num" style="background:rgba(245,158,11,.12);color:#92400e;">2</div><div class="info"><h4>Technical</h4><p>Apr 22 · 60m · TBD</p></div><span class="badge badge-f" style="background:rgba(245,158,11,.12);color:#92400e;">Scheduled</span></div></div>
+    </div><div class="note">Bordered card, click to expand Q&A below. Number badge + status badge + stars.</div></div>
+    <div class="var-card"><div class="label">2. Horizontal cards</div><div class="preview">
+      <div class="r2"><div class="card"><h4>Phone Screen</h4><p>Apr 8 · Done · 4/5</p></div><div class="card" style="border-color:rgba(245,158,11,.3);"><h4>Technical</h4><p>Apr 22 · Scheduled</p></div></div>
+    </div><div class="note">Side-by-side mini cards. Quick overview, click to expand. Good for 2-4 rounds.</div></div>
+    <div class="var-card"><div class="label">3. Timeline style</div><div class="preview">
+      <div class="r3-item"><div class="line"></div><div class="num" style="background:rgba(34,197,94,.12);color:#15803d;">1</div><div class="info"><h4>Phone Screen — Done</h4><p>Apr 8 · James Chen · 4/5</p></div></div>
+      <div class="r3-item"><div class="num" style="background:rgba(245,158,11,.12);color:#92400e;">2</div><div class="info"><h4>Technical — Scheduled</h4><p>Apr 22 · 60m</p></div></div>
+    </div><div class="note">Vertical timeline with numbered nodes. Shows progression. Natural for sequential rounds.</div></div>
+    <div class="var-card"><div class="label">4. Table rows</div><div class="preview">
+      <table class="r4"><thead><tr><th>#</th><th>Type</th><th>Date</th><th>Status</th><th>Rating</th></tr></thead><tbody>
+        <tr><td>1</td><td>Phone Screen</td><td>Apr 8</td><td style="color:#15803d;">Done</td><td>4/5</td></tr>
+        <tr><td>2</td><td>Technical</td><td>Apr 22</td><td style="color:#92400e;">Sched</td><td>—</td></tr>
+      </tbody></table>
+    </div><div class="note">Pure table. Dense, scannable. Click row to expand. Best for many rounds.</div></div>
+    <div class="var-card"><div class="label">5. Minimal list</div><div class="preview">
+      <div class="r5-item"><span class="n">1</span><span class="name">Phone Screen</span><span class="det">Apr 8 · Done · 4/5</span></div>
+      <div class="r5-item"><span class="n">2</span><span class="name">Technical</span><span class="det" style="color:#92400e;">Apr 22 · Scheduled</span></div>
+    </div><div class="note">Just number + name + details inline. Lightest weight. Expands on click.</div></div>
+  </div>
+</div>
+
+<!-- Q&A PAIR -->
+<div class="section">
+  <h2>Q&A Pair <span class="ct">inside interview rounds</span></h2>
+  <div class="desc">Individual question + answer within an interview round</div>
+  <div class="variants">
+    <div class="var-card"><div class="label">1. Bordered card</div><div class="preview">
+      <div class="qa1"><div class="fi-label">Question</div><div style="font-size:12px;font-weight:600;color:#292524;margin-bottom:6px;">Tell me about a complex project</div><div class="fi-label">Answer</div><div style="font-size:11px;color:#57534e;line-height:1.5;">Led cloud migration — 4 teams, 6 months...</div></div>
+    </div><div class="note">Current. Bordered card with labels. Clear separation between pairs.</div></div>
+    <div class="var-card"><div class="label">2. Left border indent</div><div class="preview">
+      <div class="qa2"><div style="font-size:12px;font-weight:600;color:#292524;margin-bottom:4px;">Tell me about a complex project</div><div style="font-size:11px;color:#57534e;line-height:1.5;">Led cloud migration — 4 teams, 6 months...</div></div>
+    </div><div class="note">Left border indent. Question bold, answer below. No extra chrome.</div></div>
+    <div class="var-card"><div class="label">3. Card with Q header</div><div class="preview">
+      <div class="qa3"><div class="q">Q: Tell me about a complex project</div><textarea class="txta" style="min-height:40px;font-size:11px;">Led cloud migration — 4 teams, 6 months...</textarea><div class="md-h"><code>**bold**</code> <code>- lists</code></div></div>
+    </div><div class="note">Question as bold header, answer as editable textarea. Markdown hint.</div></div>
+    <div class="var-card"><div class="label">4. Side-by-side labels</div><div class="preview">
+      <div class="qa4"><div class="q-row"><span class="q-label" style="color:#f59e0b;font-weight:700;">Q</span><textarea class="txta" style="min-height:30px;font-size:11px;">Tell me about a complex project</textarea></div><div class="q-row"><span class="q-label" style="color:#3b82f6;font-weight:700;">A</span><textarea class="txta" style="min-height:30px;font-size:11px;">Led cloud migration...</textarea></div></div>
+    </div><div class="note">Q and A labels on the left, textareas right. Color-coded Q/A.</div></div>
+    <div class="var-card"><div class="label">5. Two columns</div><div class="preview">
+      <div class="qa5"><div><div class="fi-label">Question</div><textarea class="txta" style="min-height:40px;font-size:10px;">Tell me about a complex project</textarea></div><div><div class="fi-label">Answer</div><textarea class="txta" style="min-height:40px;font-size:10px;">Led cloud migration...</textarea></div></div>
+    </div><div class="note">Question left, answer right. Desktop only — stacks on mobile. Side-by-side comparison.</div></div>
+  </div>
+</div>
+
+<!-- TIMELINE -->
+<div class="section">
+  <h2>Timeline Event <span class="ct">detail page, timeline tab</span></h2>
+  <div class="desc">Activity history (status changes, interviews scheduled, docs uploaded)</div>
+  <div class="variants">
+    <div class="var-card"><div class="label">1. Vertical dots + line</div><div class="preview">
+      <div class="tl-a"><div class="item"><div class="line"></div><div class="dot" style="background:#f59e0b;"></div><h4>Bar Raiser scheduled</h4><p>Apr 16</p></div><div class="item"><div class="line"></div><div class="dot" style="background:#f59e0b;"></div><h4>Moved to Interviewing</h4><p>Apr 12</p></div><div class="item"><div class="dot" style="background:#3b82f6;"></div><h4>Created</h4><p>Apr 5</p></div></div>
+    </div><div class="note">Current. Vertical line + colored dots. Classic timeline.</div></div>
+    <div class="var-card"><div class="label">2. Flat list</div><div class="preview">
+      <div class="tl-b"><div class="item"><div class="dot" style="background:#f59e0b;"></div><div class="info"><h4>Bar Raiser scheduled</h4></div><span class="time">Apr 16</span></div><div class="item"><div class="dot" style="background:#f59e0b;"></div><div class="info"><h4>Moved to Interviewing</h4></div><span class="time">Apr 12</span></div><div class="item"><div class="dot" style="background:#3b82f6;"></div><div class="info"><h4>Created</h4></div><span class="time">Apr 5</span></div></div>
+    </div><div class="note">No connecting line. Just dot + text + right-aligned date. Cleaner.</div></div>
+    <div class="var-card"><div class="label">3. Date column + bar</div><div class="preview">
+      <div class="tl-c"><div class="item"><div class="date-col">Apr 16</div><div class="bar" style="background:#f59e0b;"></div><div class="info"><h4>Bar Raiser scheduled</h4></div></div><div class="item"><div class="date-col">Apr 12</div><div class="bar" style="background:#f59e0b;"></div><div class="info"><h4>Moved to Interviewing</h4></div></div><div class="item"><div class="date-col">Apr 5</div><div class="bar" style="background:#3b82f6;"></div><div class="info"><h4>Created</h4></div></div></div>
+    </div><div class="note">Date in its own left column, colored bar separator. Structured, scannable dates.</div></div>
+    <div class="var-card"><div class="label">4. Glass cards</div><div class="preview">
+      <div class="tl-d"><div class="item"><div class="dot" style="background:#f59e0b;"></div><h4>Bar Raiser scheduled</h4><span class="time">Apr 16</span></div><div class="item"><div class="dot" style="background:#f59e0b;"></div><h4>Moved to Interviewing</h4><span class="time">Apr 12</span></div><div class="item"><div class="dot" style="background:#3b82f6;"></div><h4>Created</h4><span class="time">Apr 5</span></div></div>
+    </div><div class="note">Each event in its own glass card. Heavier but each event feels distinct.</div></div>
+    <div class="var-card"><div class="label">5. Inline sentence</div><div class="preview">
+      <div class="tl-e"><div class="item"><span>Bar Raiser</span> scheduled<span class="time">Apr 16</span></div><div class="item"><span>Status</span> changed to Interviewing<span class="time">Apr 12</span></div><div class="item"><span>Application</span> created via LinkedIn<span class="time">Apr 5</span></div></div>
+    </div><div class="note">Plain text sentences. No visual elements. Lightest possible. Reads like a log.</div></div>
+  </div>
+</div>
+
+<!-- DOCUMENT ITEM -->
+<div class="section">
+  <h2>Document Item <span class="ct">detail page, docs tab</span></h2>
+  <div class="desc">Uploaded files (resume, cover letter, portfolio)</div>
+  <div class="variants">
+    <div class="var-card"><div class="label">1. Icon + info row</div><div class="preview">
+      <div class="doc1"><div class="icon" style="background:rgba(59,130,246,.1);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="info"><h4>Resume_Akhil_2026.pdf</h4><p>Resume · 142 KB</p></div></div>
+      <div class="doc1"><div class="icon" style="background:rgba(139,92,246,.1);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="info"><h4>Cover_Letter_Google.pdf</h4><p>Cover Letter · 89 KB</p></div></div>
+    </div><div class="note">Current. Colored icon square + file name + metadata. Clear file type identity.</div></div>
+    <div class="var-card"><div class="label">2. Color bar</div><div class="preview">
+      <div class="doc2"><div class="bar" style="background:#3b82f6;"></div><div class="info"><h4>Resume_Akhil_2026.pdf</h4><p>Resume · 142 KB</p></div></div>
+      <div class="doc2"><div class="bar" style="background:#8b5cf6;"></div><div class="info"><h4>Cover_Letter_Google.pdf</h4><p>Cover Letter · 89 KB</p></div></div>
+    </div><div class="note">Thin left bar like kanban cards. Consistent visual language. Compact.</div></div>
+    <div class="var-card"><div class="label">3. Glass cards</div><div class="preview">
+      <div class="doc3"><div class="icon" style="background:rgba(59,130,246,.1);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="info"><h4>Resume_Akhil_2026.pdf</h4><p>Resume · 142 KB · Apr 5</p></div></div>
+      <div class="doc3"><div class="icon" style="background:rgba(139,92,246,.1);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="info"><h4>Cover_Letter_Google.pdf</h4><p>Cover Letter · 89 KB · Apr 5</p></div></div>
+    </div><div class="note">Each file in its own glass card. More prominent. Matches overall glass aesthetic.</div></div>
+    <div class="var-card"><div class="label">4. Type label + name</div><div class="preview">
+      <div class="doc4"><span class="type">Resume</span><h4>Resume_Akhil_2026.pdf</h4><span class="size">142 KB</span></div>
+      <div class="doc4"><span class="type">Cover</span><h4>Cover_Letter_Google.pdf</h4><span class="size">89 KB</span></div>
+    </div><div class="note">Type as a left label, filename + size inline. Table-like rhythm. Compact.</div></div>
+    <div class="var-card"><div class="label">5. Dashed outline</div><div class="preview">
+      <div class="doc5"><div class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#78716c" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="info"><h4>Resume_Akhil_2026.pdf</h4><p>142 KB</p></div></div>
+      <div class="doc5"><div class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#78716c" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="info"><h4>Cover_Letter_Google.pdf</h4><p>89 KB</p></div></div>
+    </div><div class="note">Dashed border. Feels like "attached" files. Quiet, doesn't draw attention.</div></div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="section">
+  <h2>Tab Bar <span class="ct">detail page navigation</span></h2>
+  <div class="desc">Overview, Interviews, JD Snapshot, Documents, Timeline</div>
+  <div class="variants">
+    <div class="var-card"><div class="label">1. Underline</div><div class="preview">
+      <div class="tabs"><div class="tab on">Overview</div><div class="tab">Interviews</div><div class="tab">JD</div><div class="tab">Docs</div></div>
+    </div><div class="note">Current. Active = underline + dark text. Classic, clear.</div></div>
+    <div class="var-card"><div class="label">2. Background chip</div><div class="preview">
+      <div class="tabs tabs2"><div class="tab on">Overview</div><div class="tab">Interviews</div><div class="tab">JD</div><div class="tab">Docs</div></div>
+    </div><div class="note">Active gets a subtle background. No underline. Softer.</div></div>
+    <div class="var-card"><div class="label">3. Pill toggle</div><div class="preview">
+      <div class="tabs tabs3"><div class="tab on">Overview</div><div class="tab">Interviews</div><div class="tab">JD</div><div class="tab">Docs</div></div>
+    </div><div class="note">Active = dark pill. Strong contrast. Very clear which tab you're on.</div></div>
+    <div class="var-card"><div class="label">4. Animated underline</div><div class="preview">
+      <div class="tabs tabs4"><div class="tab on">Overview</div><div class="tab">Interviews</div><div class="tab">JD</div><div class="tab">Docs</div></div>
+    </div><div class="note">Underline below the text, not the full tab. Tighter, more precise.</div></div>
+    <div class="var-card"><div class="label">5. Weight only</div><div class="preview">
+      <div class="tabs tabs5"><div class="tab on">Overview</div><div class="tab">Interviews</div><div class="tab">JD</div><div class="tab">Docs</div></div>
+    </div><div class="note">Active = bold. No underline, no background. Absolute minimum indicator.</div></div>
+  </div>
+</div>
+
+<!-- UPLOAD ZONE -->
+<div class="section">
+  <h2>Upload Zone <span class="ct">documents tab, drop target</span></h2>
+  <div class="desc">Area to drag files or click to upload</div>
+  <div class="variants">
+    <div class="var-card"><div class="label">1. Dashed border</div><div class="preview"><div class="uz1"><div style="font-size:18px;opacity:.3;margin-bottom:4px;">+</div>Drop files or click to upload</div></div><div class="note">Current. Classic dashed border. Universal "upload here" pattern.</div></div>
+    <div class="var-card"><div class="label">2. Solid subtle</div><div class="preview"><div class="uz2"><div style="font-size:18px;opacity:.3;margin-bottom:4px;">+</div>Drop files here</div></div><div class="note">Solid border, subtle glass bg. Slightly more finished look.</div></div>
+    <div class="var-card"><div class="label">3. Inline button</div><div class="preview"><div class="uz3"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload file</div></div><div class="note">Just an icon + text. Not a zone — more like a button. Compact.</div></div>
+    <div class="var-card"><div class="label">4. Large dashed</div><div class="preview"><div class="uz4">Drop files here<div style="font-size:10px;font-weight:400;color:#a8a29e;margin-top:2px;">PDF, DOC up to 10MB</div></div></div><div class="note">Bigger, bolder dashed zone. Prominent. Hard to miss.</div></div>
+    <div class="var-card"><div class="label">5. Row with icon</div><div class="preview"><div class="uz5"><div class="icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div class="info"><h4>Add document</h4><p>PDF, DOC up to 10MB</p></div></div></div><div class="note">Row-style with icon. Looks like another document item. Consistent.</div></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="section">
+  <h2>Modal / Dialog <span class="ct">quick-add, confirmations</span></h2>
+  <div class="desc">Overlay for adding applications, confirming actions</div>
+  <div class="variants">
+    <div class="var-card"><div class="label">1. Glass card</div><div class="preview" style="background:rgba(0,0,0,.15);display:flex;justify-content:center;">
+      <div class="modal-frame"><h3>Add Application</h3><div class="field"><div class="fi-label">Company</div><input class="inp" placeholder="Google" /></div><div class="field"><div class="fi-label">Role</div><input class="inp" placeholder="SDE III" /></div><div style="display:flex;gap:4px;justify-content:flex-end;margin-top:8px;"><button class="btn btn-g" style="font-size:11px;">Discard</button><button class="btn btn-f" style="font-size:11px;">Add</button></div></div>
+    </div><div class="note">Current. Glass bg, rounded, frosted. Matches overall aesthetic.</div></div>
+    <div class="var-card"><div class="label">2. White solid</div><div class="preview" style="background:rgba(0,0,0,.15);display:flex;justify-content:center;">
+      <div class="modal-frame" style="background:#fff;border-color:rgba(0,0,0,.08);backdrop-filter:none;"><h3>Add Application</h3><div class="field"><div class="fi-label">Company</div><input class="inp" style="background:#fafaf9;" placeholder="Google" /></div><div class="field"><div class="fi-label">Role</div><input class="inp" style="background:#fafaf9;" placeholder="SDE III" /></div><div style="display:flex;gap:4px;justify-content:flex-end;margin-top:8px;"><button class="btn btn-g" style="font-size:11px;">Discard</button><button class="btn btn-f" style="font-size:11px;">Add</button></div></div>
+    </div><div class="note">Solid white. No glass effect. Cleaner on slow devices. Sharper.</div></div>
+    <div class="var-card"><div class="label">3. Minimal (no shadow)</div><div class="preview" style="background:rgba(0,0,0,.15);display:flex;justify-content:center;">
+      <div class="modal-frame" style="box-shadow:none;border:1px solid rgba(0,0,0,.12);"><h3>Add Application</h3><div class="field"><div class="fi-label">Company</div><input class="inp" placeholder="Google" /></div><div class="field"><div class="fi-label">Role</div><input class="inp" placeholder="SDE III" /></div><div style="display:flex;gap:4px;justify-content:flex-end;margin-top:8px;"><button class="btn btn-g" style="font-size:11px;">Discard</button><button class="btn btn-f" style="font-size:11px;">Add</button></div></div>
+    </div><div class="note">No shadow, just border. Flat. Quieter presence.</div></div>
+    <div class="var-card"><div class="label">4. Top-anchored</div><div class="preview" style="background:rgba(0,0,0,.15);padding-top:8px;display:flex;justify-content:center;align-items:flex-start;">
+      <div class="modal-frame"><h3>Add Application</h3><div class="field"><div class="fi-label">Company</div><input class="inp" placeholder="Google" /></div><div class="field"><div class="fi-label">Role</div><input class="inp" placeholder="SDE III" /></div><div style="display:flex;gap:4px;justify-content:flex-end;margin-top:8px;"><button class="btn btn-g" style="font-size:11px;">Discard</button><button class="btn btn-f" style="font-size:11px;">Add</button></div></div>
+    </div><div class="note">Anchored near the top of the viewport instead of centered. Less scroll on long forms.</div></div>
+    <div class="var-card"><div class="label">5. Slide-up (mobile)</div><div class="preview" style="background:rgba(0,0,0,.15);display:flex;align-items:flex-end;min-height:160px;">
+      <div class="modal-frame" style="max-width:100%;border-radius:14px 14px 0 0;width:100%;"><div style="width:32px;height:4px;background:rgba(0,0,0,.12);border-radius:2px;margin:0 auto 10px;"></div><h3>Add Application</h3><div class="field"><div class="fi-label">Company</div><input class="inp" placeholder="Google" /></div><div style="display:flex;gap:4px;justify-content:flex-end;margin-top:8px;"><button class="btn btn-f" style="font-size:11px;width:100%;">Add</button></div></div>
+    </div><div class="note">Slides up from bottom on mobile. Grab handle at top. Native app feel.</div></div>
+  </div>
+</div>
+
+</body>
+</html>

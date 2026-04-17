@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JobDash — Component Showcase: Atoms</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--font:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Helvetica Neue',system-ui,sans-serif;--mono:'SF Mono','Menlo','Monaco',monospace;}
+body{font-family:var(--font);background:#0a0a0a;color:#fff;-webkit-font-smoothing:antialiased;font-size:14px;padding:24px 24px 80px;}
+
+h1{font-size:20px;font-weight:700;margin-bottom:4px;}
+.sub{font-size:12px;color:#555;margin-bottom:32px;}
+.section{margin-bottom:48px;}
+.section h2{font-size:15px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.section h2 .count{font-size:11px;color:#444;font-weight:600;}
+.section .desc{font-size:11px;color:#555;margin-bottom:16px;}
+
+/* Component row: 5 variants side by side */
+.variants{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+.var-card{background:#111;border:1px solid #222;border-radius:10px;padding:16px;display:flex;flex-direction:column;}
+.var-card .label{font-size:10px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.var-card .preview{background:linear-gradient(145deg,#f5f3f0,#ece8e3);border-radius:8px;padding:16px;min-height:80px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;justify-content:center;}
+.var-card .note{font-size:10px;color:#444;margin-top:8px;line-height:1.4;}
+
+/* Responsive */
+@media(max-width:900px){.variants{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:600px){.variants{grid-template-columns:repeat(2,1fr);}}
+
+/* ===== COMPONENT STYLES ===== */
+
+/* Status badges */
+.sb1{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;}
+.sb2{font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px;}
+.sb3{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;border:1.5px solid;}
+.sb4{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#57534e;}
+.sb4 .dot{width:8px;height:8px;border-radius:50%;}
+.sb5{font-size:10px;font-weight:600;padding:2px 0;border-bottom:2px solid;color:#57534e;}
+
+/* Tags */
+.tg1{font-size:10px;padding:2px 8px;border-radius:99px;background:rgba(0,0,0,.05);color:#57534e;font-weight:500;}
+.tg2{font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(0,0,0,.05);color:#57534e;font-weight:500;}
+.tg3{font-size:10px;padding:2px 8px;border-radius:99px;border:1px solid rgba(0,0,0,.12);color:#57534e;font-weight:500;background:transparent;}
+.tg4{font-size:9px;padding:1px 6px;border-radius:3px;font-weight:600;color:#fff;}
+.tg5{font-size:10px;font-weight:500;color:#78716c;display:flex;align-items:center;gap:3px;}
+.tg5::before{content:'';width:6px;height:6px;border-radius:50%;display:inline-block;}
+
+/* Buttons */
+.bt{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-family:var(--font);font-weight:600;cursor:pointer;border:none;transition:all .15s;}
+.bt1{height:34px;padding:0 16px;background:#292524;color:#fff;border-radius:10px;font-size:13px;}
+.bt2{height:34px;padding:0 16px;background:transparent;color:#292524;border:1px solid rgba(0,0,0,.12);border-radius:10px;font-size:13px;}
+.bt3{height:34px;padding:0 16px;background:rgba(0,0,0,.04);color:#292524;border-radius:10px;font-size:13px;border:none;}
+.bt4{height:30px;padding:0 12px;background:#292524;color:#fff;border-radius:7px;font-size:12px;}
+.bt5{height:28px;padding:0 10px;background:transparent;color:#78716c;font-size:12px;border:none;text-decoration:underline;text-underline-offset:2px;}
+
+/* Inputs */
+.inp{width:100%;font-family:var(--font);outline:none;color:#292524;}
+.inp1{height:36px;padding:0 12px;border:1px solid rgba(0,0,0,.1);border-radius:10px;background:rgba(255,255,255,.5);font-size:13px;}
+.inp2{height:36px;padding:0 12px;border:none;border-bottom:1.5px solid rgba(0,0,0,.15);background:transparent;font-size:13px;border-radius:0;}
+.inp3{height:40px;padding:0 14px;border:1px solid rgba(0,0,0,.1);border-radius:12px;background:rgba(255,255,255,.7);font-size:14px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.inp4{height:34px;padding:0 10px;border:1px solid rgba(0,0,0,.08);border-radius:6px;background:#fff;font-size:13px;}
+.inp5{height:36px;padding:0 12px;border:1px dashed rgba(0,0,0,.15);border-radius:10px;background:transparent;font-size:13px;color:#78716c;}
+
+/* Priority */
+.pr-dot{display:flex;align-items:center;gap:5px;font-size:11px;color:#57534e;}
+.pr-bar{display:flex;align-items:center;gap:3px;}
+.pr-bar span{width:4px;height:12px;border-radius:2px;}
+.pr-arrow{font-size:12px;font-weight:700;}
+.pr-text{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;}
+.pr-line{display:flex;align-items:center;gap:2px;}
+.pr-line span{width:8px;height:3px;border-radius:1px;}
+
+/* Column headers */
+.ch{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#57534e;padding:4px 0;}
+.ch .dot{width:8px;height:8px;border-radius:50%;}
+.ch .cnt{margin-left:auto;font-size:10px;color:#a8a29e;}
+
+.ch2{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#57534e;padding:6px 8px;background:rgba(0,0,0,.03);border-radius:8px;}
+.ch2 .dot{width:8px;height:8px;border-radius:50%;}
+.ch2 .cnt{margin-left:auto;font-size:10px;color:#a8a29e;background:rgba(0,0,0,.04);padding:0 5px;border-radius:4px;}
+
+.ch3{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#57534e;padding:4px 0;border-bottom:2px solid;}
+
+.ch4{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#a8a29e;text-transform:uppercase;letter-spacing:.5px;padding:4px 0;}
+.ch4 .dot{width:6px;height:6px;border-radius:50%;}
+
+.ch5{font-size:13px;font-weight:700;color:#292524;padding:4px 0;display:flex;align-items:center;gap:6px;}
+.ch5 .cnt{font-size:11px;font-weight:500;color:#a8a29e;}
+
+/* Search */
+.sr{display:flex;align-items:center;gap:6px;color:#a8a29e;font-size:12px;}
+.sr svg{width:14px;height:14px;flex-shrink:0;}
+.sr .key{font-size:9px;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:3px;font-family:var(--mono);margin-left:auto;}
+.sr1{height:34px;padding:0 12px;border:1px solid rgba(0,0,0,.08);border-radius:10px;background:rgba(255,255,255,.5);backdrop-filter:blur(8px);width:180px;}
+.sr2{height:34px;padding:0 12px;border:none;border-bottom:1.5px solid rgba(0,0,0,.12);background:transparent;border-radius:0;width:180px;}
+.sr3{height:38px;padding:0 14px;border:1px solid rgba(0,0,0,.08);border-radius:12px;background:rgba(255,255,255,.7);box-shadow:0 1px 3px rgba(0,0,0,.04);width:200px;}
+.sr4{height:34px;padding:0 12px;border:1px solid rgba(0,0,0,.08);border-radius:99px;background:rgba(255,255,255,.5);width:180px;}
+.sr5{height:34px;padding:0 12px;background:rgba(0,0,0,.03);border:none;border-radius:8px;width:180px;}
+
+/* Filter chips */
+.fc{display:inline-flex;align-items:center;font-weight:600;cursor:pointer;}
+.fc1{height:28px;padding:0 10px;border:1px solid rgba(0,0,0,.08);border-radius:99px;background:rgba(255,255,255,.5);color:#78716c;font-size:11px;}
+.fc1.on{background:#292524;color:#fff;border-color:#292524;}
+.fc2{height:26px;padding:0 8px;border:none;border-radius:6px;background:rgba(0,0,0,.04);color:#78716c;font-size:11px;}
+.fc2.on{background:#292524;color:#fff;}
+.fc3{height:28px;padding:0 10px;border:1.5px solid rgba(0,0,0,.1);border-radius:8px;background:transparent;color:#78716c;font-size:11px;}
+.fc3.on{border-color:#292524;color:#292524;background:rgba(0,0,0,.03);}
+.fc4{height:24px;padding:0 8px;border:none;background:transparent;color:#a8a29e;font-size:11px;border-bottom:2px solid transparent;}
+.fc4.on{color:#292524;border-bottom-color:#292524;}
+.fc5{height:28px;padding:0 10px;border:none;border-radius:99px;background:transparent;color:#78716c;font-size:11px;}
+.fc5.on{background:rgba(0,0,0,.06);color:#292524;}
+</style>
+</head>
+<body>
+
+<h1>Component Showcase — Atoms</h1>
+<div class="sub">Every small UI element. 5 variants each. Pick treatments, then I'll combine them into pages.</div>
+
+<!-- STATUS BADGE -->
+<div class="section">
+  <h2>Status Badge <span class="count">shown on cards, table, detail</span></h2>
+  <div class="desc">How application statuses are labeled across the app</div>
+  <div class="variants">
+    <div class="var-card"><div class="label">1. Pill (filled bg)</div><div class="preview">
+      <span class="sb1" style="background:rgba(59,130,246,.12);color:#2563eb;">Applied</span>
+      <span class="sb1" style="background:rgba(245,158,11,.12);color:#92400e;">Interviewing</span>
+      <span class="sb1" style="background:rgba(34,197,94,.12);color:#15803d;">Offer</span>
+      <span class="sb1" style="background:rgba(239,68,68,.12);color:#ef4444;">Rejected</span>
+    </div><div class="note">Current design. Soft colored background, rounded pill. Most common pattern.</div></div>
+    <div class="var-card"><div class="label">2. Square chip</div><div class="preview">
+      <span class="sb2" style="background:rgba(59,130,246,.12);color:#2563eb;">Applied</span>
+      <span class="sb2" style="background:rgba(245,158,11,.12);color:#92400e;">Interviewing</span>
+      <span class="sb2" style="background:rgba(34,197,94,.12);color:#15803d;">Offer</span>
+      <span class="sb2" style="background:rgba(239,68,68,.12);color:#ef4444;">Rejected</span>
+    </div><div class="note">Same colors, square corners. Slightly more technical feel. Linear uses this.</div></div>
+    <div class="var-card"><div class="label">3. Outlined pill</div><div class="preview">
+      <span class="sb3" style="border-color:rgba(59,130,246,.3);color:#3b82f6;">Applied</span>
+      <span class="sb3" style="border-color:rgba(245,158,11,.3);color:#f59e0b;">Interviewing</span>
+      <span class="sb3" style="border-color:rgba(34,197,94,.3);color:#22c55e;">Offer</span>
+      <span class="sb3" style="border-color:rgba(239,68,68,.3);color:#ef4444;">Rejected</span>
+    </div><div class="note">Outlined, no fill. Lighter visual weight. Good when badges appear near other colored elements.</div></div>
+    <div class="var-card"><div class="label">4. Dot + text</div><div class="preview">
+      <span class="sb4"><span class="dot" style="background:#3b82f6;"></span>Applied</span>
+      <span class="sb4"><span class="dot" style="background:#f59e0b;"></span>Interviewing</span>
+      <span class="sb4"><span class="dot" style="background:#22c55e;"></span>Offer</span>
+      <span class="sb4"><span class="dot" style="background:#ef4444;"></span>Rejected</span>
+    </div><div class="note">Minimal. Just a colored dot + plain text. Least visual noise. Works well in dense layouts.</div></div>
+    <div class="var-card"><div class="label">5. Underline</div><div class="preview">
+      <span class="sb5" style="border-color:#3b82f6;">Applied</span>
+      <span class="sb5" style="border-color:#f59e0b;">Interviewing</span>
+      <span class="sb5" style="border-color:#22c55e;">Offer</span>
+      <span class="sb5" style="border-color:#ef4444;">Rejected</span>
+    </div><div class="note">Colored underline, no background. Very subtle. Works well in table cells where space is tight.</div></div>
+  </div>
+</div>
+
+<!-- TAGS -->
+<div class="section">
+  <h2>Tags <span class="count">user-defined, on cards + detail</span></h2>
+  <div class="desc">Custom labels users create (remote, FAANG, referral, startup)</div>
+  <div class="variants">
+    <div class="var-card"><div class="label">1. Soft pill</div><div class="preview" style="flex-direction:row;flex-wrap:wrap;">
+      <span class="tg1">remote</span><span class="tg1">FAANG</span><span class="tg1">referral</span>
+    </div><div class="note">Rounded, subtle gray fill. Doesn't compete with status badges.</div></div>
+    <div class="var-card"><div class="label">2. Square chip</div><div class="preview" style="flex-direction:row;flex-wrap:wrap;">
+      <span class="tg2">remote</span><span class="tg2">FAANG</span><span class="tg2">referral</span>
+    </div><div class="note">Square corners. Matches square status badges if you use those.</div></div>
+    <div class="var-card"><div class="label">3. Outlined</div><div class="preview" style="flex-direction:row;flex-wrap:wrap;">
+      <span class="tg3">remote</span><span class="tg3">FAANG</span><span class="tg3">referral</span>
+    </div><div class="note">Outlined, no fill. Lightest weight. Good when tags appear alongside other elements.</div></div>
+    <div class="var-card"><div class="label">4. Colored mini</div><div class="preview" style="flex-direction:row;flex-wrap:wrap;">
+      <span class="tg4" style="background:#3b82f6;">remote</span><span class="tg4" style="background:#22c55e;">FAANG</span><span class="tg4" style="background:#8b5cf6;">referral</span>
+    </div><div class="note">User picks tag color. Bold, stands out. Good for quick visual scanning by tag.</div></div>
+    <div class="var-card"><div class="label">5. Dot prefix</div><div class="preview" style="flex-direction:row;flex-wrap:wrap;gap:12px;">
+      <span class="tg5" style="color:#57534e;"><style>.tg5-a::before{background:#3b82f6;}.tg5-b::before{background:#22c55e;}.tg5-c::before{background:#8b5cf6;}</style><span class="tg5 tg5-a">remote</span><span class="tg5 tg5-b">FAANG</span><span class="tg5 tg5-c">referral</span>
+    </div><div class="note">Colored dot + plain text. Like status dot variant but for tags. Minimal.</div></div>
+  </div>
+</div>
+
+<!-- BUTTONS -->
+<div class="section">
+  <h2>Buttons <span class="count">CTAs, actions, header</span></h2>
+  <div class="desc">Primary (+ Add), secondary (Edit, Archive), and small actions</div>
+  <div class="variants">
+    <div class="var-card"><div class="label">1. Solid rounded</div><div class="preview" style="flex-direction:row;gap:6px;flex-wrap:wrap;">
+      <button class="bt bt1">+ Add</button><button class="bt bt2">Edit</button>
+    </div><div class="note">Current. Dark solid primary, outlined secondary. Rounded 10px. Clean.</div></div>
+    <div class="var-card"><div class="label">2. Pill shape</div><div class="preview" style="flex-direction:row;gap:6px;flex-wrap:wrap;">
+      <button class="bt bt1" style="border-radius:99px;">+ Add</button><button class="bt bt2" style="border-radius:99px;">Edit</button>
+    </div><div class="note">Full pill radius. Softer, more playful. Matches pill badges.</div></div>
+    <div class="var-card"><div class="label">3. Square</div><div class="preview" style="flex-direction:row;gap:6px;flex-wrap:wrap;">
+      <button class="bt bt1" style="border-radius:6px;">+ Add</button><button class="bt bt2" style="border-radius:6px;">Edit</button>
+    </div><div class="note">Tighter radius. More technical, structured feel.</div></div>
+    <div class="var-card"><div class="label">4. Ghost + solid</div><div class="preview" style="flex-direction:row;gap:6px;flex-wrap:wrap;">
+      <button class="bt bt4">+ Add</button><button class="bt bt3">Edit</button>
+    </div><div class="note">Smaller primary, ghost secondary (subtle bg, no border). Less visual weight overall.</div></div>
+    <div class="var-card"><div class="label">5. Text link</div><div class="preview" style="flex-direction:row;gap:6px;flex-wrap:wrap;">
+      <button class="bt bt4">+ Add</button><button class="bt bt5">Edit</button>
+    </div><div class="note">Solid primary, underlined text for secondary. Minimal secondary actions.</div></div>
+  </div>
+</div>
+
+<!-- INPUTS -->
+<div class="section">
+  <h2>Form Inputs <span class="count">detail editing, add modal, settings</span></h2>
+  <div class="desc">Text fields, selects, textareas for editing application data</div>
+  <div class="variants">
+    <div class="var-card"><div class="label">1. Glass bordered</div><div class="preview"><input class="inp inp1" value="Senior Software Engineer" /></div><div class="note">Current. Subtle border, frosted glass bg. Matches the overall aesthetic.</div></div>
+    <div class="var-card"><div class="label">2. Bottom line</div><div class="preview"><input class="inp inp2" value="Senior Software Engineer" /></div><div class="note">Just a bottom border. Cleaner, more minimal. Material design influence.</div></div>
+    <div class="var-card"><div class="label">3. Raised</div><div class="preview"><input class="inp inp3" value="Senior Software Engineer" /></div><div class="note">Slightly raised with shadow. Feels more substantial. Bigger touch target.</div></div>
+    <div class="var-card"><div class="label">4. Flat white</div><div class="preview"><input class="inp inp4" value="Senior Software Engineer" /></div><div class="note">Solid white, subtle border, tight radius. Clean and simple.</div></div>
+    <div class="var-card"><div class="label">5. Dashed (edit mode)</div><div class="preview"><input class="inp inp5" value="Senior Software Engineer" /></div><div class="note">Dashed border, transparent bg. Feels like "tap to edit" — less like a form field.</div></div>
+  </div>
+</div>
+
+<!-- PRIORITY -->
+<div class="section">
+  <h2>Priority Indicator <span class="count">on cards, table, detail</span></h2>
+  <div class="desc">High / Medium / Low priority signal</div>
+  <div class="variants">
+    <div class="var-card"><div class="label">1. Colored dot</div><div class="preview" style="gap:12px;">
+      <span class="pr-dot"><span style="width:7px;height:7px;border-radius:50%;background:#ef4444;flex-shrink:0;"></span>High</span>
+      <span class="pr-dot"><span style="width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0;"></span>Medium</span>
+      <span class="pr-dot"><span style="width:7px;height:7px;border-radius:50%;background:#a8a29e;flex-shrink:0;"></span>Low</span>
+    </div><div class="note">Current. Simple dot. Red/amber/gray. Most compact.</div></div>
+    <div class="var-card"><div class="label">2. Bar levels</div><div class="preview" style="gap:12px;">
+      <span class="pr-dot"><span class="pr-bar"><span style="background:#ef4444;"></span><span style="background:#ef4444;"></span><span style="background:#ef4444;"></span></span> High</span>
+      <span class="pr-dot"><span class="pr-bar"><span style="background:#f59e0b;"></span><span style="background:#f59e0b;"></span><span style="background:rgba(0,0,0,.08);"></span></span> Med</span>
+      <span class="pr-dot"><span class="pr-bar"><span style="background:#a8a29e;"></span><span style="background:rgba(0,0,0,.08);"></span><span style="background:rgba(0,0,0,.08);"></span></span> Low</span>
+    </div><div class="note">Signal bars like WiFi strength. Visual hierarchy without color alone.</div></div>
+    <div class="var-card"><div class="label">3. Arrow</div><div class="preview" style="gap:12px;">
+      <span class="pr-arrow" style="color:#ef4444;">&#9650; High</span>
+      <span class="pr-arrow" style="color:#f59e0b;">&#9654; Med</span>
+      <span class="pr-arrow" style="color:#a8a29e;">&#9660; Low</span>
+    </div><div class="note">Up/right/down arrows. Direction + color. Clear at small sizes.</div></div>
+    <div class="var-card"><div class="label">4. Text chip</div><div class="preview" style="flex-direction:row;gap:6px;flex-wrap:wrap;">
+      <span class="pr-text" style="background:rgba(239,68,68,.1);color:#ef4444;">High</span>
+      <span class="pr-text" style="background:rgba(245,158,11,.1);color:#92400e;">Med</span>
+      <span class="pr-text" style="background:rgba(0,0,0,.04);color:#a8a29e;">Low</span>
+    </div><div class="note">Like a mini badge. More explicit than a dot. Takes more space.</div></div>
+    <div class="var-card"><div class="label">5. Dash lines</div><div class="preview" style="gap:12px;">
+      <span class="pr-dot"><span class="pr-line"><span style="background:#ef4444;"></span><span style="background:#ef4444;"></span><span style="background:#ef4444;"></span></span> High</span>
+      <span class="pr-dot"><span class="pr-line"><span style="background:#f59e0b;"></span><span style="background:#f59e0b;"></span><span style="background:rgba(0,0,0,.08);"></span></span> Med</span>
+      <span class="pr-dot"><span class="pr-line"><span style="background:#a8a29e;"></span><span style="background:rgba(0,0,0,.08);"></span><span style="background:rgba(0,0,0,.08);"></span></span> Low</span>
+    </div><div class="note">Horizontal dashes. Flatter than bars. Works well inline with text.</div></div>
+  </div>
+</div>
+
+<!-- COLUMN HEADERS -->
+<div class="section">
+  <h2>Column Header <span class="count">kanban columns</span></h2>
+  <div class="desc">Status name + count at the top of each kanban column</div>
+  <div class="variants">
+    <div class="var-card"><div class="label">1. Dot + text</div><div class="preview">
+      <div class="ch"><span class="dot" style="background:#f59e0b;"></span>Interviewing<span class="cnt">3</span></div>
+    </div><div class="note">Current. Colored dot, text, right-aligned count. Clean.</div></div>
+    <div class="var-card"><div class="label">2. Filled bar</div><div class="preview">
+      <div class="ch2"><span class="dot" style="background:#f59e0b;"></span>Interviewing<span class="cnt">3</span></div>
+    </div><div class="note">Subtle background fill. Header feels like a zone. More prominent.</div></div>
+    <div class="var-card"><div class="label">3. Bottom border</div><div class="preview">
+      <div class="ch3" style="border-color:#f59e0b;">Interviewing <span style="font-size:10px;color:#a8a29e;margin-left:4px;">3</span></div>
+    </div><div class="note">Colored bottom border. No dot needed — the line IS the status color. Editorial feel.</div></div>
+    <div class="var-card"><div class="label">4. Uppercase small</div><div class="preview">
+      <div class="ch4"><span class="dot" style="background:#f59e0b;"></span>Interviewing <span style="margin-left:2px;">3</span></div>
+    </div><div class="note">Uppercase, smaller, muted. Header recedes, cards are the focus. Data-dense feel.</div></div>
+    <div class="var-card"><div class="label">5. Bold title</div><div class="preview">
+      <div class="ch5">Interviewing <span class="cnt">3</span></div>
+    </div><div class="note">No dot. Just bold name + count. Color only on the cards below. Cleanest.</div></div>
+  </div>
+</div>
+
+<!-- SEARCH BAR -->
+<div class="section">
+  <h2>Search Bar <span class="count">header, table</span></h2>
+  <div class="desc">Global search + Cmd+K shortcut</div>
+  <div class="variants">
+    <div class="var-card"><div class="label">1. Glass bordered</div><div class="preview"><div class="sr sr1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search<span class="key">&#8984;K</span></div></div><div class="note">Current. Glass bg, subtle border, rounded. Matches cards.</div></div>
+    <div class="var-card"><div class="label">2. Bottom line</div><div class="preview"><div class="sr sr2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search<span class="key">&#8984;K</span></div></div><div class="note">Underline only. Minimal chrome. Pairs with bottom-line inputs.</div></div>
+    <div class="var-card"><div class="label">3. Raised</div><div class="preview"><div class="sr sr3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search<span class="key">&#8984;K</span></div></div><div class="note">Raised with shadow. Feels clickable. Prominent.</div></div>
+    <div class="var-card"><div class="label">4. Pill</div><div class="preview"><div class="sr sr4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search<span class="key">&#8984;K</span></div></div><div class="note">Full pill radius. Friendly, app-like feel.</div></div>
+    <div class="var-card"><div class="label">5. Filled subtle</div><div class="preview"><div class="sr sr5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search<span class="key">&#8984;K</span></div></div><div class="note">Subtle gray fill, no border. Recedes into the background. Quietest option.</div></div>
+  </div>
+</div>
+
+<!-- FILTER CHIPS -->
+<div class="section">
+  <h2>Filter Chips <span class="count">table view filters</span></h2>
+  <div class="desc">Status filters above the table (All, Applied, Interviewing, Offer)</div>
+  <div class="variants">
+    <div class="var-card"><div class="label">1. Pill toggle</div><div class="preview" style="flex-direction:row;gap:4px;flex-wrap:wrap;">
+      <span class="fc fc1 on">All (24)</span><span class="fc fc1">Applied</span><span class="fc fc1">Offer</span>
+    </div><div class="note">Current. Pill shape, dark fill when active. Clear on/off state.</div></div>
+    <div class="var-card"><div class="label">2. Tab chips</div><div class="preview" style="flex-direction:row;gap:4px;flex-wrap:wrap;">
+      <span class="fc fc2 on">All (24)</span><span class="fc fc2">Applied</span><span class="fc fc2">Offer</span>
+    </div><div class="note">Square, subtle bg. Less contrast between on/off. Softer.</div></div>
+    <div class="var-card"><div class="label">3. Outlined toggle</div><div class="preview" style="flex-direction:row;gap:4px;flex-wrap:wrap;">
+      <span class="fc fc3 on">All (24)</span><span class="fc fc3">Applied</span><span class="fc fc3">Offer</span>
+    </div><div class="note">Outlined. Active = darker border + subtle fill. Medium weight.</div></div>
+    <div class="var-card"><div class="label">4. Underline tabs</div><div class="preview" style="flex-direction:row;gap:8px;flex-wrap:wrap;">
+      <span class="fc fc4 on">All (24)</span><span class="fc fc4">Applied</span><span class="fc fc4">Offer</span>
+    </div><div class="note">Just underline. Lightest weight. Works like navigation tabs.</div></div>
+    <div class="var-card"><div class="label">5. Subtle bg</div><div class="preview" style="flex-direction:row;gap:4px;flex-wrap:wrap;">
+      <span class="fc fc5 on">All (24)</span><span class="fc fc5">Applied</span><span class="fc fc5">Offer</span>
+    </div><div class="note">Active = subtle gray bg. Inactive = transparent. Quietest toggle.</div></div>
+  </div>
+</div>
+
+</body>
+</html>
