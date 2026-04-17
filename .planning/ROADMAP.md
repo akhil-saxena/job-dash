@@ -47,7 +47,13 @@ JobDash: a multi-user job application tracker on Cloudflare's edge stack. 9 phas
   6. Icon sidebar on desktop (72px), bottom tab bar on mobile
   7. App shell with routing (TanStack Router): Board, List, Calendar, Analytics, Settings + detail page
   8. Quick-add modal for new applications
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Design tokens, dark mode, status colors, and 9 design system components
+- [ ] 03-02-PLAN.md — TanStack Router with auth guards, app shell layout (sidebar, header, bottom tab bar)
+- [ ] 03-03-PLAN.md — Kanban board with data fetching, urgency tints, mobile layout, quick-add modal
+
 **UI hint**: yes
 
 ### Phase 4: Table, Detail & Navigation
@@ -140,7 +146,7 @@ Phases 1-4 are linear. 5, 6, 7 can partially overlap after 4. 8 depends on 6. 9 
 |-------|----------------|--------|-----------|
 | 1. Authentication & Foundation | 4/4 | Complete | 2026-04-16 |
 | 2. Application Tracking API | 3/3 | Complete | 2026-04-16 |
-| 3. Frontend Shell & Kanban | 0/0 | Planning | - |
+| 3. Frontend Shell & Kanban | 0/3 | Planning | - |
 | 4. Table, Detail & Navigation | 0/0 | Not started | - |
 | 5. Interview Tracking & Notes | 0/0 | Not started | - |
 | 6. Tags, Deadlines & Company | 0/0 | Not started | - |
