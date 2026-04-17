@@ -3,6 +3,7 @@ import { Sun, Moon, Monitor } from "lucide-react";
 import { SearchBar } from "@/client/components/design-system/SearchBar";
 import { Button } from "@/client/components/design-system/Button";
 import { useTheme } from "@/client/hooks/useTheme";
+import { useQuickAdd } from "@/client/hooks/useQuickAdd";
 import { authClient } from "@/client/lib/auth-client";
 import type { ThemeMode } from "@/client/hooks/useTheme";
 
@@ -66,6 +67,7 @@ export function Header() {
 	const currentPath = matches[matches.length - 1]?.fullPath ?? "/";
 	const pageTitle = getPageTitle(currentPath);
 
+	const { setOpen: openQuickAdd } = useQuickAdd();
 	const ThemeIcon = MODE_ICONS[mode];
 	const userName = session?.user?.name ?? "User";
 	const userInitial = userName.charAt(0).toUpperCase();
@@ -94,8 +96,8 @@ export function Header() {
 				/>
 			</div>
 
-			{/* + Add button */}
-			<Button variant="filled" size="sm">
+			{/* + Add button -- opens QuickAddModal */}
+			<Button variant="filled" size="sm" onClick={() => openQuickAdd(true)}>
 				<span className="hidden sm:inline">+ Add Application</span>
 				<span className="sm:hidden">+ Add</span>
 			</Button>
