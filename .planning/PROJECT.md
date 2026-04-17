@@ -12,60 +12,51 @@ At a glance, the user knows exactly where every application stands and what need
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Multi-user auth: Google OAuth + email/password — Phase 1
+- ✓ Application CRUD with status pipeline, pin, archive, soft-delete — Phase 2
+- ✓ Auto-generated timeline events on status changes — Phase 2
 
 ### Active
 
-- [ ] Smart dashboard landing view with summary cards and quick actions
-- [ ] Kanban board with drag-and-drop status changes
-- [ ] Table view with sorting, filtering, and search
-- [ ] Calendar view for interviews and deadlines
-- [ ] Timeline view for application history
-- [ ] Application CRUD with full detail panel (company, role, salary, status, priority, source, notes)
-- [ ] Status pipeline: Wishlist → Applied → Screening → Interviewing → Offer → Accepted → Rejected → Withdrawn
-- [ ] Interview round tracking (type, date, interviewer, questions, answers, self-rating, feedback)
-- [ ] Job description snapshots — auto-scrape from URL + manual paste, versioned
-- [ ] Company research notes (markdown, persisted per company across applications)
-- [ ] Company ratings (1-5 stars + written review after application concludes)
-- [ ] Deadline & expiry tracking with urgency color coding
-- [ ] Referral tracking linked to contacts and applications
-- [ ] Contact manager (recruiters, hiring managers, referrals)
+- [ ] Kanban board as home page with drag-and-drop status changes
+- [ ] Table view with sorting, filtering, search (card list on mobile)
+- [ ] Full-page application detail with hero + tabs
+- [ ] Calendar view with Google Calendar sync
+- [ ] Interview round tracking with Q&A pairs, markdown, star ratings
+- [ ] JD snapshots — auto-scrape + manual paste, versioned
+- [ ] Company research notes (markdown, persisted per company)
+- [ ] Document uploads per application (R2 storage)
 - [ ] Tags & labels (user-defined, color-coded)
-- [ ] Pin/star high-priority applications
-- [ ] Archive and soft-delete
-- [ ] Salary tracking (min/max/offered, currency support, comparison view)
-- [ ] Auto-generated timeline events (status changes, interviews, feedback)
-- [ ] In-app notification system with bell dropdown
-- [ ] Follow-up nudge reminders (cron-driven)
-- [ ] Email digest for pending deadlines and stale applications
-- [ ] Analytics: funnel/Sankey chart, source effectiveness, response heatmap, summary stats
-- [ ] Command palette (Cmd+K) for quick actions and navigation
-- [ ] Multi-user auth: Google OAuth + email/password
+- [ ] Deadline & staleness tracking with urgency card tints
+- [ ] Salary tracking (min/max/offered, currency)
+- [ ] Analytics: pipeline funnel, source effectiveness, response times
+- [ ] Command palette (Cmd+K)
 - [ ] Dark mode with system preference detection
-- [ ] CSV import with column mapping
-- [ ] CSV/JSON data export
-- [ ] Bulk actions (archive, tag, status change, delete)
-- [ ] Markdown editor for notes (WYSIWYG with auto-save)
-- [ ] Mobile-responsive design for quick capture on phone
+- [ ] Glass card design system with reusable components
+- [ ] Mobile-responsive with bottom tab bar
 
 ### Out of Scope
 
-- Chrome extension for one-click save from LinkedIn — v2 feature, high complexity
-- Question bank / reusable answer templates — v2 feature
-- Pre-interview checklist generation — v2 feature
-- Email template generator — v2 feature
-- Calendar sync (Google Calendar push/pull) — v2 feature
-- Community questions (anonymized sharing) — v2 feature
-- Native mobile app — web responsive is sufficient
-- Real-time collaboration — single-user-at-a-time is fine
+- Separate dashboard page — kanban IS the home page, dashboard was redundant
+- Contacts/referral tracker — contacts noted in application detail instead
+- Notifications system — deferred to v2, architecture allows adding later
+- Bulk actions — not needed at < 30 applications
+- Salary comparison page — salary fields per-app, no dedicated view
+- Company ratings — replaced by per-round interview experience rating
+- CSV import/export — deferred to v2
+- Chrome extension — v2 feature
+- Question bank / templates — v2 feature
+- Native mobile app — responsive web sufficient
+- Real-time collaboration — single-user is fine
 
 ## Context
 
-- Replaces an existing Google Sheets + Apps Script implementation (in `src/`) that had functional parity for basic tracking but poor UX — clunky forms, no drag-and-drop, not visually clean
-- The original web app spec (`job-tracker-spec.md`) was written for Next.js + Turso + Vercel — now pivoting to all-Cloudflare for zero cost and ecosystem simplicity
-- User has an existing Cloudflare account, so deployment and configuration are familiar
-- Starting with a clean data slate — no migration from Sheets needed
-- Design goal: Linear's minimal structure + Todoist's warm approachability (whitespace, sharp typography, rounded elements, soft colors)
+- Replaces an existing Google Sheets + Apps Script implementation that had poor UX
+- Built on all-Cloudflare stack: Pages + Workers + D1 + R2 (zero cost)
+- Auth (Phase 1) and API (Phase 2) are complete and tested
+- Design system defined: glass card aesthetic, warm gradient, Apple system fonts, SVG icons
+- Design direction explored through interactive prototyping — all page layouts and components locked
+- Starting with clean data slate — no migration from Sheets
 
 ## Constraints
 
