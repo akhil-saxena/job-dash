@@ -92,12 +92,12 @@
 
 ### Design & Polish
 
-- [ ] **UI-01**: Dark mode with system preference detection and manual toggle
+- [x] **UI-01**: Dark mode with system preference detection and manual toggle
 - [ ] **UI-02**: Desktop-first responsive design; mobile-friendly with bottom tab bar
-- [ ] **UI-03**: Glass card aesthetic: warm gradient bg, frosted glass surfaces, Apple system fonts
-- [ ] **UI-04**: Consistent status color system across all views
+- [x] **UI-03**: Glass card aesthetic: warm gradient bg, frosted glass surfaces, Apple system fonts
+- [x] **UI-04**: Consistent status color system across all views
 - [ ] **UI-05**: Optimistic UI for drag-and-drop, status changes, pin/archive
-- [ ] **UI-06**: Reusable design system components (Badge, Button, Input, Card, etc.)
+- [x] **UI-06**: Reusable design system components (Badge, Button, Input, Card, etc.)
 
 ### Documents
 
@@ -170,11 +170,11 @@ Deferred to future release.
 | TRACK-07 | Phase 2 | Complete |
 | TRACK-08 | Phase 2 | Complete |
 | VIEW-01 | Phase 3 | Pending |
-| UI-01 | Phase 3 | Pending |
+| UI-01 | Phase 3 | Complete |
 | UI-02 | Phase 3 | Pending |
-| UI-03 | Phase 3 | Pending |
-| UI-04 | Phase 3 | Pending |
-| UI-06 | Phase 3 | Pending |
+| UI-03 | Phase 3 | Complete |
+| UI-04 | Phase 3 | Complete |
+| UI-06 | Phase 3 | Complete |
 | VIEW-02 | Phase 4 | Pending |
 | VIEW-04 | Phase 4 | Pending |
 | UI-05 | Phase 4 | Pending |

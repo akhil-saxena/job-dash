@@ -50,7 +50,7 @@ JobDash: a multi-user job application tracker on Cloudflare's edge stack. 9 phas
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Design tokens, dark mode, status colors, and 9 design system components
+- [x] 03-01-PLAN.md — Design tokens, dark mode, status colors, and 9 design system components
 - [ ] 03-02-PLAN.md — TanStack Router with auth guards, app shell layout (sidebar, header, bottom tab bar)
 - [ ] 03-03-PLAN.md — Kanban board with data fetching, urgency tints, mobile layout, quick-add modal
 
