@@ -41,7 +41,7 @@ export function LoginForm() {
 					setError(result.error.message || "Invalid email or password");
 				}
 			} else {
-				window.location.href = "/dashboard";
+				window.location.href = "/board";
 			}
 		} catch {
 			showToast("Network error. Please check your connection.");
