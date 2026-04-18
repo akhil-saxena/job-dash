@@ -159,3 +159,17 @@ Phases 1-4 are linear. 5, 6, 7 can partially overlap after 4. 8 depends on 6. 9 
 | 7. JD Snapshots & Documents | 0/0 | Not started | - |
 | 8. Calendar & Analytics | 0/0 | Not started | - |
 | 9. Command Palette & Polish | 0/0 | Not started | - |
+| 10. Design Refresh — Board & Detail | 0/3 | Planning | - |
+
+### Phase 10: Design Refresh — Board & Detail
+**Goal**: Restyle the kanban board view (column layout, card design with richer meta, column header dots + amber count badges, column body gradients, add-card placeholders) and build out all 5 application detail tabs (enhanced Overview with reminder bar + role excerpt, Interviews schedule, JD with fit score + skill grid, Docs with file grid + drag-drop, Timeline with full activity events) to match the two HTML design mockups
+**Depends on**: Phase 4
+**Requirements**: UI-01, UI-02, UI-03, VIEW-01, VIEW-04
+**Plans**: 3 plans
+
+Plans:
+- [ ] 10-01-PLAN.md — Kanban board restyle: column borders, rich cards, gradient washes, add-card buttons
+- [ ] 10-02-PLAN.md — Enhanced Overview tab with KV grid, role excerpt, contacts sidebar + Timeline tab
+- [ ] 10-03-PLAN.md — Interviews, JD, Docs tabs + wire all 5 tabs into DetailPage
+
+**UI hint**: yes
