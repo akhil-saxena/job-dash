@@ -1,26 +1,11 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { ExternalLink, Pencil } from "lucide-react";
 import { useUpdateApplication } from "@/client/hooks/useApplications";
+import { useDebouncedMutate } from "@/client/hooks/useDebouncedMutate";
 import type { ApplicationDetail } from "@/client/hooks/useApplicationDetail";
 
 interface OverviewTabProps {
 	app: ApplicationDetail;
-}
-
-function useDebouncedMutate(
-	mutate: (fields: Record<string, unknown>) => void,
-	delay = 800,
-) {
-	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-	const debouncedMutate = useCallback(
-		(fields: Record<string, unknown>) => {
-			if (timerRef.current) clearTimeout(timerRef.current);
-			timerRef.current = setTimeout(() => mutate(fields), delay);
-		},
-		[mutate, delay],
-	);
-	useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
-	return debouncedMutate;
 }
 
 function formatDate(value: number | string | null | undefined): string {
