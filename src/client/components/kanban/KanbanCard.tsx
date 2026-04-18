@@ -1,6 +1,5 @@
 import { Draggable } from "@hello-pangea/dnd";
 import { useRouter } from "@tanstack/react-router";
-import { MapPin, DollarSign } from "lucide-react";
 import type { Application } from "@/client/hooks/useApplications";
 import {
 	calculateUrgency,
@@ -14,30 +13,12 @@ interface KanbanCardProps {
 	index: number;
 }
 
-function formatSalary(
-	min: number | null,
-	max: number | null,
-	currency: string,
-): string | null {
-	if (!min && !max) return null;
-	const fmt = (n: number) =>
-		n >= 1000 ? `${Math.round(n / 1000)}K` : String(n);
-	if (min && max) return `${fmt(min)}–${fmt(max)} ${currency}`;
-	if (min) return `${fmt(min)}+ ${currency}`;
-	return `${fmt(max!)} ${currency}`;
-}
-
 export function KanbanCard({ app, index }: KanbanCardProps) {
 	const router = useRouter();
 	const urgency = calculateUrgency(app);
 	const urgencyClass = URGENCY_STYLES[urgency];
 	const days = getDaysSinceUpdate(app.updatedAt);
 	const isStale = urgency === "stale";
-	const salary = formatSalary(
-		app.salaryMin,
-		app.salaryMax,
-		app.salaryCurrency,
-	);
 
 	function handleClick() {
 		router.navigate({ to: "/app/$slug", params: { slug: app.slug } });
@@ -51,63 +32,46 @@ export function KanbanCard({ app, index }: KanbanCardProps) {
 					{...provided.draggableProps}
 					{...provided.dragHandleProps}
 					onClick={handleClick}
-					className={`cursor-pointer rounded-xl transition-all focus:outline-none ${
-						snapshot.isDragging
-							? "shadow-xl scale-[1.02] rotate-[1deg]"
-							: ""
+					className={`cursor-pointer transition-all ${
+						snapshot.isDragging ? "scale-[1.02] shadow-xl" : ""
 					}`}
 				>
+					{/* BC2 card: glass surface, single main row, optional hint bar */}
 					<div
-						className={`glass rounded-xl border border-white/40 p-4 transition-all hover:border-white/60 hover:shadow-md dark:border-white/10 dark:hover:border-white/20 ${urgencyClass}`}
+						className={[
+							"rounded-[10px] border border-white/50 px-3 py-2.5",
+							"bg-white/[0.6] backdrop-blur-[10px]",
+							"transition-all hover:bg-white/[0.8] hover:shadow-sm",
+							"dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.1]",
+							urgencyClass,
+						].join(" ")}
 					>
-						{/* Top: Company badge + name */}
-						<div className="flex items-center gap-3">
-							<CompanyBadge
-								companyName={app.companyName}
-								size="md"
-							/>
+						{/* Main row: badge + company/role + days */}
+						<div className="flex items-center gap-2.5">
+							<CompanyBadge companyName={app.companyName} size="sm" />
+
 							<div className="min-w-0 flex-1">
-								<p className="truncate text-[13px] font-semibold leading-tight text-text-primary dark:text-dark-accent">
+								<p className="truncate text-[12px] font-semibold text-text-primary dark:text-dark-accent">
 									{app.companyName}
 								</p>
-								<p className="mt-0.5 truncate text-[11px] text-text-secondary dark:text-dark-accent/60">
+								<p className="truncate text-[11px] text-text-secondary dark:text-dark-accent/60">
 									{app.roleTitle}
 								</p>
 							</div>
-						</div>
 
-						{/* Bottom: meta row */}
-						<div className="mt-3 flex items-center gap-2 border-t border-black/[0.04] pt-3 text-xs text-text-muted dark:border-white/[0.06] dark:text-dark-accent/40">
-							{app.locationType && (
-								<span className="flex items-center gap-1">
-									<MapPin size={12} strokeWidth={1.8} />
-									<span className="truncate">
-										{app.locationType}
-										{app.locationCity
-											? ` · ${app.locationCity}`
-											: ""}
-									</span>
-								</span>
-							)}
-
-							{salary && (
-								<span className="flex items-center gap-1">
-									<DollarSign size={12} strokeWidth={1.8} />
-									{salary}
-								</span>
-							)}
-
-							{/* Days — pushed to the right */}
 							<span
-								className={`ml-auto tabular-nums ${
+								className={`shrink-0 text-[11px] tabular-nums ${
 									isStale
 										? "font-bold text-status-rejected"
-										: ""
+										: "text-text-muted dark:text-dark-accent/40"
 								}`}
 							>
 								{days}d
 							</span>
 						</div>
+
+						{/* Hint bar — only when actionable (Phase 5/6 adds interview/deadline hints) */}
+						{/* Per rendering rules: stale has NO hint bar (tint says it) */}
 					</div>
 				</div>
 			)}
