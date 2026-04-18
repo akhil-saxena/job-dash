@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 80">
-<g transform="translate(14 14) skewX(-14) scale(1)">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 100">
+<g stroke="#F59E0B" stroke-linecap="round" fill="none" stroke-width="6">
+    <line x1="14" y1="48" x2="70" y2="48" opacity="0.6"></line>
+    <line x1="20" y1="64" x2="62" y2="64" opacity="0.4"></line>
+  </g>
+  <g transform="translate(100 20) skewX(-14) scale(1)">
     <rect x="0" y="0" width="40" height="12" rx="2" fill="#292524"></rect>
     <rect x="14" y="0" width="12" height="48" rx="2" fill="#292524"></rect>
     <path d="M 20 48 Q 20 64 6 64 Q -4 64 -5 54" fill="none" stroke="#F59E0B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"></path>

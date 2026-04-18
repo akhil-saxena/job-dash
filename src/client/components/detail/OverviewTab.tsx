@@ -39,10 +39,16 @@ function useDebouncedMutate(
 	return debouncedMutate;
 }
 
-function formatDateForInput(epoch: number | null): string {
-	if (!epoch) return "";
-	const d = new Date(epoch * 1000);
-	return d.toISOString().split("T")[0];
+function formatDateForInput(value: number | string | null | undefined): string {
+	if (!value) return "";
+	try {
+		// Could be epoch seconds (number) or ISO string
+		const d = typeof value === "number" ? new Date(value * 1000) : new Date(value);
+		if (Number.isNaN(d.getTime())) return "";
+		return d.toISOString().split("T")[0];
+	} catch {
+		return "";
+	}
 }
 
 export function OverviewTab({ app }: OverviewTabProps) {
@@ -122,9 +128,14 @@ export function OverviewTab({ app }: OverviewTabProps) {
 
 	const handleAppliedAt = (val: string) => {
 		setAppliedAt(val);
-		// API expects ISO datetime string (z.string().datetime()), not epoch
-		const isoString = val ? new Date(val).toISOString() : undefined;
-		doMutate({ appliedAt: isoString });
+		if (!val) return;
+		try {
+			const d = new Date(val);
+			if (Number.isNaN(d.getTime())) return;
+			doMutate({ appliedAt: d.toISOString() });
+		} catch {
+			// Invalid date — ignore
+		}
 	};
 
 	const selectClasses =

@@ -27,10 +27,10 @@ export function Sidebar() {
 
 	return (
 		<aside className="hidden md:flex flex-col items-center w-[72px] h-screen sticky top-0 left-0 glass border-r border-white/30 dark:border-white/10 py-4">
-			{/* Logo area */}
-			<div className="mb-6 flex h-10 w-10 items-center justify-center rounded-[var(--radius-card)] bg-surface-accent text-white text-sm font-semibold dark:bg-dark-accent dark:text-dark-dominant">
-				JD
-			</div>
+			{/* Logo */}
+			<Link to="/board" className="mb-6 flex h-10 w-10 items-center justify-center">
+				<img src="/logo-j.svg" alt="JobDash" className="h-8 w-8" />
+			</Link>
 
 			{/* Nav items */}
 			<nav className="flex flex-1 flex-col items-center gap-1">
