@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { DetailHero } from "./DetailHero";
 import { OverviewTab } from "./OverviewTab";
-import { PlaceholderTab } from "./PlaceholderTab";
+import { InterviewsTab } from "./InterviewsTab";
+import { JDTab } from "./JDTab";
+import { DocsTab } from "./DocsTab";
+import { TimelineTab } from "./TimelineTab";
 import type { ApplicationDetail } from "@/client/hooks/useApplicationDetail";
 
 interface DetailPageProps {
@@ -13,13 +16,6 @@ interface TabDef {
 	value: string;
 	count?: number;
 }
-
-const TAB_LABELS: Record<string, string> = {
-	interviews: "Interviews",
-	jd: "JD",
-	docs: "Documents",
-	timeline: "Timeline",
-};
 
 export function DetailPage({ app }: DetailPageProps) {
 	const [activeTab, setActiveTab] = useState("overview");
@@ -71,11 +67,11 @@ export function DetailPage({ app }: DetailPageProps) {
 
 			{/* Tab content */}
 			<div className="px-6 py-5">
-				{activeTab === "overview" ? (
-					<OverviewTab app={app} />
-				) : (
-					<PlaceholderTab name={TAB_LABELS[activeTab] ?? activeTab} />
-				)}
+				{activeTab === "overview" && <OverviewTab app={app} />}
+				{activeTab === "interviews" && <InterviewsTab app={app} />}
+				{activeTab === "jd" && <JDTab app={app} />}
+				{activeTab === "docs" && <DocsTab app={app} />}
+				{activeTab === "timeline" && <TimelineTab app={app} />}
 			</div>
 		</div>
 	);
