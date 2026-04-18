@@ -41,33 +41,33 @@
 
 ### Company Intelligence
 
-- [ ] **COMP-01**: Company entity persists across applications (deduplicated by domain)
-- [ ] **COMP-02**: User can write markdown research notes per company (Glassdoor reviews, tech stack, culture, flags)
-- [ ] **COMP-03**: Company notes persist when user applies to multiple roles at the same company
+- [x] **COMP-01**: Company entity persists across applications (deduplicated by domain)
+- [x] **COMP-02**: User can write markdown research notes per company (Glassdoor reviews, tech stack, culture, flags)
+- [x] **COMP-03**: Company notes persist when user applies to multiple roles at the same company
 
 ### Job Description Snapshots
 
 - [ ] **SNAP-01**: User can save a job description by pasting markdown text
-- ~~**SNAP-02**: User can save a job description by providing a URL (app auto-scrapes the posting content)~~ *Deferred to v2*
-- ~~**SNAP-03**: Snapshots are versioned (user can re-scrape if JD changes)~~ *Deferred to v2*
+- [ ] **SNAP-02**: User can save a job description by providing a URL (app auto-scrapes the posting content)
+- [ ] **SNAP-03**: Snapshots are versioned (user can re-scrape if JD changes)
 - [ ] **SNAP-04**: Saved JD renders as formatted markdown in the detail page
 
 ### Tags & Labels
 
-- [x] **TAG-01**: User can create custom tags with a name and color
-- [x] **TAG-02**: User can assign multiple tags to any application
-- [x] **TAG-03**: User can filter applications by tag across all views
+- [ ] **TAG-01**: User can create custom tags with a name and color
+- [ ] **TAG-02**: User can assign multiple tags to any application
+- [ ] **TAG-03**: User can filter applications by tag across all views
 
 ### Deadlines & Staleness
 
-- [x] **DEAD-01**: User can set deadlines per application (types: application close, offer expiry, follow-up, custom)
-- [x] **DEAD-02**: Kanban cards show urgency via background tint (red=stale, amber=interview, green=offer expiring) — no redundant text labels
-- [x] **DEAD-03**: Applications show stale indicator when no status update for 7+ days
+- [ ] **DEAD-01**: User can set deadlines per application (types: application close, offer expiry, follow-up, custom)
+- [ ] **DEAD-02**: Kanban cards show urgency via background tint (red=stale, amber=interview, green=offer expiring) — no redundant text labels
+- [ ] **DEAD-03**: Applications show stale indicator when no status update for 7+ days
 
 ### Salary
 
-- [ ] **SAL-01**: User can track salary expectation (min/max), offered amount, equity, and bonus per application
-- [ ] **SAL-02**: User can set currency per application (INR, USD, EUR, GBP)
+- [x] **SAL-01**: User can track salary expectation (min/max), offered amount, equity, and bonus per application
+- [x] **SAL-02**: User can set currency per application (INR, USD, EUR, GBP)
 
 ### Analytics
 
@@ -185,17 +185,17 @@ Deferred to future release.
 | NOTE-01 | Phase 5 | Complete |
 | NOTE-02 | Phase 5 | Complete |
 | NOTE-03 | Phase 5 | Complete |
-| COMP-01 | Phase 6 | Pending |
-| COMP-02 | Phase 6 | Pending |
-| COMP-03 | Phase 6 | Pending |
-| TAG-01 | Phase 6 | Complete |
-| TAG-02 | Phase 6 | Complete |
-| TAG-03 | Phase 6 | Complete |
-| DEAD-01 | Phase 6 | Complete |
-| DEAD-02 | Phase 6 | Complete |
-| DEAD-03 | Phase 6 | Complete |
-| SAL-01 | Phase 6 | Pending |
-| SAL-02 | Phase 6 | Pending |
+| COMP-01 | Phase 6 | Complete |
+| COMP-02 | Phase 6 | Complete |
+| COMP-03 | Phase 6 | Complete |
+| TAG-01 | Phase 6 | Pending |
+| TAG-02 | Phase 6 | Pending |
+| TAG-03 | Phase 6 | Pending |
+| DEAD-01 | Phase 6 | Pending |
+| DEAD-02 | Phase 6 | Pending |
+| DEAD-03 | Phase 6 | Pending |
+| SAL-01 | Phase 6 | Complete |
+| SAL-02 | Phase 6 | Complete |
 | SNAP-01 | Phase 7 | Pending |
 | SNAP-02 | Phase 7 | Pending |
 | SNAP-03 | Phase 7 | Pending |

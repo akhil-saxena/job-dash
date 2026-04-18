@@ -28,6 +28,9 @@ export const TIMELINE_EVENT_TYPES = [
 ] as const;
 export type TimelineEventType = (typeof TIMELINE_EVENT_TYPES)[number];
 
+export const SALARY_CURRENCIES = ["INR", "USD", "EUR", "GBP"] as const;
+export type SalaryCurrency = (typeof SALARY_CURRENCIES)[number];
+
 export const INTERVIEW_ROUND_TYPES = [
 	"phone_screen",
 	"recruiter_call",

@@ -5,6 +5,8 @@ import { useDebouncedMutate } from "@/client/hooks/useDebouncedMutate";
 import type { ApplicationDetail } from "@/client/hooks/useApplicationDetail";
 import { TagPicker } from "./TagPicker";
 import { DeadlineSection } from "./DeadlineSection";
+import { CompanyResearchCard } from "./CompanyResearchCard";
+import { SalaryCard } from "./SalaryCard";
 
 interface OverviewTabProps {
 	app: ApplicationDetail;
@@ -131,6 +133,9 @@ export function OverviewTab({ app }: OverviewTabProps) {
 				{/* 3. Deadlines */}
 				<DeadlineSection applicationId={app.id} />
 
+				{/* 3b. Salary / Compensation */}
+				<SalaryCard app={app} />
+
 				{/* 4. About the role */}
 				<div className="rounded-[14px] bg-white/55 backdrop-blur-[14px] border border-white/50 p-5 dark:bg-zinc-800/50 dark:border-white/10">
 					<div className="mb-3 flex items-center gap-2">
@@ -160,7 +165,7 @@ export function OverviewTab({ app }: OverviewTabProps) {
 					</ul>
 				</div>
 
-				{/* 4. Notes -- editable */}
+				{/* 5. Notes -- editable */}
 				<div className="rounded-[14px] bg-white/55 backdrop-blur-[14px] border border-white/50 p-5 dark:bg-zinc-800/50 dark:border-white/10">
 					<div className="mb-3 flex items-center gap-2">
 						<span className="text-[13px] font-bold tracking-tight text-text-secondary dark:text-dark-accent/60" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -213,38 +218,8 @@ export function OverviewTab({ app }: OverviewTabProps) {
 				{/* Tags */}
 				<TagPicker applicationId={app.id} />
 
-				{/* Contacts panel */}
-				<div className="rounded-[14px] bg-white/55 backdrop-blur-[14px] border border-white/50 p-5 dark:bg-zinc-800/50 dark:border-white/10">
-					<div className="mb-3 flex items-center gap-2">
-						<span className="inline-block h-[15px] w-[4px] rounded-sm bg-amber-500" />
-						<span className="text-[13px] font-bold tracking-tight text-text-secondary dark:text-dark-accent/60">Contacts</span>
-					</div>
-					<div className="flex flex-col gap-3">
-						{/* Static placeholder contacts */}
-						<div className="flex items-center gap-2.5">
-							<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[11px] font-bold text-amber-700 dark:bg-amber-500/20 dark:text-amber-400">SC</div>
-							<div className="min-w-0 flex-1">
-								<p className="truncate text-[12.5px] font-semibold text-text-primary dark:text-dark-accent">Sarah Chen</p>
-								<p className="truncate text-[10.5px] text-text-muted dark:text-dark-accent/40">Recruiter</p>
-							</div>
-						</div>
-						<div className="flex items-center gap-2.5">
-							<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[11px] font-bold text-amber-700 dark:bg-amber-500/20 dark:text-amber-400">MJ</div>
-							<div className="min-w-0 flex-1">
-								<p className="truncate text-[12.5px] font-semibold text-text-primary dark:text-dark-accent">Mike Johnson</p>
-								<p className="truncate text-[10.5px] text-text-muted dark:text-dark-accent/40">Hiring Manager</p>
-							</div>
-						</div>
-						<div className="flex items-center gap-2.5">
-							<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[11px] font-bold text-amber-700 dark:bg-amber-500/20 dark:text-amber-400">LP</div>
-							<div className="min-w-0 flex-1">
-								<p className="truncate text-[12.5px] font-semibold text-text-primary dark:text-dark-accent">Lisa Park</p>
-								<p className="truncate text-[10.5px] text-text-muted dark:text-dark-accent/40">Team Lead</p>
-							</div>
-						</div>
-					</div>
-					<p className="mt-3 pt-3 border-t border-black/[0.06] text-[10px] text-text-muted dark:border-white/[0.06] dark:text-dark-accent/30">Contact management coming in a future update</p>
-				</div>
+				{/* Company Research */}
+				<CompanyResearchCard companyName={app.companyName} />
 			</div>
 		</div>
 	);
