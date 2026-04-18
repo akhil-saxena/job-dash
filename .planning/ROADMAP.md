@@ -88,7 +88,13 @@ Plans:
   4. Auto-save with "Saving..."/"Saved" indicator
   5. Experience notes and feedback fields per round
   6. Upcoming rounds highlighted with amber border
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — DB schema (interview_round + interview_qa tables), constants, Zod validators, migration
+- [ ] 05-02-PLAN.md — Interview CRUD API (service layer + Hono routes + integration tests)
+- [ ] 05-03-PLAN.md — Frontend InterviewsTab with accordion rounds, Q&A cards, star ratings, auto-save
+
 **UI hint**: yes
 
 ### Phase 6: Tags, Deadlines & Company Intelligence
@@ -154,7 +160,7 @@ Phases 1-4 are linear. 5, 6, 7 can partially overlap after 4. 8 depends on 6. 9 
 | 2. Application Tracking API | 3/3 | Complete | 2026-04-16 |
 | 3. Frontend Shell & Kanban | 0/3 | Planning | - |
 | 4. Table, Detail & Navigation | 2/3 | Executing | - |
-| 5. Interview Tracking & Notes | 0/0 | Not started | - |
+| 5. Interview Tracking & Notes | 0/3 | Planning | - |
 | 6. Tags, Deadlines & Company | 0/0 | Not started | - |
 | 7. JD Snapshots & Documents | 0/0 | Not started | - |
 | 8. Calendar & Analytics | 0/0 | Not started | - |
