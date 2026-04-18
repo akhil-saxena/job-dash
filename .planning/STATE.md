@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 05-03-PLAN.md
-last_updated: "2026-04-18T17:47:06.344Z"
+status: executing
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-04-18T18:19:15.000Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 10
   completed_phases: 5
-  total_plans: 19
-  completed_plans: 18
-  percent: 93
+  total_plans: 20
+  completed_plans: 19
+  percent: 95
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-16)
 
 **Core value:** At a glance, the user knows exactly where every application stands and what needs attention today
-**Current focus:** Phase 05 — interview-tracking-notes
+**Current focus:** Phase 06 — tags-deadlines-company
 
 ## Current Position
 
-Phase: 10
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 6
+Plan: 1 of TBD
+Status: Plan 1 complete
 Last activity: 2026-04-18
 
-Progress: [=========.] 93%
+Progress: [=========.] 95%
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ Progress: [=========.] 93%
 | Phase 05 P01 | 4min | 2 tasks | 8 files |
 | Phase 05 P02 | 14min | 3 tasks | 6 files |
 | Phase 05 P03 | 4min | 3 tasks | 9 files |
+| Phase 06 P01 | 3min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,10 @@ Recent decisions affecting current work:
 - [Phase 05]: Flat route paths for interview endpoints per Phase 4 Hono trie router decision
 - [Phase 05]: Per-field debounced mutations in QACard and InterviewRoundCard to prevent race conditions on partial updates
 - [Phase 05]: Extracted useDebouncedMutate to shared hook for reuse between OverviewTab and interview components
+- [Phase 06]: Tag-application many-to-many via application_tag join table with unique constraint
+- [Phase 06]: Company deduplication by unique index on (userId, domain) with nullable domain
+- [Phase 06]: 18 tag colors map to Tailwind palette names for frontend integration
+- [Phase 06]: Salary currencies scoped to INR/USD/EUR/GBP per SAL-02
 
 ### Pending Todos
 
@@ -123,6 +128,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T17:45:20.633Z
-Stopped at: Completed 05-03-PLAN.md
+Last session: 2026-04-18T18:19:15.000Z
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
