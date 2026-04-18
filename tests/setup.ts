@@ -24,6 +24,17 @@ CREATE INDEX IF NOT EXISTS \`idx_interview_round_user\` ON \`interview_round\` (
 CREATE INDEX IF NOT EXISTS \`idx_interview_round_scheduled\` ON \`interview_round\` (\`application_id\`,\`scheduled_at\`);
 CREATE TABLE IF NOT EXISTS \`interview_qa\` (\`id\` text PRIMARY KEY NOT NULL, \`round_id\` text NOT NULL, \`user_id\` text NOT NULL, \`question\` text NOT NULL, \`answer\` text, \`sort_order\` integer DEFAULT 0 NOT NULL, \`created_at\` integer DEFAULT (unixepoch()) NOT NULL, \`updated_at\` integer DEFAULT (unixepoch()) NOT NULL, FOREIGN KEY (\`round_id\`) REFERENCES \`interview_round\`(\`id\`) ON UPDATE no action ON DELETE cascade, FOREIGN KEY (\`user_id\`) REFERENCES \`user\`(\`id\`) ON UPDATE no action ON DELETE cascade);
 CREATE INDEX IF NOT EXISTS \`idx_interview_qa_round\` ON \`interview_qa\` (\`round_id\`,\`sort_order\`);
+CREATE TABLE IF NOT EXISTS \`tag\` (\`id\` text PRIMARY KEY NOT NULL, \`user_id\` text NOT NULL, \`name\` text NOT NULL, \`color\` text DEFAULT 'blue' NOT NULL, \`created_at\` integer DEFAULT (unixepoch()) NOT NULL, \`updated_at\` integer DEFAULT (unixepoch()) NOT NULL, FOREIGN KEY (\`user_id\`) REFERENCES \`user\`(\`id\`) ON UPDATE no action ON DELETE cascade);
+CREATE UNIQUE INDEX IF NOT EXISTS \`idx_tag_user_name\` ON \`tag\` (\`user_id\`,\`name\`);
+CREATE TABLE IF NOT EXISTS \`application_tag\` (\`id\` text PRIMARY KEY NOT NULL, \`application_id\` text NOT NULL, \`tag_id\` text NOT NULL, \`user_id\` text NOT NULL, \`created_at\` integer DEFAULT (unixepoch()) NOT NULL, FOREIGN KEY (\`application_id\`) REFERENCES \`application\`(\`id\`) ON UPDATE no action ON DELETE cascade, FOREIGN KEY (\`tag_id\`) REFERENCES \`tag\`(\`id\`) ON UPDATE no action ON DELETE cascade, FOREIGN KEY (\`user_id\`) REFERENCES \`user\`(\`id\`) ON UPDATE no action ON DELETE cascade);
+CREATE UNIQUE INDEX IF NOT EXISTS \`idx_application_tag_unique\` ON \`application_tag\` (\`application_id\`,\`tag_id\`);
+CREATE INDEX IF NOT EXISTS \`idx_application_tag_tag\` ON \`application_tag\` (\`tag_id\`);
+CREATE TABLE IF NOT EXISTS \`deadline\` (\`id\` text PRIMARY KEY NOT NULL, \`application_id\` text NOT NULL, \`user_id\` text NOT NULL, \`deadline_type\` text NOT NULL, \`label\` text, \`due_date\` integer NOT NULL, \`is_completed\` integer DEFAULT false NOT NULL, \`created_at\` integer DEFAULT (unixepoch()) NOT NULL, \`updated_at\` integer DEFAULT (unixepoch()) NOT NULL, FOREIGN KEY (\`application_id\`) REFERENCES \`application\`(\`id\`) ON UPDATE no action ON DELETE cascade, FOREIGN KEY (\`user_id\`) REFERENCES \`user\`(\`id\`) ON UPDATE no action ON DELETE cascade);
+CREATE INDEX IF NOT EXISTS \`idx_deadline_app\` ON \`deadline\` (\`application_id\`);
+CREATE INDEX IF NOT EXISTS \`idx_deadline_user_due\` ON \`deadline\` (\`user_id\`,\`due_date\`);
+CREATE TABLE IF NOT EXISTS \`company\` (\`id\` text PRIMARY KEY NOT NULL, \`user_id\` text NOT NULL, \`name\` text NOT NULL, \`domain\` text, \`website\` text, \`notes\` text, \`created_at\` integer DEFAULT (unixepoch()) NOT NULL, \`updated_at\` integer DEFAULT (unixepoch()) NOT NULL, FOREIGN KEY (\`user_id\`) REFERENCES \`user\`(\`id\`) ON UPDATE no action ON DELETE cascade);
+CREATE UNIQUE INDEX IF NOT EXISTS \`idx_company_user_domain\` ON \`company\` (\`user_id\`,\`domain\`);
+CREATE INDEX IF NOT EXISTS \`idx_company_user_name\` ON \`company\` (\`user_id\`,\`name\`);
 `;
 
 // D1 exec() handles multiple semicolon-separated statements
