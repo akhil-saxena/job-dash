@@ -71,6 +71,26 @@ export const INTERVIEW_STATUS_LABELS: Record<InterviewStatus, string> = {
 };
 
 // ---------------------------------------------------------------------------
+// Tag colors (TAG-01)
+// ---------------------------------------------------------------------------
+
+export const TAG_COLORS = [
+	"#ef4444", // red
+	"#f97316", // orange
+	"#f59e0b", // amber
+	"#84cc16", // lime
+	"#22c55e", // green
+	"#06b6d4", // cyan
+	"#3b82f6", // blue
+	"#8b5cf6", // violet
+	"#d946ef", // fuchsia
+	"#ec4899", // pink
+	"#6b7280", // gray
+	"#78716c", // stone
+] as const;
+export type TagColor = (typeof TAG_COLORS)[number];
+
+// ---------------------------------------------------------------------------
 // Deadline types (DEAD-01)
 // ---------------------------------------------------------------------------
 
@@ -88,32 +108,6 @@ export const DEADLINE_TYPE_LABELS: Record<DeadlineType, string> = {
 	follow_up: "Follow-Up",
 	custom: "Custom",
 };
-
-// ---------------------------------------------------------------------------
-// Tag colors (TAG-01)
-// ---------------------------------------------------------------------------
-
-export const TAG_COLORS = [
-	"slate",
-	"red",
-	"orange",
-	"amber",
-	"yellow",
-	"lime",
-	"green",
-	"emerald",
-	"teal",
-	"cyan",
-	"sky",
-	"blue",
-	"indigo",
-	"violet",
-	"purple",
-	"fuchsia",
-	"pink",
-	"rose",
-] as const;
-export type TagColor = (typeof TAG_COLORS)[number];
 
 // ---------------------------------------------------------------------------
 // Salary currencies (SAL-02)

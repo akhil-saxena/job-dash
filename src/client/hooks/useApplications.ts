@@ -22,6 +22,7 @@ export interface Application {
 	salaryMax: number | null;
 	salaryCurrency: string;
 	notes: string | null;
+	tags?: Array<{ id: string; name: string; color: string }>;
 }
 
 async function fetchApplications(): Promise<Application[]> {

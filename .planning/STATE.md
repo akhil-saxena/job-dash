@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 05-03-PLAN.md
-last_updated: "2026-04-18T17:47:06.344Z"
+stopped_at: Completed 06-03-PLAN.md
+last_updated: "2026-04-18T18:46:54.393Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 10
   completed_phases: 5
   total_plans: 19
-  completed_plans: 18
+  completed_plans: 19
   percent: 93
 ---
 
@@ -67,7 +67,7 @@ Progress: [=========.] 93%
 | Phase 05 P01 | 4min | 2 tasks | 8 files |
 | Phase 05 P02 | 14min | 3 tasks | 6 files |
 | Phase 05 P03 | 4min | 3 tasks | 9 files |
-| Phase 06 P02 | 4min | 2 tasks | 10 files |
+| Phase 06 P03 | 9min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -106,10 +106,9 @@ Recent decisions affecting current work:
 - [Phase 05]: Flat route paths for interview endpoints per Phase 4 Hono trie router decision
 - [Phase 05]: Per-field debounced mutations in QACard and InterviewRoundCard to prevent race conditions on partial updates
 - [Phase 05]: Extracted useDebouncedMutate to shared hook for reuse between OverviewTab and interview components
-- [Phase 06]: Company findOrCreate returns { company, created } to differentiate new vs existing
-- [Phase 06]: Flat route paths for deadlines per Phase 4 Hono trie router decision
-- [Phase 06]: Tag assignment is idempotent (silently returns existing on duplicate)
-- [Phase 06]: Upcoming deadlines filtered by isCompleted=false AND dueDate >= now
+- [Phase 06]: TAG_COLORS and DEADLINE_TYPES added to shared constants for frontend (parallel Plan 01 worktree)
+- [Phase 06]: Client-side tag filtering in list view; server-side tag filter deferred until application_tag schema merges
+- [Phase 06]: DeadlineMap prop drilling pattern: Board fetches upcoming deadlines, builds Map<appId, deadlines>, passes through Column to Card
 
 ### Pending Todos
 
@@ -128,6 +127,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T18:29:13Z
-Stopped at: Completed 06-02-PLAN.md
+Last session: 2026-04-18T18:46:54.389Z
+Stopped at: Completed 06-03-PLAN.md
 Resume file: None

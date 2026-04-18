@@ -3,6 +3,8 @@ import { ExternalLink, Pencil } from "lucide-react";
 import { useUpdateApplication } from "@/client/hooks/useApplications";
 import { useDebouncedMutate } from "@/client/hooks/useDebouncedMutate";
 import type { ApplicationDetail } from "@/client/hooks/useApplicationDetail";
+import { TagPicker } from "./TagPicker";
+import { DeadlineSection } from "./DeadlineSection";
 
 interface OverviewTabProps {
 	app: ApplicationDetail;
@@ -126,7 +128,10 @@ export function OverviewTab({ app }: OverviewTabProps) {
 					)}
 				</div>
 
-				{/* 3. About the role */}
+				{/* 3. Deadlines */}
+				<DeadlineSection applicationId={app.id} />
+
+				{/* 4. About the role */}
 				<div className="rounded-[14px] bg-white/55 backdrop-blur-[14px] border border-white/50 p-5 dark:bg-zinc-800/50 dark:border-white/10">
 					<div className="mb-3 flex items-center gap-2">
 						<span className="inline-block h-[15px] w-[4px] rounded-sm bg-amber-500" />
@@ -204,6 +209,9 @@ export function OverviewTab({ app }: OverviewTabProps) {
 						Click to expand
 					</div>
 				</div>
+
+				{/* Tags */}
+				<TagPicker applicationId={app.id} />
 
 				{/* Contacts panel */}
 				<div className="rounded-[14px] bg-white/55 backdrop-blur-[14px] border border-white/50 p-5 dark:bg-zinc-800/50 dark:border-white/10">

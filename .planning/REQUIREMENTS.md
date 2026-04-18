@@ -54,15 +54,15 @@
 
 ### Tags & Labels
 
-- [ ] **TAG-01**: User can create custom tags with a name and color
-- [ ] **TAG-02**: User can assign multiple tags to any application
-- [ ] **TAG-03**: User can filter applications by tag across all views
+- [x] **TAG-01**: User can create custom tags with a name and color
+- [x] **TAG-02**: User can assign multiple tags to any application
+- [x] **TAG-03**: User can filter applications by tag across all views
 
 ### Deadlines & Staleness
 
-- [ ] **DEAD-01**: User can set deadlines per application (types: application close, offer expiry, follow-up, custom)
-- [ ] **DEAD-02**: Kanban cards show urgency via background tint (red=stale, amber=interview, green=offer expiring) — no redundant text labels
-- [ ] **DEAD-03**: Applications show stale indicator when no status update for 7+ days
+- [x] **DEAD-01**: User can set deadlines per application (types: application close, offer expiry, follow-up, custom)
+- [x] **DEAD-02**: Kanban cards show urgency via background tint (red=stale, amber=interview, green=offer expiring) — no redundant text labels
+- [x] **DEAD-03**: Applications show stale indicator when no status update for 7+ days
 
 ### Salary
 
@@ -188,12 +188,12 @@ Deferred to future release.
 | COMP-01 | Phase 6 | Pending |
 | COMP-02 | Phase 6 | Pending |
 | COMP-03 | Phase 6 | Pending |
-| TAG-01 | Phase 6 | Pending |
-| TAG-02 | Phase 6 | Pending |
-| TAG-03 | Phase 6 | Pending |
-| DEAD-01 | Phase 6 | Pending |
-| DEAD-02 | Phase 6 | Pending |
-| DEAD-03 | Phase 6 | Pending |
+| TAG-01 | Phase 6 | Complete |
+| TAG-02 | Phase 6 | Complete |
+| TAG-03 | Phase 6 | Complete |
+| DEAD-01 | Phase 6 | Complete |
+| DEAD-02 | Phase 6 | Complete |
+| DEAD-03 | Phase 6 | Complete |
 | SAL-01 | Phase 6 | Pending |
 | SAL-02 | Phase 6 | Pending |
 | SNAP-01 | Phase 7 | Pending |

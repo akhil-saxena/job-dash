@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { DragDropContext, type DropResult } from "@hello-pangea/dnd";
 import { APPLICATION_STATUSES } from "@/shared/constants";
 import type { ApplicationStatus } from "@/shared/constants";
@@ -5,6 +6,7 @@ import {
 	useApplicationsByStatus,
 	useUpdateStatus,
 } from "@/client/hooks/useApplications";
+import { useUpcomingDeadlines } from "@/client/hooks/useDeadlines";
 import { Button } from "@/client/components/design-system/Button";
 import { ColumnHeader } from "@/client/components/design-system/ColumnHeader";
 import { KanbanColumn } from "./KanbanColumn";
@@ -69,6 +71,19 @@ export function KanbanBoard() {
 	const { grouped, isLoading, isError, refetch } =
 		useApplicationsByStatus();
 	const updateStatus = useUpdateStatus();
+	const { data: upcomingDeadlines } = useUpcomingDeadlines();
+
+	// Build a map of applicationId -> deadlines for urgency calculation
+	const deadlineMap = useMemo(() => {
+		const map = new Map<string, Array<{ deadlineType: string; dueAt: number; isCompleted: number }>>();
+		if (!upcomingDeadlines) return map;
+		for (const d of upcomingDeadlines) {
+			const existing = map.get(d.applicationId) ?? [];
+			existing.push({ deadlineType: d.deadlineType, dueAt: d.dueAt, isCompleted: d.isCompleted });
+			map.set(d.applicationId, existing);
+		}
+		return map;
+	}, [upcomingDeadlines]);
 
 	function handleDragEnd(result: DropResult) {
 		const { destination, source, draggableId } = result;
@@ -180,6 +195,7 @@ export function KanbanBoard() {
 									status={col.status}
 									apps={col.apps}
 									showHeader={false}
+									deadlineMap={deadlineMap}
 								/>
 							</div>
 						))}

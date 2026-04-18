@@ -19,9 +19,10 @@ interface KanbanColumnProps {
 	count?: number;
 	showHeader?: boolean;
 	onAddCard?: () => void;
+	deadlineMap?: Map<string, Array<{ deadlineType: string; dueAt: number; isCompleted: number }>>;
 }
 
-export function KanbanColumn({ status, apps, label, count, showHeader = true, onAddCard }: KanbanColumnProps) {
+export function KanbanColumn({ status, apps, label, count, showHeader = true, onAddCard, deadlineMap }: KanbanColumnProps) {
 	const gradient = COLUMN_GRADIENTS[status] ?? "transparent";
 
 	return (
@@ -46,7 +47,7 @@ export function KanbanColumn({ status, apps, label, count, showHeader = true, on
 						}`}
 					>
 						{apps.map((app, index) => (
-							<KanbanCard key={app.id} app={app} index={index} />
+							<KanbanCard key={app.id} app={app} index={index} deadlines={deadlineMap?.get(app.id)} />
 						))}
 						{provided.placeholder}
 

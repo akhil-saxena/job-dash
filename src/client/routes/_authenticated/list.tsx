@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { useApplications } from "@/client/hooks/useApplications";
 import type { Application } from "@/client/hooks/useApplications";
+import { useTags } from "@/client/hooks/useTags";
 import { useSearch } from "@/client/hooks/useSearch";
 import { FilterChips } from "@/client/components/design-system/FilterChips";
 import { ApplicationTable } from "@/client/components/table/ApplicationTable";
@@ -12,6 +13,7 @@ import { getDaysSinceUpdate } from "@/client/lib/urgency";
 
 const searchSchema = z.object({
 	status: z.string().optional(),
+	tag: z.string().optional(),
 	sort: z
 		.enum(["company", "role", "status", "priority", "source", "applied", "days"])
 		.optional(),
@@ -59,9 +61,10 @@ function sortApps(
 }
 
 function ListPage() {
-	const { status, sort, order } = Route.useSearch();
+	const { status, tag, sort, order } = Route.useSearch();
 	const navigate = Route.useNavigate();
 	const { data: apps, isLoading } = useApplications();
+	const { data: allTags } = useTags();
 	const { query } = useSearch();
 
 	// Filter pipeline
@@ -72,7 +75,14 @@ function ListPage() {
 		filtered = filtered.filter((app) => app.status === status);
 	}
 
-	// (b) Filter by search query
+	// (b) Filter by tag (client-side: check app.tags if available)
+	if (tag) {
+		filtered = filtered.filter((app) =>
+			app.tags?.some((t) => t.id === tag),
+		);
+	}
+
+	// (c) Filter by search query
 	if (query) {
 		const q = query.toLowerCase();
 		filtered = filtered.filter(
@@ -82,10 +92,10 @@ function ListPage() {
 		);
 	}
 
-	// (c) Sort
+	// (d) Sort
 	const sorted = sortApps(filtered, sort, order);
 
-	// Build filter chip items
+	// Build status filter chip items
 	const allApps = apps ?? [];
 	const chipItems = [
 		{ label: "All", value: "all", count: allApps.length },
@@ -96,11 +106,29 @@ function ListPage() {
 		})),
 	];
 
+	// Build tag filter chip items
+	const tagChipItems = [
+		{ label: "All tags", value: "all" },
+		...(allTags ?? []).map((t) => ({
+			label: t.name,
+			value: t.id,
+		})),
+	];
+
 	function handleStatusChange(value: string) {
 		navigate({
 			search: (prev: Record<string, unknown>) => ({
 				...prev,
 				status: value === "all" ? undefined : value,
+			}),
+		});
+	}
+
+	function handleTagChange(value: string) {
+		navigate({
+			search: (prev: Record<string, unknown>) => ({
+				...prev,
+				tag: value === "all" ? undefined : value,
 			}),
 		});
 	}
@@ -150,13 +178,23 @@ function ListPage() {
 
 	return (
 		<div className="flex flex-col gap-4 p-4 md:p-6">
-			{/* Filter chips */}
+			{/* Status filter chips */}
 			<FilterChips
 				variant="tab"
 				items={chipItems}
 				active={status || "all"}
 				onChange={handleStatusChange}
 			/>
+
+			{/* Tag filter chips -- only show when tags exist */}
+			{(allTags ?? []).length > 0 && (
+				<FilterChips
+					variant="outlined"
+					items={tagChipItems}
+					active={tag || "all"}
+					onChange={handleTagChange}
+				/>
+			)}
 
 			{/* Desktop: glass table */}
 			<div className="hidden md:block">
