@@ -29,6 +29,13 @@
       "when": 1776532240954,
       "tag": "0003_fearless_vision",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1776538478683,
+      "tag": "0004_spotty_madame_masque",
+      "breakpoints": true
     }
   ]
 }
