@@ -21,37 +21,35 @@ export function AppShell({ children }: AppShellProps) {
 			<div className="flex min-w-0 flex-1 flex-col overflow-hidden">
 				<Header />
 				<main
-					className="relative flex-1 overflow-y-auto overflow-x-hidden pb-[58px] md:pb-0"
+					className="relative flex-1 overflow-y-auto pb-[58px] md:pb-0"
 					style={{
 						backgroundColor: "#f5f3f0",
 						backgroundImage: "radial-gradient(circle, rgba(41,37,36,0.13) 1px, transparent 1.2px)",
 						backgroundSize: "16px 16px",
 					}}
 				>
-					{/* Decorative amber arc rings — bottom-right corner */}
-					<svg
-						className="pointer-events-none fixed bottom-0 right-0 z-0"
-						width="1200"
-						height="1200"
-						viewBox="0 0 1200 1200"
+					{/* Decorative amber arc rings — fixed to viewport bottom-right */}
+					<div
+						className="pointer-events-none fixed bottom-0 right-0 z-0 h-screen w-screen"
 						aria-hidden="true"
 					>
-						<defs>
-							<radialGradient id="arcFade" cx="100%" cy="100%" r="90%">
-								<stop offset="0%" stopColor="#f59e0b" stopOpacity="0.20" />
-								<stop offset="50%" stopColor="#f59e0b" stopOpacity="0.08" />
-								<stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
-							</radialGradient>
-						</defs>
-						<g fill="none" stroke="url(#arcFade)" strokeWidth="1.5">
-							<circle cx="1200" cy="1200" r="200" />
-							<circle cx="1200" cy="1200" r="340" />
-							<circle cx="1200" cy="1200" r="500" />
-							<circle cx="1200" cy="1200" r="680" />
-							<circle cx="1200" cy="1200" r="880" />
-							<circle cx="1200" cy="1200" r="1100" />
-						</g>
-					</svg>
+						<svg
+							className="absolute bottom-0 right-0"
+							width="100%"
+							height="100%"
+							viewBox="0 0 1000 1000"
+							preserveAspectRatio="xMaxYMax meet"
+						>
+							<g fill="none" stroke="#f59e0b" strokeWidth="1">
+								<circle cx="1000" cy="1000" r="150" opacity="0.18" />
+								<circle cx="1000" cy="1000" r="280" opacity="0.14" />
+								<circle cx="1000" cy="1000" r="420" opacity="0.11" />
+								<circle cx="1000" cy="1000" r="580" opacity="0.08" />
+								<circle cx="1000" cy="1000" r="760" opacity="0.06" />
+								<circle cx="1000" cy="1000" r="960" opacity="0.04" />
+							</g>
+						</svg>
+					</div>
 					<div className="relative z-10">{children}</div>
 				</main>
 			</div>
