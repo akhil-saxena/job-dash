@@ -3,7 +3,7 @@ import { TAG_COLORS } from "@/shared/constants";
 
 export const createTagSchema = z.object({
 	name: z.string().min(1).max(50),
-	color: z.enum(TAG_COLORS).optional().default("blue"),
+	color: z.enum(TAG_COLORS).optional().default("#3b82f6"),
 });
 
 export const updateTagSchema = z.object({

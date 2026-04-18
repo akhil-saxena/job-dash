@@ -102,7 +102,7 @@ describe("Tag CRUD", () => {
 		expect(json.data).toBeDefined();
 		expect(json.data.id).toBeDefined();
 		expect(json.data.name).toBe("Frontend");
-		expect(json.data.color).toBe("blue");
+		expect(json.data.color).toBe("#3b82f6");
 
 		tagId = json.data.id;
 	});
@@ -111,13 +111,13 @@ describe("Tag CRUD", () => {
 		const res = await SELF.fetch("http://localhost/api/tags", {
 			method: "POST",
 			headers: headersA(),
-			body: JSON.stringify({ name: "Backend", color: "green" }),
+			body: JSON.stringify({ name: "Backend", color: "#22c55e" }),
 		});
 		const json = (await res.json()) as any;
 
 		expect(res.status).toBe(201);
 		expect(json.data.name).toBe("Backend");
-		expect(json.data.color).toBe("green");
+		expect(json.data.color).toBe("#22c55e");
 	});
 
 	it("rejects duplicate tag name for same user", async () => {
@@ -151,14 +151,14 @@ describe("Tag CRUD", () => {
 			{
 				method: "PATCH",
 				headers: headersA(),
-				body: JSON.stringify({ name: "UI/Frontend", color: "amber" }),
+				body: JSON.stringify({ name: "UI/Frontend", color: "#f59e0b" }),
 			},
 		);
 		const json = (await res.json()) as any;
 
 		expect(res.status).toBe(200);
 		expect(json.data.name).toBe("UI/Frontend");
-		expect(json.data.color).toBe("amber");
+		expect(json.data.color).toBe("#f59e0b");
 	});
 
 	it("deletes a tag", async () => {
@@ -226,7 +226,7 @@ describe("Tag Assignment", () => {
 		const res = await SELF.fetch("http://localhost/api/tags", {
 			method: "POST",
 			headers: headersA(),
-			body: JSON.stringify({ name: "AssignTest", color: "red" }),
+			body: JSON.stringify({ name: "AssignTest", color: "#ef4444" }),
 		});
 		const json = (await res.json()) as any;
 		assignTagId = json.data.id;
@@ -274,7 +274,7 @@ describe("Tag Assignment", () => {
 		const assignedTag = json.data.find((t: any) => t.id === assignTagId);
 		expect(assignedTag).toBeDefined();
 		expect(assignedTag.name).toBe("AssignTest");
-		expect(assignedTag.color).toBe("red");
+		expect(assignedTag.color).toBe("#ef4444");
 	});
 
 	it("unassigns a tag from an application", async () => {

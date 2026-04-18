@@ -20,7 +20,7 @@ export const tag = sqliteTable(
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
 		name: text("name").notNull(),
-		color: text("color").notNull().default("blue"),
+		color: text("color").notNull().default("#3b82f6"),
 		createdAt: integer("created_at", { mode: "timestamp" })
 			.notNull()
 			.default(sql`(unixepoch())`),
