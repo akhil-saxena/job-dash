@@ -130,7 +130,7 @@ export function KanbanBoard() {
 			<div className="hidden md:block">
 				<DragDropContext onDragEnd={handleDragEnd}>
 					{/* Header row — all status labels inline */}
-					<div className="flex gap-3 border-b border-black/[0.04] px-6 py-3 dark:border-white/[0.06]">
+					<div className="flex gap-3 px-6 py-3">
 						{columns.map((col) => (
 							<div key={col.key} className={`min-w-0 flex-1 ${col.dimmed ? "opacity-50" : ""}`}>
 								<ColumnHeader
