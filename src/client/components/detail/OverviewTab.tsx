@@ -1,82 +1,79 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Input } from "@/client/components/design-system/Input";
-import { Card } from "@/client/components/design-system/Card";
+import { ExternalLink, Pencil } from "lucide-react";
 import { useUpdateApplication } from "@/client/hooks/useApplications";
-import { LOCATION_TYPES } from "@/shared/constants";
 import type { ApplicationDetail } from "@/client/hooks/useApplicationDetail";
 
 interface OverviewTabProps {
 	app: ApplicationDetail;
 }
 
-/**
- * Simple debounce hook using useRef + setTimeout.
- * Returns a stable callback that debounces the given function.
- */
 function useDebouncedMutate(
 	mutate: (fields: Record<string, unknown>) => void,
-	delay = 500,
+	delay = 800,
 ) {
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
 	const debouncedMutate = useCallback(
 		(fields: Record<string, unknown>) => {
 			if (timerRef.current) clearTimeout(timerRef.current);
-			timerRef.current = setTimeout(() => {
-				mutate(fields);
-			}, delay);
+			timerRef.current = setTimeout(() => mutate(fields), delay);
 		},
 		[mutate, delay],
 	);
-
-	// Cleanup on unmount
-	useEffect(() => {
-		return () => {
-			if (timerRef.current) clearTimeout(timerRef.current);
-		};
-	}, []);
-
+	useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 	return debouncedMutate;
 }
 
-function formatDateForInput(value: number | string | null | undefined): string {
-	if (!value) return "";
+function formatDate(value: number | string | null | undefined): string {
+	if (!value) return "—";
 	try {
-		// Could be epoch seconds (number) or ISO string
 		const d = typeof value === "number" ? new Date(value * 1000) : new Date(value);
-		if (Number.isNaN(d.getTime())) return "";
-		return d.toISOString().split("T")[0];
-	} catch {
-		return "";
-	}
+		if (Number.isNaN(d.getTime())) return "—";
+		return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+	} catch { return "—"; }
+}
+
+function formatSalary(min: number | null, max: number | null, currency: string): string {
+	if (!min && !max) return "—";
+	const fmt = (n: number) => n >= 1000 ? `$${Math.round(n / 1000)}K` : `$${n}`;
+	if (min && max) return `${fmt(min)} – ${fmt(max)} ${currency}`;
+	if (min) return `${fmt(min)}+ ${currency}`;
+	return `${fmt(max!)} ${currency}`;
+}
+
+function hostname(url: string | null): string | null {
+	if (!url) return null;
+	try { return new URL(url.startsWith("http") ? url : `https://${url}`).hostname; }
+	catch { return url; }
+}
+
+function fullUrl(url: string): string {
+	return url.startsWith("http") ? url : `https://${url}`;
+}
+
+/** A single key-value row in the "At a glance" section */
+function KV({ label, value, mono, link }: { label: string; value: string; mono?: boolean; link?: string }) {
+	return (
+		<div className="flex flex-col gap-1">
+			<span className="text-[9px] font-bold uppercase tracking-widest text-text-muted dark:text-dark-accent/40" style={{ fontFamily: "var(--mono, monospace)" }}>
+				{label}
+			</span>
+			{link ? (
+				<a href={fullUrl(link)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[14px] font-medium text-amber-600 hover:underline dark:text-amber-400" style={mono ? { fontFamily: "var(--mono, monospace)", fontSize: "13px" } : undefined}>
+					{value} <ExternalLink size={11} />
+				</a>
+			) : (
+				<span className={`text-[14.5px] font-medium text-text-primary dark:text-dark-accent ${mono ? "font-semibold" : ""}`} style={mono ? { fontFamily: "var(--mono, monospace)", fontSize: "13.5px" } : undefined}>
+					{value}
+				</span>
+			)}
+		</div>
+	);
 }
 
 export function OverviewTab({ app }: OverviewTabProps) {
 	const updateApplication = useUpdateApplication();
-
-	// Local state for fields, initialized from app data
-	const [jobPostingUrl, setJobPostingUrl] = useState(
-		app.jobPostingUrl || "",
-	);
-	const [applicationPortalUrl, setApplicationPortalUrl] = useState(
-		app.applicationPortalUrl || "",
-	);
-	const [locationType, setLocationType] = useState(app.locationType || "");
-	const [locationCity, setLocationCity] = useState(app.locationCity || "");
-	const [salaryMin, setSalaryMin] = useState(
-		app.salaryMin != null ? String(app.salaryMin) : "",
-	);
-	const [salaryMax, setSalaryMax] = useState(
-		app.salaryMax != null ? String(app.salaryMax) : "",
-	);
-	const [salaryCurrency, setSalaryCurrency] = useState(
-		app.salaryCurrency || "USD",
-	);
-	const [source, setSource] = useState(app.source || "");
-	const [appliedAt, setAppliedAt] = useState(
-		formatDateForInput(app.appliedAt),
-	);
 	const [notes, setNotes] = useState(app.notes || "");
+	const [editing, setEditing] = useState(false);
 
 	const doMutate = useCallback(
 		(fields: Record<string, unknown>) => {
@@ -84,265 +81,148 @@ export function OverviewTab({ app }: OverviewTabProps) {
 		},
 		[updateApplication, app.id, app.slug],
 	);
-
-	const debouncedMutate = useDebouncedMutate(doMutate, 500);
-
-	// Handlers for text fields (debounced)
-	const handleJobPostingUrl = (val: string) => {
-		setJobPostingUrl(val);
-		debouncedMutate({ jobPostingUrl: val || null });
-	};
-
-	const handleApplicationPortalUrl = (val: string) => {
-		setApplicationPortalUrl(val);
-		debouncedMutate({ applicationPortalUrl: val || null });
-	};
-
-	const handleLocationCity = (val: string) => {
-		setLocationCity(val);
-		debouncedMutate({ locationCity: val || null });
-	};
-
-	const handleSalaryMin = (val: string) => {
-		setSalaryMin(val);
-		debouncedMutate({ salaryMin: val ? Number(val) : null });
-	};
-
-	const handleSalaryMax = (val: string) => {
-		setSalaryMax(val);
-		debouncedMutate({ salaryMax: val ? Number(val) : null });
-	};
-
-	const handleSalaryCurrency = (val: string) => {
-		setSalaryCurrency(val);
-		debouncedMutate({ salaryCurrency: val || "USD" });
-	};
-
-	const handleSource = (val: string) => {
-		setSource(val);
-		debouncedMutate({ source: val || null });
-	};
+	const debouncedMutate = useDebouncedMutate(doMutate);
 
 	const handleNotes = (val: string) => {
 		setNotes(val);
 		debouncedMutate({ notes: val || null });
 	};
 
-	// Handlers for selects/date (immediate)
-	const handleLocationType = (val: string) => {
-		setLocationType(val);
-		doMutate({ locationType: val || null });
-	};
-
-	const handleAppliedAt = (val: string) => {
-		setAppliedAt(val);
-		if (!val) return;
-		try {
-			const d = new Date(val);
-			if (Number.isNaN(d.getTime())) return;
-			doMutate({ appliedAt: d.toISOString() });
-		} catch {
-			// Invalid date — ignore
-		}
-	};
-
-	const selectClasses =
-		"block w-full px-3 py-2 text-text-primary dark:text-dark-accent placeholder:text-text-muted dark:placeholder:text-dark-accent/40 focus:outline-none focus:ring-2 focus:ring-surface-accent/20 focus:border-surface-accent/40 dark:focus:ring-dark-accent/20 dark:focus:border-dark-accent/40 transition-colors rounded-[var(--radius-input)] glass border-white/30 dark:border-white/10";
+	const salaryLabel = formatSalary(app.salaryMin, app.salaryMax, app.salaryCurrency);
+	const location = app.locationType
+		? `${app.locationType.charAt(0).toUpperCase() + app.locationType.slice(1)}${app.locationCity ? ` · ${app.locationCity}` : ""}`
+		: "—";
 
 	return (
-		<div className="space-y-6">
-			<div className="grid gap-6 md:grid-cols-2">
-				{/* Left: editable fields */}
-				<div className="space-y-4">
-					<div className="space-y-1.5">
-						<label className="block text-xs font-semibold uppercase tracking-wide text-text-secondary dark:text-dark-accent/60">
-							Job Posting URL
-						</label>
-						<div className="flex gap-2">
-							<Input
-								variant="glass"
-								value={jobPostingUrl}
-								onChange={(e) =>
-									handleJobPostingUrl(
-										(e.target as HTMLInputElement).value,
-									)
-								}
-								placeholder="https://greenhouse.io/..."
-							/>
-							{jobPostingUrl && (
-								<a
-									href={jobPostingUrl.startsWith("http") ? jobPostingUrl : `https://${jobPostingUrl}`}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="flex h-[38px] shrink-0 items-center gap-1.5 rounded-[var(--radius-input)] border border-white/30 bg-white/50 px-3 text-xs font-semibold text-text-secondary transition-colors hover:bg-white/70 hover:text-text-primary dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.1]"
-									onClick={(e) => e.stopPropagation()}
-								>
-									<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-									Visit
-								</a>
-							)}
-						</div>
-						{jobPostingUrl && (
-							<p className="truncate text-[10px] text-text-muted dark:text-dark-accent/40">
-								{(() => { try { return new URL(jobPostingUrl.startsWith("http") ? jobPostingUrl : `https://${jobPostingUrl}`).hostname; } catch { return jobPostingUrl; } })()}
-							</p>
+		<div className="grid gap-5 md:grid-cols-[1fr_320px]">
+			{/* Main column */}
+			<div className="flex flex-col gap-4">
+				{/* At a glance */}
+				<div className="rounded-[14px] bg-white/55 backdrop-blur-[14px] border border-white/50 p-5 dark:bg-zinc-800/50 dark:border-white/10">
+					<div className="mb-4 flex items-center gap-2">
+						<span className="text-[13px] font-bold tracking-tight text-text-secondary dark:text-dark-accent/60" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+							<span className="inline-block h-[15px] w-[4px] rounded-sm bg-amber-500" />
+							At a glance
+						</span>
+						<button
+							type="button"
+							onClick={() => setEditing(!editing)}
+							className="ml-auto text-text-muted hover:text-text-secondary transition-colors dark:text-dark-accent/40"
+							title="Edit details"
+						>
+							<Pencil size={13} />
+						</button>
+					</div>
+					<div className="grid grid-cols-2 gap-x-7 gap-y-5 sm:grid-cols-3">
+						<KV label="Location" value={location} />
+						<KV label="Salary range" value={salaryLabel} mono />
+						<KV label="Source" value={app.source ? app.source.charAt(0).toUpperCase() + app.source.slice(1) : "—"} />
+						<KV label="Applied" value={formatDate(app.appliedAt)} mono />
+						<KV label="Time in stage" value={`${Math.max(0, Math.floor((Date.now() / 1000 - (typeof app.updatedAt === "number" ? app.updatedAt : new Date(app.updatedAt).getTime() / 1000)) / 86400))} days`} />
+						{app.jobPostingUrl ? (
+							<KV label="Job posting" value={hostname(app.jobPostingUrl) ?? "View"} mono link={app.jobPostingUrl} />
+						) : (
+							<KV label="Job posting" value="—" />
 						)}
 					</div>
-					<div className="space-y-1.5">
-						<label className="block text-xs font-semibold uppercase tracking-wide text-text-secondary dark:text-dark-accent/60">
-							Application Portal
-						</label>
-						<div className="flex gap-2">
-							<Input
-								variant="glass"
-								value={applicationPortalUrl}
-								onChange={(e) =>
-									handleApplicationPortalUrl(
-										(e.target as HTMLInputElement).value,
-									)
-								}
-								placeholder="https://boards.greenhouse.io/..."
-							/>
-							{applicationPortalUrl && (
-								<a
-									href={applicationPortalUrl.startsWith("http") ? applicationPortalUrl : `https://${applicationPortalUrl}`}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="flex h-[38px] shrink-0 items-center gap-1.5 rounded-[var(--radius-input)] border border-white/30 bg-white/50 px-3 text-xs font-semibold text-text-secondary transition-colors hover:bg-white/70 hover:text-text-primary dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.1]"
-									onClick={(e) => e.stopPropagation()}
-								>
-									<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-									Open
-								</a>
-							)}
+					{app.applicationPortalUrl && (
+						<div className="mt-4 pt-4 border-t border-black/[0.06] dark:border-white/[0.06]">
+							<KV label="Application portal" value={hostname(app.applicationPortalUrl) ?? "Open"} mono link={app.applicationPortalUrl} />
 						</div>
-						{applicationPortalUrl && (
-							<p className="truncate text-[10px] text-text-muted dark:text-dark-accent/40">
-								{(() => { try { return new URL(applicationPortalUrl.startsWith("http") ? applicationPortalUrl : `https://${applicationPortalUrl}`).hostname; } catch { return applicationPortalUrl; } })()}
-							</p>
-						)}
-					</div>
-					<div className="grid grid-cols-2 gap-4">
-						<div className="space-y-1.5">
-							<label
-								htmlFor="location-type"
-								className="block text-xs font-semibold uppercase tracking-wide text-text-secondary dark:text-dark-accent/60"
-							>
-								Location Type
-							</label>
-							<select
-								id="location-type"
-								value={locationType}
-								onChange={(e) =>
-									handleLocationType(e.target.value)
-								}
-								className={selectClasses}
-							>
-								<option value="">Select...</option>
-								{LOCATION_TYPES.map((lt) => (
-									<option key={lt} value={lt}>
-										{lt.charAt(0).toUpperCase() + lt.slice(1)}
-									</option>
-								))}
-							</select>
-						</div>
-						<Input
-							label="City"
-							variant="glass"
-							value={locationCity}
-							onChange={(e) =>
-								handleLocationCity(
-									(e.target as HTMLInputElement).value,
-								)
-							}
-							placeholder="Mountain View"
-						/>
-					</div>
-					<div className="grid grid-cols-3 gap-4">
-						<Input
-							label="Salary Min"
-							type="number"
-							variant="glass"
-							value={salaryMin}
-							onChange={(e) =>
-								handleSalaryMin(
-									(e.target as HTMLInputElement).value,
-								)
-							}
-							placeholder="120000"
-						/>
-						<Input
-							label="Salary Max"
-							type="number"
-							variant="glass"
-							value={salaryMax}
-							onChange={(e) =>
-								handleSalaryMax(
-									(e.target as HTMLInputElement).value,
-								)
-							}
-							placeholder="180000"
-						/>
-						<Input
-							label="Currency"
-							variant="glass"
-							value={salaryCurrency}
-							onChange={(e) =>
-								handleSalaryCurrency(
-									(e.target as HTMLInputElement).value,
-								)
-							}
-							placeholder="USD"
-						/>
-					</div>
-					<Input
-						label="Source"
-						variant="glass"
-						value={source}
-						onChange={(e) =>
-							handleSource(
-								(e.target as HTMLInputElement).value,
-							)
-						}
-						placeholder="LinkedIn, Referral, etc."
-					/>
-					<Input
-						label="Applied Date"
-						type="date"
-						variant="glass"
-						value={appliedAt}
-						onChange={(e) =>
-							handleAppliedAt(
-								(e.target as HTMLInputElement).value,
-							)
-						}
-					/>
+					)}
 				</div>
 
-				{/* Right: notes textarea */}
-				<div>
-					<Input
-						as="textarea"
-						label="Notes"
-						variant="glass"
-						hint="**bold** *italic* - lists `code`"
+				{/* Notes — editable */}
+				<div className="rounded-[14px] bg-white/55 backdrop-blur-[14px] border border-white/50 p-5 dark:bg-zinc-800/50 dark:border-white/10">
+					<div className="mb-3 flex items-center gap-2">
+						<span className="text-[13px] font-bold tracking-tight text-text-secondary dark:text-dark-accent/60" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+							<span className="inline-block h-[15px] w-[4px] rounded-sm bg-amber-500" />
+							Notes
+						</span>
+						{updateApplication.isPending && (
+							<span className="text-[10px] text-text-muted dark:text-dark-accent/40">Saving…</span>
+						)}
+						{!updateApplication.isPending && notes && (
+							<span className="text-[10px] text-green-600 dark:text-green-400">Saved</span>
+						)}
+					</div>
+					<textarea
 						value={notes}
-						onChange={(e) =>
-							handleNotes(
-								(e.target as HTMLTextAreaElement).value,
-							)
-						}
-						className="min-h-[300px]"
+						onChange={(e) => handleNotes(e.target.value)}
+						placeholder="Add notes — prep tips, key contacts, follow-up reminders…"
+						className="w-full min-h-[120px] rounded-lg border border-dashed border-black/[0.12] bg-transparent p-3 text-[14px] leading-relaxed text-text-primary placeholder:text-text-muted/50 focus:border-amber-400 focus:outline-none resize-y dark:border-white/[0.1] dark:text-dark-accent dark:placeholder:text-dark-accent/30"
+						style={{ fontFamily: "inherit" }}
 					/>
+					<div className="mt-1.5 text-[9px] text-text-muted dark:text-dark-accent/30" style={{ fontFamily: "var(--mono, monospace)" }}>
+						**bold** · *italic* · - lists · `code` — markdown supported
+					</div>
+				</div>
+
+				{/* Company research */}
+				<div className="rounded-[14px] bg-white/55 backdrop-blur-[14px] border border-white/50 p-5 dark:bg-zinc-800/50 dark:border-white/10">
+					<div className="mb-3 flex items-center gap-2">
+						<span className="text-[13px] font-bold tracking-tight text-text-secondary dark:text-dark-accent/60" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+							<span className="inline-block h-[15px] w-[4px] rounded-sm bg-amber-500" />
+							Company research
+						</span>
+						<span className="ml-auto text-[9px] text-text-muted dark:text-dark-accent/30" style={{ fontFamily: "var(--mono, monospace)" }}>
+							Shared across all {app.companyName} apps
+						</span>
+					</div>
+					<p className="text-[13px] leading-relaxed text-text-secondary dark:text-dark-accent/60">
+						No research notes yet. Add Glassdoor reviews, tech stack, culture notes, and red/green flags.
+					</p>
 				</div>
 			</div>
 
-			{/* Company research placeholder (per D-10) */}
-			<Card padding="p-4">
-				<p className="text-xs text-text-muted dark:text-dark-accent/40">
-					Company research notes will be available in Phase 6.
-				</p>
-			</Card>
+			{/* Right sidebar */}
+			<div className="flex flex-col gap-4">
+				{/* Sticky note style */}
+				<div
+					className="rounded-[10px] p-4 text-[13.5px] font-semibold leading-snug shadow-sm cursor-text"
+					style={{
+						background: "linear-gradient(145deg, #fef3c7, #fde68a)",
+						border: "1px solid rgba(245,158,11,0.25)",
+						transform: "rotate(-0.6deg)",
+						boxShadow: "0 2px 8px rgba(245,158,11,0.15)",
+					}}
+				>
+					{notes ? (
+						<span className="text-text-primary">{notes.slice(0, 120)}{notes.length > 120 ? "…" : ""}</span>
+					) : (
+						<span className="text-amber-700/60 italic">Quick note — click to edit above</span>
+					)}
+					<div className="mt-2.5 text-[9px] font-bold uppercase tracking-widest text-amber-700/60" style={{ fontFamily: "var(--mono, monospace)" }}>
+						Click to expand
+					</div>
+				</div>
+
+				{/* Quick info */}
+				<div className="rounded-[14px] bg-white/55 backdrop-blur-[14px] border border-white/50 p-5 dark:bg-zinc-800/50 dark:border-white/10">
+					<div className="mb-3 text-[13px] font-bold tracking-tight text-text-secondary dark:text-dark-accent/60" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+						<span className="inline-block h-[15px] w-[4px] rounded-sm bg-amber-500" />
+						Quick info
+					</div>
+					<div className="flex flex-col gap-3 text-[13px]">
+						<div className="flex justify-between">
+							<span className="text-text-muted dark:text-dark-accent/40">Priority</span>
+							<span className="font-semibold capitalize text-text-primary dark:text-dark-accent">{app.priority}</span>
+						</div>
+						{app.equity && (
+							<div className="flex justify-between">
+								<span className="text-text-muted dark:text-dark-accent/40">Equity</span>
+								<span className="font-semibold text-text-primary dark:text-dark-accent">{app.equity}</span>
+							</div>
+						)}
+						{app.bonus && (
+							<div className="flex justify-between">
+								<span className="text-text-muted dark:text-dark-accent/40">Bonus</span>
+								<span className="font-semibold text-text-primary dark:text-dark-accent">{app.bonus}</span>
+							</div>
+						)}
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 }
