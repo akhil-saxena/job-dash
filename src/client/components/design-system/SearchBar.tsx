@@ -36,8 +36,8 @@ export function SearchBar({
 				onChange={(e) => onChange?.(e.target.value)}
 				className="flex-1 bg-transparent text-sm text-text-primary dark:text-dark-accent placeholder:text-text-muted dark:placeholder:text-dark-accent/40 focus:outline-none"
 			/>
-			<kbd className="hidden shrink-0 rounded-[4px] border border-black/10 bg-black/[0.03] px-1.5 py-0.5 text-[10px] font-medium text-text-muted dark:border-white/10 dark:bg-white/[0.04] dark:text-dark-accent/40 sm:inline-block">
-				Cmd+K
+			<kbd className="hidden shrink-0 rounded border border-black/10 bg-black/[0.03] px-1.5 py-0.5 text-[10px] font-medium text-text-muted dark:border-white/10 dark:bg-white/[0.04] dark:text-dark-accent/40 sm:inline-block">
+				⌘K
 			</kbd>
 		</div>
 	);

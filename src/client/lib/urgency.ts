@@ -16,8 +16,14 @@ interface UrgencyInput {
  * Calculate days since the last update.
  * updatedAt is a unix epoch in seconds (from D1).
  */
-export function getDaysSinceUpdate(updatedAt: number): number {
-	return Math.floor((Date.now() / 1000 - updatedAt) / 86400);
+export function getDaysSinceUpdate(updatedAt: number | string | null | undefined): number {
+	if (!updatedAt) return 0;
+	// Could be epoch seconds (number) or ISO string or Date object
+	const epochSec = typeof updatedAt === "number"
+		? updatedAt
+		: Math.floor(new Date(updatedAt).getTime() / 1000);
+	if (Number.isNaN(epochSec)) return 0;
+	return Math.max(0, Math.floor((Date.now() / 1000 - epochSec) / 86400));
 }
 
 /**
