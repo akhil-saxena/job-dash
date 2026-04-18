@@ -70,32 +70,12 @@ export function KanbanCard({ app, index }: KanbanCardProps) {
 							</span>
 						</div>
 
-						{/* Row 2: priority + location */}
-						<div className="mt-1.5 flex items-center gap-2 text-[10px] text-text-muted dark:text-dark-accent/40">
-							{/* Priority dot */}
-							<span
-								className="inline-block h-[6px] w-[6px] shrink-0 rounded-full"
-								style={{
-									backgroundColor:
-										app.priority === "high"
-											? "#ef4444"
-											: app.priority === "medium"
-												? "#f59e0b"
-												: "#a8a29e",
-								}}
-							/>
-							<span className="capitalize">{app.priority}</span>
-
-							{app.locationType && (
-								<>
-									<span className="text-black/10 dark:text-white/10">·</span>
-									<span className="capitalize">{app.locationType}</span>
-									{app.locationCity && (
-										<span className="truncate">{app.locationCity}</span>
-									)}
-								</>
-							)}
-						</div>
+						{/* Row 2: location */}
+						{app.locationType && (
+							<p className="mt-1.5 truncate text-[10px] capitalize text-text-muted dark:text-dark-accent/40">
+								{app.locationType}{app.locationCity ? ` · ${app.locationCity}` : ""}
+							</p>
+						)}
 
 						{/* Hint bar — only when actionable (Phase 5/6 adds interview/deadline hints) */}
 					</div>
