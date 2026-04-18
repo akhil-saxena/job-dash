@@ -107,12 +107,15 @@ Plans:
   3. Stale indicator at 7+ days with no status update
   4. Company entity deduplicated by domain, shared research notes
   5. Salary min/max/offered/currency per application
-**Plans**: 3 plans
+**Plans**: 4 plans
 
 Plans:
-- [x] 06-01-PLAN.md -- DB schema (tag, application_tag, deadline, company tables), constants, Zod validators, migration
-- [ ] 06-02-PLAN.md -- Tag, deadline, and company CRUD API (service layer + Hono routes + integration tests)
-- [ ] 06-03-PLAN.md -- Frontend tag picker, deadline manager, company panel, salary fields in detail page
+- [x] 06-01-PLAN.md — DB schema (tag, application_tag, deadline, company tables), constants, Zod validators, migration
+- [x] 06-02-PLAN.md — Service layer and API routes for tags, deadlines, companies with integration tests
+- [ ] 06-03-PLAN.md — Frontend tag picker, deadline manager, company panel
+- [ ] 06-04-PLAN.md — Urgency tints, stale indicators, salary fields
+
+**UI hint**: yes
 
 ### Phase 7: JD Snapshots & Documents
 **Goal**: Users can save job descriptions before postings disappear and upload documents per application
@@ -166,7 +169,7 @@ Phases 1-4 are linear. 5, 6, 7 can partially overlap after 4. 8 depends on 6. 9 
 | 3. Frontend Shell & Kanban | 0/3 | Planning | - |
 | 4. Table, Detail & Navigation | 2/3 | Executing | - |
 | 5. Interview Tracking & Notes | 0/3 | Planning | - |
-| 6. Tags, Deadlines & Company | 1/3 | Executing | - |
+| 6. Tags, Deadlines & Company | 2/4 | Executing | - |
 | 7. JD Snapshots & Documents | 0/0 | Not started | - |
 | 8. Calendar & Analytics | 0/0 | Not started | - |
 | 9. Command Palette & Polish | 0/0 | Not started | - |
