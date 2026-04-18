@@ -1,0 +1,1 @@
+ALTER TABLE `application` ADD `application_portal_url` text;

@@ -21,6 +21,7 @@ export const application = sqliteTable(
 		companyName: text("company_name").notNull(),
 		roleTitle: text("role_title").notNull(),
 		jobPostingUrl: text("job_posting_url"),
+		applicationPortalUrl: text("application_portal_url"),
 		locationType: text("location_type"),
 		locationCity: text("location_city"),
 		salaryMin: integer("salary_min"),

@@ -23,7 +23,7 @@ export function KanbanCard({ app, index }: KanbanCardProps) {
 	const router = useRouter();
 	const urgency = calculateUrgency(app);
 	const urgencyClass = URGENCY_STYLES[urgency];
-	const days = getDaysSinceUpdate(app.updatedAt);
+	const days = getDaysSinceUpdate(app.appliedAt ?? app.createdAt);
 	const isStale = urgency === "stale";
 	// Priority tint only if no urgency tint is active
 	const priorityClass = urgency === "normal" ? (PRIORITY_TINTS[app.priority] ?? "") : "";

@@ -35,12 +35,7 @@ export function KanbanColumn({ status, apps, label, count }: KanbanColumnProps) 
 				)}
 			</Droppable>
 
-			{/* Empty state */}
-			{apps.length === 0 && (
-				<p className="py-6 text-center text-xs text-text-muted dark:text-dark-accent/40">
-					No applications
-				</p>
-			)}
+			{/* Empty columns just show the droppable area — no text needed */}
 		</div>
 	);
 }

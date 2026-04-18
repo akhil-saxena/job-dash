@@ -12,6 +12,7 @@ interface TimelineEvent {
 
 export interface ApplicationDetail extends Application {
 	jobPostingUrl: string | null;
+	applicationPortalUrl: string | null;
 	equity: string | null;
 	bonus: string | null;
 	timeline: TimelineEvent[];

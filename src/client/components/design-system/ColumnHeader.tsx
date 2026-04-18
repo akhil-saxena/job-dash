@@ -44,9 +44,11 @@ export function ColumnHeader({
 			<span className="text-xs font-semibold text-text-primary dark:text-dark-accent">
 				{label}
 			</span>
-			<Badge variant="filled" color={status} size="sm">
-				{count}
-			</Badge>
+			{count > 0 && (
+				<Badge variant="filled" color={status} size="sm">
+					{count}
+				</Badge>
+			)}
 		</div>
 	);
 }

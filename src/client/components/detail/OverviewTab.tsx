@@ -58,6 +58,9 @@ export function OverviewTab({ app }: OverviewTabProps) {
 	const [jobPostingUrl, setJobPostingUrl] = useState(
 		app.jobPostingUrl || "",
 	);
+	const [applicationPortalUrl, setApplicationPortalUrl] = useState(
+		app.applicationPortalUrl || "",
+	);
 	const [locationType, setLocationType] = useState(app.locationType || "");
 	const [locationCity, setLocationCity] = useState(app.locationCity || "");
 	const [salaryMin, setSalaryMin] = useState(
@@ -88,6 +91,11 @@ export function OverviewTab({ app }: OverviewTabProps) {
 	const handleJobPostingUrl = (val: string) => {
 		setJobPostingUrl(val);
 		debouncedMutate({ jobPostingUrl: val || null });
+	};
+
+	const handleApplicationPortalUrl = (val: string) => {
+		setApplicationPortalUrl(val);
+		debouncedMutate({ applicationPortalUrl: val || null });
 	};
 
 	const handleLocationCity = (val: string) => {
@@ -177,6 +185,40 @@ export function OverviewTab({ app }: OverviewTabProps) {
 						{jobPostingUrl && (
 							<p className="truncate text-[10px] text-text-muted dark:text-dark-accent/40">
 								{(() => { try { return new URL(jobPostingUrl.startsWith("http") ? jobPostingUrl : `https://${jobPostingUrl}`).hostname; } catch { return jobPostingUrl; } })()}
+							</p>
+						)}
+					</div>
+					<div className="space-y-1.5">
+						<label className="block text-xs font-semibold uppercase tracking-wide text-text-secondary dark:text-dark-accent/60">
+							Application Portal
+						</label>
+						<div className="flex gap-2">
+							<Input
+								variant="glass"
+								value={applicationPortalUrl}
+								onChange={(e) =>
+									handleApplicationPortalUrl(
+										(e.target as HTMLInputElement).value,
+									)
+								}
+								placeholder="https://boards.greenhouse.io/..."
+							/>
+							{applicationPortalUrl && (
+								<a
+									href={applicationPortalUrl.startsWith("http") ? applicationPortalUrl : `https://${applicationPortalUrl}`}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="flex h-[38px] shrink-0 items-center gap-1.5 rounded-[var(--radius-input)] border border-white/30 bg-white/50 px-3 text-xs font-semibold text-text-secondary transition-colors hover:bg-white/70 hover:text-text-primary dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.1]"
+									onClick={(e) => e.stopPropagation()}
+								>
+									<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+									Open
+								</a>
+							)}
+						</div>
+						{applicationPortalUrl && (
+							<p className="truncate text-[10px] text-text-muted dark:text-dark-accent/40">
+								{(() => { try { return new URL(applicationPortalUrl.startsWith("http") ? applicationPortalUrl : `https://${applicationPortalUrl}`).hostname; } catch { return applicationPortalUrl; } })()}
 							</p>
 						)}
 					</div>

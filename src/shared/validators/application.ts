@@ -9,6 +9,7 @@ export const createApplicationSchema = z.object({
 	companyName: z.string().min(1).max(200),
 	roleTitle: z.string().min(1).max(200),
 	jobPostingUrl: z.string().url().optional().or(z.literal("")),
+	applicationPortalUrl: z.string().url().optional().or(z.literal("")),
 	locationType: z.enum(LOCATION_TYPES).optional(),
 	locationCity: z.string().max(100).optional(),
 	salaryMin: z.number().int().min(0).optional(),
