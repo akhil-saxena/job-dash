@@ -75,7 +75,7 @@ export function DetailHero({ app }: DetailHeroProps) {
 		app.salaryCurrency,
 	);
 	const locationLabel = formatLocation(app.locationType, app.locationCity);
-	const days = daysSince(app.createdAt);
+	const days = daysSince(app.appliedAt ?? app.createdAt);
 
 	const pillClasses =
 		"inline-flex items-center gap-1 text-xs text-text-secondary dark:text-dark-accent/60 bg-black/[0.03] dark:bg-white/[0.05] px-2 py-1 rounded-[var(--radius-pill)]";
