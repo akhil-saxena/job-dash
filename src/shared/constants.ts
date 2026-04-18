@@ -69,3 +69,33 @@ export const INTERVIEW_STATUS_LABELS: Record<InterviewStatus, string> = {
 	cancelled: "Cancelled",
 	no_show: "No Show",
 };
+
+export const TAG_COLORS = [
+	"#ef4444", // red
+	"#f97316", // orange
+	"#f59e0b", // amber
+	"#84cc16", // lime
+	"#22c55e", // green
+	"#06b6d4", // cyan
+	"#3b82f6", // blue
+	"#8b5cf6", // violet
+	"#d946ef", // fuchsia
+	"#ec4899", // pink
+	"#6b7280", // gray
+	"#78716c", // stone
+] as const;
+
+export const DEADLINE_TYPES = [
+	"application_close",
+	"offer_expiry",
+	"follow_up",
+	"custom",
+] as const;
+export type DeadlineType = (typeof DEADLINE_TYPES)[number];
+
+export const DEADLINE_TYPE_LABELS: Record<DeadlineType, string> = {
+	application_close: "Application Close",
+	offer_expiry: "Offer Expiry",
+	follow_up: "Follow Up",
+	custom: "Custom",
+};
