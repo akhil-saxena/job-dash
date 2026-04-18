@@ -29,6 +29,7 @@ export function SearchBar({
 				className="shrink-0 text-text-muted dark:text-dark-accent/40"
 			/>
 			<input
+				id="global-search"
 				type="text"
 				placeholder={placeholder}
 				value={value}

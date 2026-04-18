@@ -5,6 +5,7 @@ import { SearchBar } from "@/client/components/design-system/SearchBar";
 import { Button } from "@/client/components/design-system/Button";
 import { useTheme } from "@/client/hooks/useTheme";
 import { useQuickAdd } from "@/client/hooks/useQuickAdd";
+import { useSearch } from "@/client/hooks/useSearch";
 import { authClient } from "@/client/lib/auth-client";
 import type { ThemeMode } from "@/client/hooks/useTheme";
 
@@ -81,7 +82,20 @@ export function Header() {
 	const pageTitle = getPageTitle(currentPath);
 
 	const { setOpen: openQuickAdd } = useQuickAdd();
+	const search = useSearch();
 	const ThemeIcon = MODE_ICONS[mode];
+
+	// Cmd+K / Ctrl+K to focus search bar
+	useEffect(() => {
+		function handleKeyDown(e: KeyboardEvent) {
+			if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+				e.preventDefault();
+				document.getElementById("global-search")?.focus();
+			}
+		}
+		document.addEventListener("keydown", handleKeyDown);
+			return () => document.removeEventListener("keydown", handleKeyDown);
+	}, []);
 	const userName = session?.user?.name ?? "User";
 	const userEmail = session?.user?.email ?? "";
 	const userInitial = userName.charAt(0).toUpperCase();
@@ -102,7 +116,12 @@ export function Header() {
 			<div className="flex-1" />
 
 			<div className="hidden w-64 sm:block lg:w-80">
-				<SearchBar variant="glass" placeholder="Search applications..." />
+				<SearchBar
+					variant="glass"
+					placeholder="Search applications..."
+					value={search.query}
+					onChange={search.setQuery}
+				/>
 			</div>
 
 			<Button variant="filled" size="sm" onClick={() => openQuickAdd(true)}>
