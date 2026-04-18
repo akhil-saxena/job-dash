@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { DragDropContext, type DropResult } from "@hello-pangea/dnd";
 import { APPLICATION_STATUSES } from "@/shared/constants";
 import type { ApplicationStatus } from "@/shared/constants";
@@ -26,9 +25,6 @@ function BoardSkeleton() {
 export function KanbanBoard() {
 	const { grouped, isLoading, isError, refetch } = useApplicationsByStatus();
 	const updateStatus = useUpdateStatus();
-	// Delay DnD render to avoid StrictMode + @hello-pangea/dnd context invariant
-	const [dndReady, setDndReady] = useState(false);
-	useEffect(() => { setDndReady(true); }, []);
 
 	function handleDragEnd(result: DropResult) {
 		const { destination, source, draggableId } = result;
@@ -66,21 +62,17 @@ export function KanbanBoard() {
 		<>
 			{/* Desktop: CSS grid with DragDropContext -- hidden on mobile */}
 			<div className="hidden p-4 md:block md:p-6">
-				{dndReady ? (
-					<DragDropContext onDragEnd={handleDragEnd}>
-						<div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-2">
-							{APPLICATION_STATUSES.map((status) => (
-								<KanbanColumn
-									key={status}
-									status={status}
-									apps={grouped.get(status) ?? []}
-								/>
-							))}
-						</div>
-					</DragDropContext>
-				) : (
-					<BoardSkeleton />
-				)}
+				<DragDropContext onDragEnd={handleDragEnd}>
+					<div className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-2">
+						{APPLICATION_STATUSES.map((status) => (
+							<KanbanColumn
+								key={status}
+								status={status}
+								apps={grouped.get(status) ?? []}
+							/>
+						))}
+					</div>
+				</DragDropContext>
 			</div>
 
 			{/* Mobile: collapsible sections (no DnD) -- hidden on desktop */}

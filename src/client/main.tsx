@@ -49,12 +49,13 @@ function InnerApp() {
 	);
 }
 
+// Note: StrictMode removed because @hello-pangea/dnd Draggable/Droppable
+// throws "Could not find required context" invariant during React 19
+// StrictMode double-render. StrictMode is dev-only and doesn't affect production.
 createRoot(document.getElementById("root")!).render(
-	<StrictMode>
-		<QueryClientProvider client={queryClient}>
-			<ToastProvider>
-				<InnerApp />
-			</ToastProvider>
-		</QueryClientProvider>
-	</StrictMode>,
+	<QueryClientProvider client={queryClient}>
+		<ToastProvider>
+			<InnerApp />
+		</ToastProvider>
+	</QueryClientProvider>,
 );
