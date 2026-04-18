@@ -26,10 +26,10 @@ export function Sidebar() {
 	}
 
 	return (
-		<aside className="hidden md:flex flex-col items-center w-[72px] h-screen sticky top-0 left-0 glass border-r border-white/30 dark:border-white/10 py-4">
-			{/* Logo */}
-			<Link to="/board" className="mb-6 flex h-12 w-12 items-center justify-center overflow-visible">
-				<img src="/logo-j.svg" alt="JobDash" className="h-10 w-10" />
+		<aside className="hidden md:flex flex-col items-center w-[72px] h-screen sticky top-0 left-0 z-50 glass border-r border-white/30 dark:border-white/10 py-4">
+			{/* Logo — reduced 2-line mark for small sizes (brand rule: < 32px use reduced) */}
+			<Link to="/board" className="mb-6 flex w-full items-center justify-center px-2">
+				<img src="/logo-sidebar.svg" alt="JobDash" className="h-8 w-auto" />
 			</Link>
 
 			{/* Nav items */}
