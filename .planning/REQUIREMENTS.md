@@ -26,7 +26,7 @@
 
 ### Views
 
-- [ ] **VIEW-01**: Kanban board as the home/landing page with columns per status, drag-and-drop, card preview (company badge, role, days, urgency tint)
+- [x] **VIEW-01**: Kanban board as the home/landing page with columns per status, drag-and-drop, card preview (company badge, role, days, urgency tint)
 - [x] **VIEW-02**: Table view with sortable columns, filterable by status/source/priority/tags, full-text search. Mobile: glass card list
 - [ ] **VIEW-03**: Calendar view showing scheduled interviews and deadlines in month/week layout with Google Calendar sync
 - [ ] **VIEW-04**: Application detail as a full page with sticky hero + tabbed sections (Overview, Interviews, JD, Docs, Timeline)
@@ -169,7 +169,7 @@ Deferred to future release.
 | TRACK-06 | Phase 2 | Complete |
 | TRACK-07 | Phase 2 | Complete |
 | TRACK-08 | Phase 2 | Complete |
-| VIEW-01 | Phase 3 | Pending |
+| VIEW-01 | Phase 3 | Complete |
 | UI-01 | Phase 3 | Complete |
 | UI-02 | Phase 3 | Pending |
 | UI-03 | Phase 3 | Complete |
