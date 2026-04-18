@@ -9,17 +9,17 @@ import { Button } from "@/client/components/design-system/Button";
 import { KanbanColumn } from "./KanbanColumn";
 import { MobileKanban } from "./MobileKanban";
 
-/** Core statuses always shown even if empty — the main pipeline */
+/** Core statuses — the main pipeline most people use */
 const CORE_STATUSES: ApplicationStatus[] = [
-	"wishlist",
 	"applied",
-	"screening",
 	"interviewing",
 	"offer",
 ];
 
-/** Terminal statuses — only show if they have applications */
-const TERMINAL_STATUSES: ApplicationStatus[] = [
+/** Secondary statuses — only show if they have applications */
+const SECONDARY_STATUSES: ApplicationStatus[] = [
+	"wishlist",
+	"screening",
 	"accepted",
 	"rejected",
 	"withdrawn",
@@ -29,7 +29,7 @@ function getVisibleStatuses(
 	grouped: Map<ApplicationStatus, unknown[]>,
 ): ApplicationStatus[] {
 	const visible: ApplicationStatus[] = [...CORE_STATUSES];
-	for (const status of TERMINAL_STATUSES) {
+	for (const status of SECONDARY_STATUSES) {
 		if ((grouped.get(status)?.length ?? 0) > 0) {
 			visible.push(status);
 		}
@@ -39,11 +39,11 @@ function getVisibleStatuses(
 
 function BoardSkeleton() {
 	return (
-		<div className="flex gap-4 overflow-x-auto p-4 md:p-6">
-			{Array.from({ length: 5 }).map((_, i) => (
+		<div className="flex gap-3 p-4 md:p-6">
+			{Array.from({ length: 3 }).map((_, i) => (
 				<div
 					key={`skeleton-${i}`}
-					className="flex w-64 shrink-0 flex-col gap-2"
+					className="flex min-w-0 flex-1 flex-col gap-2"
 				>
 					<div className="h-9 rounded-lg bg-black/[0.04] dark:bg-white/[0.06]" />
 					<div className="h-20 rounded-lg bg-black/[0.03] dark:bg-white/[0.04]" />
@@ -97,11 +97,11 @@ export function KanbanBoard() {
 			{/* Desktop: horizontal scrollable columns with DragDropContext */}
 			<div className="hidden p-4 md:block md:p-6">
 				<DragDropContext onDragEnd={handleDragEnd}>
-					<div className="flex gap-3 overflow-x-auto pb-2">
+					<div className="flex gap-3">
 						{visibleStatuses.map((status) => (
 							<div
 								key={status}
-								className="w-64 shrink-0 xl:w-72"
+								className="min-w-0 flex-1"
 							>
 								<KanbanColumn
 									status={status}
