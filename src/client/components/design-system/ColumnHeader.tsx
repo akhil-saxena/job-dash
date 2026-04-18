@@ -34,7 +34,7 @@ export function ColumnHeader({
 	// filled (default)
 	return (
 		<div
-			className="flex items-center gap-2 rounded-[var(--radius-card)] px-3 py-2"
+			className="flex h-9 items-center gap-2 rounded-[var(--radius-card)] px-3"
 			style={{ backgroundColor: `${color}14` }}
 		>
 			<span
