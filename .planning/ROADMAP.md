@@ -71,7 +71,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — getBySlug API endpoint, shared optimistic mutation hooks, search store, @hello-pangea/dnd install
+- [x] 04-01-PLAN.md — getBySlug API endpoint, shared optimistic mutation hooks, search store, @hello-pangea/dnd install
 - [ ] 04-02-PLAN.md — Kanban drag-and-drop, glass table/list view, filter chips, global search with Cmd+K
 - [ ] 04-03-PLAN.md — Full-page application detail with sticky hero, tabs, and Overview tab
 
