@@ -9,13 +9,15 @@ interface KanbanColumnProps {
 	apps: Application[];
 	label?: string;
 	count?: number;
+	showHeader?: boolean;
 }
 
-export function KanbanColumn({ status, apps, label, count }: KanbanColumnProps) {
+export function KanbanColumn({ status, apps, label, count, showHeader = true }: KanbanColumnProps) {
 	return (
 		<div className="flex min-h-[200px] flex-col gap-2">
-			{/* Column header stays OUTSIDE the Droppable */}
-			<ColumnHeader status={status} count={count ?? apps.length} variant="filled" label={label} />
+			{showHeader && (
+				<ColumnHeader status={status} count={count ?? apps.length} label={label} />
+			)}
 
 			{/* Droppable card list */}
 			<Droppable droppableId={status}>

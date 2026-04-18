@@ -102,39 +102,56 @@ export function KanbanBoard() {
 
 	const visibleColumns = getVisibleColumns(grouped);
 
+	// Build flat list of { status, label, apps, dimmed } for rendering
+	const columns = visibleColumns.map((col) => {
+		if (col.type === "status") {
+			return {
+				key: col.status,
+				status: col.status as ApplicationStatus,
+				label: undefined as string | undefined,
+				apps: grouped.get(col.status) ?? [],
+				dimmed: false,
+			};
+		}
+		const closedApps = col.statuses.flatMap((s) => grouped.get(s) ?? []);
+		return {
+			key: "closed",
+			status: "rejected" as ApplicationStatus,
+			label: "Closed",
+			apps: closedApps,
+			dimmed: true,
+		};
+	});
+
 	return (
 		<>
-			{/* Desktop: columns fill full width with DragDropContext */}
-			<div className="hidden p-4 md:block md:p-6">
+			{/* Desktop */}
+			<div className="hidden md:block">
 				<DragDropContext onDragEnd={handleDragEnd}>
-					<div className="flex gap-3">
-						{visibleColumns.map((col) => {
-							if (col.type === "status") {
-								return (
-									<div key={col.status} className="min-w-0 flex-1">
-										<KanbanColumn
-											status={col.status}
-											apps={grouped.get(col.status) ?? []}
-										/>
-									</div>
-								);
-							}
-							// Closed group — merge accepted/rejected/withdrawn into one column
-							const closedApps = col.statuses.flatMap(
-								(s) => grouped.get(s) ?? [],
-							);
-							const closedCount = closedApps.length;
-							return (
-								<div key="closed" className="min-w-0 flex-1 opacity-60">
-									<KanbanColumn
-										status="rejected"
-										label="Closed"
-										count={closedCount}
-										apps={closedApps}
-									/>
-								</div>
-							);
-						})}
+					{/* Header row — all status labels inline */}
+					<div className="flex gap-3 border-b border-black/[0.04] px-6 py-3 dark:border-white/[0.06]">
+						{columns.map((col) => (
+							<div key={col.key} className={`min-w-0 flex-1 ${col.dimmed ? "opacity-50" : ""}`}>
+								<ColumnHeader
+									status={col.status}
+									count={col.apps.length}
+									label={col.label}
+								/>
+							</div>
+						))}
+					</div>
+
+					{/* Card columns */}
+					<div className="flex gap-3 px-6 pt-3 pb-6">
+						{columns.map((col) => (
+							<div key={col.key} className={`min-w-0 flex-1 ${col.dimmed ? "opacity-50" : ""}`}>
+								<KanbanColumn
+									status={col.status}
+									apps={col.apps}
+									showHeader={false}
+								/>
+							</div>
+						))}
 					</div>
 				</DragDropContext>
 			</div>
