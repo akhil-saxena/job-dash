@@ -117,8 +117,13 @@ Plans:
   1. Paste markdown JD into detail page
   2. Rendered markdown in glass card (JD tab)
   3. Upload files to R2, listed as glass cards (Docs tab)
-  5. Upload button expands to drop zone on drag-over
-**Plans**: TBD
+  4. Upload button expands to drop zone on drag-over
+**Plans**: 2 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Schema (jd_text column + document table), R2 config, document CRUD API with integration tests
+- [ ] 07-02-PLAN.md — Frontend JDTab markdown editor/renderer + DocsTab file upload/download with drag-over drop zone
+
 **UI hint**: yes
 
 ### Phase 8: Calendar & Analytics
@@ -161,7 +166,7 @@ Phases 1-4 are linear. 5, 6, 7 can partially overlap after 4. 8 depends on 6. 9 
 | 4. Table, Detail & Navigation | 2/3 | Executing | - |
 | 5. Interview Tracking & Notes | 0/3 | Planning | - |
 | 6. Tags, Deadlines & Company | 0/0 | Not started | - |
-| 7. JD Snapshots & Documents | 0/0 | Not started | - |
+| 7. JD Snapshots & Documents | 0/2 | Planning | - |
 | 8. Calendar & Analytics | 0/0 | Not started | - |
 | 9. Command Palette & Polish | 0/0 | Not started | - |
 | 10. Design Refresh — Board & Detail | 3/3 | Complete    | 2026-04-18 |
