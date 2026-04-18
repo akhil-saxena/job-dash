@@ -34,8 +34,8 @@ export function Badge({
 	const bg = resolveBg(color);
 	const sizeClasses =
 		size === "sm"
-			? "text-[10px] h-5 px-2 leading-none"
-			: "text-xs h-6 px-2.5 leading-none";
+			? "text-[10px] min-h-5 px-2 py-px"
+			: "text-xs min-h-6 px-2.5 py-px";
 
 	if (variant === "dot") {
 		return (
@@ -54,7 +54,7 @@ export function Badge({
 	if (variant === "outlined") {
 		return (
 			<span
-				className={`inline-flex items-center font-semibold rounded-[var(--radius-pill)] border ${sizeClasses}`}
+				className={`inline-flex items-center justify-center font-semibold rounded-[var(--radius-pill)] border ${sizeClasses}`}
 				style={{ color: hex, borderColor: hex }}
 			>
 				{children}
@@ -65,7 +65,7 @@ export function Badge({
 	// filled (default)
 	return (
 		<span
-			className={`inline-flex items-center font-semibold rounded-[var(--radius-pill)] ${sizeClasses}`}
+			className={`inline-flex items-center justify-center font-semibold rounded-[var(--radius-pill)] ${sizeClasses}`}
 			style={{ backgroundColor: bg, color: hex }}
 		>
 			{children}
