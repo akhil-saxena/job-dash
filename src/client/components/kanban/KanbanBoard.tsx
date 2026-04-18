@@ -19,7 +19,7 @@ const CORE_STATUSES: ApplicationStatus[] = [
 	"offer",
 ];
 
-/** Grouped as "Closed" — show as one column if any have apps */
+/** Grouped as "Closed" -- show as one column if any have apps */
 const CLOSED_STATUSES: ApplicationStatus[] = [
 	"accepted",
 	"rejected",
@@ -129,10 +129,25 @@ export function KanbanBoard() {
 			{/* Desktop */}
 			<div className="hidden md:block">
 				<DragDropContext onDragEnd={handleDragEnd}>
-					{/* Header row — all status labels inline */}
-					<div className="flex gap-3 px-6 py-3">
-						{columns.map((col) => (
-							<div key={col.key} className={`min-w-0 flex-1 ${col.dimmed ? "opacity-50" : ""}`}>
+					{/* Header row -- border-separated, fixed-width columns */}
+					<div className="flex px-6 py-3">
+						{columns.map((col, i) => (
+							<div
+								key={col.key}
+								className={[
+									i === columns.length - 1
+										? "min-w-0 flex-1"
+										: "min-w-0 flex-[0_0_220px]",
+									col.dimmed ? "opacity-50" : "",
+									i > 0 ? "pl-3" : "",
+									i < columns.length - 1
+										? "border-r border-black/[0.04] pr-3 dark:border-white/[0.04]"
+										: "",
+								]
+									.filter(Boolean)
+									.join(" ")}
+								style={i < columns.length - 1 ? { minWidth: 220 } : undefined}
+							>
 								<ColumnHeader
 									status={col.status}
 									count={col.apps.length}
@@ -142,10 +157,25 @@ export function KanbanBoard() {
 						))}
 					</div>
 
-					{/* Card columns */}
-					<div className="flex gap-3 px-6 pt-3 pb-6">
-						{columns.map((col) => (
-							<div key={col.key} className={`min-w-0 flex-1 ${col.dimmed ? "opacity-50" : ""}`}>
+					{/* Card columns -- border-separated */}
+					<div className="flex px-6 pb-6">
+						{columns.map((col, i) => (
+							<div
+								key={col.key}
+								className={[
+									i === columns.length - 1
+										? "min-w-0 flex-1"
+										: "min-w-0 flex-[0_0_220px]",
+									col.dimmed ? "opacity-50" : "",
+									i > 0 ? "pl-3" : "",
+									i < columns.length - 1
+										? "border-r border-black/[0.04] pr-3 dark:border-white/[0.04]"
+										: "",
+								]
+									.filter(Boolean)
+									.join(" ")}
+								style={i < columns.length - 1 ? { minWidth: 220 } : undefined}
+							>
 								<KanbanColumn
 									status={col.status}
 									apps={col.apps}
