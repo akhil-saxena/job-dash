@@ -69,3 +69,55 @@ export const INTERVIEW_STATUS_LABELS: Record<InterviewStatus, string> = {
 	cancelled: "Cancelled",
 	no_show: "No Show",
 };
+
+// ---------------------------------------------------------------------------
+// Deadline types (DEAD-01)
+// ---------------------------------------------------------------------------
+
+export const DEADLINE_TYPES = [
+	"application_close",
+	"offer_expiry",
+	"follow_up",
+	"custom",
+] as const;
+export type DeadlineType = (typeof DEADLINE_TYPES)[number];
+
+export const DEADLINE_TYPE_LABELS: Record<DeadlineType, string> = {
+	application_close: "Application Close",
+	offer_expiry: "Offer Expiry",
+	follow_up: "Follow-Up",
+	custom: "Custom",
+};
+
+// ---------------------------------------------------------------------------
+// Tag colors (TAG-01)
+// ---------------------------------------------------------------------------
+
+export const TAG_COLORS = [
+	"slate",
+	"red",
+	"orange",
+	"amber",
+	"yellow",
+	"lime",
+	"green",
+	"emerald",
+	"teal",
+	"cyan",
+	"sky",
+	"blue",
+	"indigo",
+	"violet",
+	"purple",
+	"fuchsia",
+	"pink",
+	"rose",
+] as const;
+export type TagColor = (typeof TAG_COLORS)[number];
+
+// ---------------------------------------------------------------------------
+// Salary currencies (SAL-02)
+// ---------------------------------------------------------------------------
+
+export const SALARY_CURRENCIES = ["INR", "USD", "EUR", "GBP"] as const;
+export type SalaryCurrency = (typeof SALARY_CURRENCIES)[number];
