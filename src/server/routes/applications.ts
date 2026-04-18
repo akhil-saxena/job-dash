@@ -59,6 +59,19 @@ app.get(
 );
 
 // ---------------------------------------------------------------------------
+// GET /api/application-by-slug/:slug -- Get single application by slug
+// NOTE: Separate path to avoid Hono trie router conflict with /:id
+// ---------------------------------------------------------------------------
+
+app.get("/api/application-by-slug/:slug", async (c) => {
+	const userId = c.get("userId");
+	const db = createDb(c.env.DB);
+	const slug = c.req.param("slug");
+	const result = await applicationService.getBySlug(db, userId, slug);
+	return c.json(success(result));
+});
+
+// ---------------------------------------------------------------------------
 // GET /api/applications/:id -- Get single application with timeline
 // ---------------------------------------------------------------------------
 

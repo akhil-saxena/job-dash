@@ -159,6 +159,26 @@ export async function getById(db: Database, userId: string, appId: string) {
 	return { ...app, timeline: events };
 }
 
+/** Get a single application by slug with its timeline events */
+export async function getBySlug(db: Database, userId: string, slug: string) {
+	const app = await db
+		.select()
+		.from(application)
+		.where(and(eq(application.slug, slug), ...baseConditions(userId)))
+		.get();
+
+	if (!app) throw new NotFoundError("Application not found");
+
+	const events = await db
+		.select()
+		.from(timelineEvent)
+		.where(eq(timelineEvent.applicationId, app.id))
+		.orderBy(desc(timelineEvent.occurredAt))
+		.all();
+
+	return { ...app, timeline: events };
+}
+
 /** List applications with filtering, search, sorting, and pagination */
 export async function list(
 	db: Database,

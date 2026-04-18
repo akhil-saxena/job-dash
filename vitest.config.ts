@@ -6,6 +6,7 @@ export default defineConfig({
 	test: {
 		globals: true,
 		setupFiles: ["./tests/setup.ts"],
+		exclude: ["**/node_modules/**", "**/.claude/worktrees/**"],
 	},
 	resolve: {
 		alias: {
