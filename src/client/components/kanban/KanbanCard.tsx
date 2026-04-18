@@ -13,12 +13,20 @@ interface KanbanCardProps {
 	index: number;
 }
 
+const PRIORITY_TINTS: Record<string, string> = {
+	high: "border-l-[3px] border-l-red-400/40",
+	medium: "",
+	low: "",
+};
+
 export function KanbanCard({ app, index }: KanbanCardProps) {
 	const router = useRouter();
 	const urgency = calculateUrgency(app);
 	const urgencyClass = URGENCY_STYLES[urgency];
 	const days = getDaysSinceUpdate(app.updatedAt);
 	const isStale = urgency === "stale";
+	// Priority tint only if no urgency tint is active
+	const priorityClass = urgency === "normal" ? (PRIORITY_TINTS[app.priority] ?? "") : "";
 
 	function handleClick() {
 		router.navigate({ to: "/app/$slug", params: { slug: app.slug } });
@@ -44,6 +52,7 @@ export function KanbanCard({ app, index }: KanbanCardProps) {
 							"transition-all hover:bg-white/[0.8] hover:shadow-sm",
 							"dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.1]",
 							urgencyClass,
+							priorityClass,
 						].join(" ")}
 					>
 						{/* Row 1: badge + company/role + days */}
