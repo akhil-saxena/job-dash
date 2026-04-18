@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JobDash — Application · Combo A with tabs</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --font:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',system-ui,sans-serif;
+  --mono:'JetBrains Mono','SF Mono','Menlo',monospace;
+  --display:'Archivo',system-ui,sans-serif;
+  --ink:#292524;--ink-2:#57534e;--ink-3:#78716c;--ink-4:#a8a29e;--ink-5:#d6d3d1;
+  --cream:#f5f3f0;--cream-2:#ece8e3;--cream-3:#e7e2dc;
+  --amber:#f59e0b;--amber-d:#d97706;--amber-l:#fef3c7;
+  --blue:#3b82f6;--purple:#8b5cf6;--green:#22c55e;--red:#ef4444;
+  --rule:rgba(0,0,0,.08);
+  --g-bg:rgba(255,255,255,.55);
+  --g-bd:rgba(255,255,255,.5);
+  --g-blur:14px;
+}
+body.glass-heavy{--g-bg:rgba(255,255,255,.4);--g-blur:22px}
+body.glass-subtle{--g-bg:rgba(255,255,255,.85);--g-blur:6px;--g-bd:rgba(0,0,0,.05)}
+
+html,body{background:#f5f3f0;background-image:
+  radial-gradient(circle at 100% 100%, transparent 199px, rgba(245,158,11,.10) 200px 201px, transparent 202px),
+  radial-gradient(circle at 100% 100%, transparent 339px, rgba(245,158,11,.09) 340px 341px, transparent 342px),
+  radial-gradient(circle at 100% 100%, transparent 479px, rgba(245,158,11,.08) 480px 481px, transparent 482px),
+  radial-gradient(circle at 100% 100%, transparent 619px, rgba(245,158,11,.07) 620px 621px, transparent 622px),
+  radial-gradient(circle, rgba(41,37,36,.13) 1px, transparent 1.2px);
+background-size:100% 100%,100% 100%,100% 100%,100% 100%,16px 16px;background-attachment:fixed;
+  color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;min-height:100%}
+.wrap{max-width:1400px;margin:0 auto;padding:36px 28px 160px}
+
+.intro{padding:0 0 18px;border-bottom:1px solid var(--rule);margin-bottom:24px}
+.intro .kicker{font-size:10px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.8px}
+.intro h1{font-family:var(--display);font-weight:800;font-size:28px;letter-spacing:-.025em;margin-top:10px;line-height:1.05}
+.intro p{font-size:13px;color:var(--ink-2);max-width:900px;line-height:1.55;margin-top:8px}
+.tab-hint{margin-top:10px;font-family:var(--mono);font-size:10.5px;color:var(--amber-d);letter-spacing:.04em}
+
+.mock{border-radius:16px;overflow:hidden;border:1px solid rgba(0,0,0,.07);background:var(--cream);position:relative}
+.chrome{display:grid;grid-template-columns:56px 1fr;min-height:720px}
+.rail{background:rgba(255,255,255,.5);backdrop-filter:blur(var(--g-blur));border-right:1px solid var(--rule);display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:8px;position:relative;z-index:3}
+.rail .logo{width:32px;height:32px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.rail .ic{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--ink-3);cursor:pointer}
+.rail .ic.on{background:var(--ink);color:var(--cream)}
+.rail .bot{margin-top:auto}
+
+.main{display:flex;flex-direction:column;position:relative;z-index:2}
+.topbar{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--rule);background:rgba(255,255,255,.55);backdrop-filter:blur(10px)}
+.topbar .t{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:-.01em}
+.topbar .sp{flex:1}
+.topbar .srch{background:rgba(255,255,255,.6);border:1px solid var(--rule);border-radius:8px;padding:6px 10px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-3);width:260px}
+.topbar .kbd{margin-left:auto;font-family:var(--mono);font-size:9.5px;background:var(--cream-2);border-radius:4px;padding:1px 5px;color:var(--ink-3)}
+.avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(145deg,#c4a484,#a0826d);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+
+.glass{background:var(--g-bg);backdrop-filter:blur(var(--g-blur));border:1px solid var(--g-bd);border-radius:14px}
+.co-logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(145deg,#1a1717,#292524);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:20px;flex-shrink:0}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-2);background:rgba(255,255,255,.55);border:1px solid rgba(0,0,0,.05);border-radius:999px;padding:4px 10px;font-weight:500;white-space:nowrap}
+.btn{font-size:12px;padding:6px 12px;border-radius:7px;font-weight:600;border:1px solid var(--rule);background:rgba(255,255,255,.5);color:var(--ink-2);display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-family:var(--font);white-space:nowrap}
+.btn.dark{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.btn.amber{background:var(--amber);color:#fff;border-color:var(--amber-d)}
+.btn.ghost{background:transparent}
+.icbtn{width:30px;height:30px;border-radius:7px;border:1px solid var(--rule);background:rgba(255,255,255,.5);display:inline-flex;align-items:center;justify-content:center;color:var(--ink-2);cursor:pointer}
+.icbtn.active{color:var(--amber);border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.08)}
+.dd{background:rgba(255,255,255,.6);border:1px solid var(--rule);border-radius:8px;padding:6px 10px;display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;white-space:nowrap}
+.dd .d{width:7px;height:7px;border-radius:50%}
+.label{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+
+.pipe{display:flex;align-items:center;padding:10px 12px;border-radius:10px;font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase}
+.pipe-step{display:flex;align-items:center;gap:7px;padding:0 10px;color:var(--ink-4);font-weight:600;white-space:nowrap}
+.pipe-step .d{width:7px;height:7px;border-radius:50%;background:var(--ink-5)}
+.pipe-step.done{color:var(--ink-3)}.pipe-step.done .d{background:var(--ink-3)}
+.pipe-step.cur{color:var(--blue)}.pipe-step.cur .d{background:var(--blue);box-shadow:0 0 0 4px rgba(59,130,246,.15)}
+.pipe-sep{width:24px;height:1px;background:var(--ink-5);flex-shrink:0}
+
+.sticky{background:linear-gradient(145deg,#fef3c7,#fde68a);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:14px 16px;transform:rotate(-.6deg);box-shadow:0 2px 8px rgba(245,158,11,.15);cursor:text;font-family:'Archivo',sans-serif;font-weight:600;line-height:1.45;font-size:13.5px;color:var(--ink)}
+.sticky .hint{font-family:var(--mono);font-size:9px;color:var(--amber-d);letter-spacing:.08em;margin-top:10px;text-transform:uppercase;font-weight:700;opacity:.75;white-space:nowrap}
+
+.contact{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px}
+.contact:hover{background:rgba(255,255,255,.4)}
+.contact .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(145deg,#8b5cf6,#6d28d9);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0}
+.contact .av.b{background:linear-gradient(145deg,#3b82f6,#1d4ed8)}
+.contact .av.g{background:linear-gradient(145deg,#22c55e,#15803d)}
+.contact .nm{font-size:13px;font-weight:600;line-height:1.2}
+.contact .rl{font-size:11px;color:var(--ink-3);line-height:1.2;margin-top:1px}
+
+.iv{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px dashed rgba(0,0,0,.06)}
+.iv:last-child{border-bottom:0}
+.iv .date{width:42px;text-align:center;flex-shrink:0}
+.iv .date .m{font-family:var(--mono);font-size:9px;color:var(--amber-d);letter-spacing:.06em;font-weight:700;text-transform:uppercase}
+.iv .date .n{font-family:var(--display);font-weight:800;font-size:22px;line-height:1;letter-spacing:-.02em}
+.iv .bd{flex:1;min-width:0}
+.iv .ti{font-size:12.5px;font-weight:600;letter-spacing:-.005em}
+.iv .sb{font-size:11px;color:var(--ink-3);margin-top:2px;display:flex;align-items:center;gap:6px}
+.iv .sb .dot{width:3px;height:3px;border-radius:50%;background:var(--ink-4)}
+.iv .tm{font-family:var(--mono);font-size:10px;color:var(--ink-2);font-weight:600;white-space:nowrap}
+
+.tl{position:relative;padding-left:18px}
+.tl::before{content:"";position:absolute;left:5px;top:5px;bottom:5px;width:1px;background:rgba(0,0,0,.1)}
+.tl .ev{position:relative;padding:6px 0;font-size:12px}
+.tl .ev::before{content:"";position:absolute;left:-18px;top:11px;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid var(--ink-4)}
+.tl .ev.on::before{border-color:var(--amber);background:var(--amber)}
+.tl .ev .when{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);letter-spacing:.05em;text-transform:uppercase;font-weight:600}
+.tl .ev .wt{margin-top:2px;color:var(--ink-2);line-height:1.4}
+.tl .ev .wt b{color:var(--ink);font-weight:600}
+
+.sec-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;white-space:nowrap}
+.sec-hd .t{font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:-.005em}
+.sec-hd .sub{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.sec-hd .r{margin-left:auto}
+
+.hero-blk{display:flex;align-items:flex-start;gap:18px;padding:22px 24px}
+.hero-blk .co-logo{width:60px;height:60px;font-size:26px;border-radius:12px}
+.hero-blk .co{font-family:var(--display);font-weight:800;font-size:28px;letter-spacing:-.025em;line-height:1}
+.hero-blk .rl{font-family:var(--display);font-size:16px;color:var(--ink-2);margin-top:6px;font-weight:500}
+.hero-blk .chips{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.hero-blk .tr{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;max-width:300px}
+
+.tab-row{display:flex;gap:2px;padding:0 4px;border-bottom:1px solid var(--rule)}
+.tab{padding:10px 16px;font-size:13px;color:var(--ink-3);font-weight:500;border-bottom:2px solid transparent;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:var(--display);transition:color .15s}
+.tab:hover{color:var(--ink-2)}
+.tab.on{color:var(--ink);border-bottom-color:var(--amber);font-weight:700}
+.tab .ct{font-family:var(--mono);font-size:10px;background:var(--cream-2);border-radius:4px;padding:1px 5px;color:var(--ink-3);font-weight:500}
+.tab.on .ct{background:var(--amber-l);color:var(--amber-d)}
+
+.grp{padding:22px 24px}
+.grp-hd{display:flex;align-items:center;gap:8px;margin-bottom:16px;white-space:nowrap}
+.grp-hd .t{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:-.005em;color:var(--ink-2);display:flex;align-items:center;gap:10px;white-space:nowrap}
+.grp-hd .t::before{content:"";width:4px;height:15px;background:var(--amber);border-radius:2px;display:inline-block}
+.grp-hd .c{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-left:auto}
+.grp-hd .r{margin-left:auto}
+
+.fields2{display:grid;grid-template-columns:1fr 1fr;gap:20px 28px}
+.fields3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px 28px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field .k{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.field .v{font-size:14.5px;font-weight:500;color:var(--ink);padding:5px 0;border-bottom:1px dashed rgba(0,0,0,.12);cursor:text;line-height:1.3}
+.field .v:hover{border-bottom-color:var(--amber)}
+.field .v.empty{color:var(--ink-4);font-style:italic;font-weight:400}
+.field .v.link{color:var(--amber-d);font-family:var(--mono);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.field .v.m{font-family:var(--mono);font-size:13.5px;font-weight:600}
+
+/* Layout */
+.main-body{padding:22px 24px;display:grid;grid-template-columns:1fr 320px;gap:20px}
+.main-body.no-rail{grid-template-columns:1fr}
+.main-body.no-rail #railRight{display:none}
+.main-body.no-rail .hero,.main-body.no-rail .pipe-wrap,.main-body.no-rail .tabs-wrap,.main-body.no-rail .panel-col{grid-column:1/-1}
+.hero{grid-column:1/-1}
+.pipe-wrap{grid-column:1/-1;padding:10px 16px;display:flex;align-items:center;gap:14px}
+.tabs-wrap{grid-column:1/-1;margin-top:4px}
+.panel-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.rail-right{display:flex;flex-direction:column;gap:16px}
+.rail-right .pnl{padding:18px 20px}
+
+/* ====== OVERVIEW: smart highlight cards ====== */
+.reminder{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:9px;background:rgba(255,255,255,.4);border:1px solid var(--rule);font-size:13px;color:var(--ink-2);flex-wrap:wrap}
+.reminder .rlabel{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:700;padding:2px 7px;border-radius:4px;background:var(--cream-2)}
+.reminder .rtext{flex:1;min-width:200px}
+.reminder .rlink{font-family:var(--mono);font-size:11px;color:var(--amber-d);font-weight:700;text-decoration:none;letter-spacing:.04em}
+.reminder .rlink:hover{text-decoration:underline}
+.next-action{padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid rgba(245,158,11,.3);background:linear-gradient(145deg,rgba(254,243,199,.7),rgba(255,255,255,.55))}
+.next-action .ico{width:40px;height:40px;border-radius:10px;background:var(--amber);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.next-action .body{flex:1 1 0%;min-width:260px}
+.next-action .k{font-family:var(--mono);font-size:10px;color:var(--amber-d);letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.next-action .t{font-family:var(--display);font-weight:700;font-size:16px;margin-top:3px;letter-spacing:-.01em}
+.next-action .sub{font-size:12.5px;color:var(--ink-2);margin-top:3px}
+
+.kv-row{display:flex;gap:28px;flex-wrap:wrap}
+.kv-item{display:flex;flex-direction:column;gap:4px;min-width:100px}
+.kv-item .k{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.kv-item .v{font-family:var(--display);font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.005em}
+.kv-item .v.m{font-family:var(--mono);font-size:14px}
+
+.role-excerpt{font-size:14px;line-height:1.6;color:var(--ink-2);max-width:68ch}
+.role-excerpt b{color:var(--ink);font-weight:600}
+.bullet-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.bullet-list li{list-style:none;position:relative;padding-left:16px;font-size:13px;line-height:1.55;color:var(--ink-2)}
+.bullet-list li::before{content:"";position:absolute;left:0;top:.6em;width:5px;height:5px;border-radius:50%;background:var(--amber)}
+
+/* ====== INTERVIEWS ====== */
+.ivrow{display:grid;grid-template-columns:60px 1fr auto;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+.ivrow:last-child{border-bottom:0}
+.ivrow .dt{text-align:center}
+.ivrow .dt .m{font-family:var(--mono);font-size:10px;color:var(--amber-d);letter-spacing:.06em;font-weight:700;text-transform:uppercase}
+.ivrow .dt .n{font-family:var(--display);font-weight:800;font-size:28px;line-height:.95;letter-spacing:-.02em}
+.ivrow .dt .y{font-family:var(--mono);font-size:9px;color:var(--ink-4);margin-top:2px}
+.ivrow .bd{min-width:0}
+.ivrow .ttl{font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:-.005em;display:flex;align-items:center;gap:8px}
+.ivrow .kind{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);background:var(--cream-2);padding:2px 6px;border-radius:4px;letter-spacing:.05em;text-transform:uppercase;font-weight:700}
+.ivrow .sub{font-size:12.5px;color:var(--ink-2);margin-top:4px;display:flex;align-items:center;gap:8px}
+.ivrow .sub .dot{width:3px;height:3px;border-radius:50%;background:var(--ink-4)}
+.ivrow .out{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.ivrow .out .tm{font-family:var(--mono);font-size:11px;color:var(--ink-2);font-weight:600}
+.ivrow .badge{font-family:var(--mono);font-size:9.5px;padding:3px 8px;border-radius:999px;letter-spacing:.05em;text-transform:uppercase;font-weight:700}
+.badge.upcoming{background:rgba(59,130,246,.12);color:#1d4ed8}
+.badge.passed{background:rgba(34,197,94,.14);color:#15803d}
+.badge.pending{background:var(--cream-2);color:var(--ink-3)}
+.badge.done{background:rgba(139,92,246,.12);color:#6d28d9}
+
+.ivrow.past{opacity:.85}
+.ivrow.next{background:linear-gradient(90deg,rgba(254,243,199,.4),transparent)}
+
+/* ====== JD ====== */
+.jd-hero{display:flex;gap:30px;flex-wrap:wrap;align-items:flex-start;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--rule)}
+.jd-stat{display:flex;flex-direction:column;gap:3px}
+.jd-stat .k{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.jd-stat .v{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.005em}
+.jd-stat .v.m{font-family:var(--mono);font-size:14px}
+.fit-bar{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.fit-meter{width:160px;height:6px;background:var(--cream-2);border-radius:3px;overflow:hidden;position:relative}
+.fit-meter i{display:block;height:100%;width:78%;background:linear-gradient(90deg,#22c55e,#16a34a);border-radius:3px}
+.fit-label{font-family:var(--mono);font-size:11px;color:#15803d;font-weight:700}
+.jd-text{font-size:14px;line-height:1.65;color:var(--ink-2);max-width:72ch}
+.jd-text h4{font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:-.005em;color:var(--ink);margin-top:18px;margin-bottom:10px}
+.jd-text h4:first-child{margin-top:0}
+.jd-text p{margin-bottom:10px}
+.skill-grid{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.skill{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;padding:4px 9px;border-radius:6px;background:rgba(255,255,255,.55);border:1px solid rgba(0,0,0,.06);font-weight:600;color:var(--ink-2)}
+.skill.match{background:rgba(34,197,94,.1);color:#15803d;border-color:rgba(34,197,94,.25)}
+.skill.miss{background:rgba(239,68,68,.08);color:#b91c1c;border-color:rgba(239,68,68,.2)}
+.skill .dot{width:5px;height:5px;border-radius:50%}
+
+/* ====== DOCS ====== */
+.doc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.doc{display:flex;gap:14px;padding:14px 16px;border-radius:10px;background:rgba(255,255,255,.45);border:1px solid rgba(0,0,0,.05);align-items:center;cursor:pointer;transition:background .15s}
+.doc:hover{background:rgba(255,255,255,.7)}
+.doc .ico{width:44px;height:56px;border-radius:6px;background:#fff;border:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.doc .ico .tag{position:absolute;top:-5px;right:-5px;font-family:var(--mono);font-size:8.5px;background:var(--ink);color:var(--cream);padding:2px 5px;border-radius:4px;font-weight:700;letter-spacing:.04em}
+.doc .ico svg{color:var(--ink-3)}
+.doc .bd{flex:1;min-width:0}
+.doc .nm{font-family:var(--display);font-weight:700;font-size:13.5px;letter-spacing:-.005em}
+.doc .meta{font-family:var(--mono);font-size:10px;color:var(--ink-3);margin-top:3px;letter-spacing:.04em}
+.doc .v{font-family:var(--mono);font-size:9.5px;color:var(--amber-d);margin-top:3px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.doc-drop{display:flex;align-items:center;justify-content:center;gap:10px;padding:18px;border-radius:10px;border:1.5px dashed rgba(0,0,0,.15);font-size:12.5px;color:var(--ink-3);cursor:pointer}
+.doc-drop:hover{border-color:var(--amber);color:var(--amber-d);background:rgba(245,158,11,.05)}
+
+.link-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.link-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.4);border:1px solid rgba(0,0,0,.05)}
+.link-row .ico{width:26px;height:26px;border-radius:6px;background:var(--cream-2);display:flex;align-items:center;justify-content:center;color:var(--ink-3);flex-shrink:0}
+.link-row .nm{font-size:13px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.link-row .url{font-family:var(--mono);font-size:11px;color:var(--amber-d)}
+
+/* ====== TIMELINE ====== */
+.tl-full{position:relative;padding-left:32px}
+.tl-full::before{content:"";position:absolute;left:11px;top:8px;bottom:8px;width:1.5px;background:rgba(0,0,0,.08)}
+.tl-ev{position:relative;padding:14px 0;display:grid;grid-template-columns:100px 1fr auto;gap:16px;align-items:flex-start;border-bottom:1px dashed rgba(0,0,0,.06)}
+.tl-ev:last-child{border-bottom:0}
+.tl-ev::before{content:"";position:absolute;left:-26px;top:20px;width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid var(--ink-4);z-index:2}
+.tl-ev.done::before{border-color:var(--amber);background:var(--amber);box-shadow:0 0 0 4px var(--amber-l)}
+.tl-ev.pending::before{background:#fff;border-color:var(--ink-5);border-style:dashed}
+.tl-ev .when{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.05em;text-transform:uppercase;font-weight:700;padding-top:3px}
+.tl-ev .body .t{font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:-.005em}
+.tl-ev .body .d{font-size:12.5px;color:var(--ink-2);margin-top:4px;line-height:1.5}
+.tl-ev .body .meta{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.tl-ev .body .meta .chip{font-size:10px;padding:2px 8px}
+.tl-ev .act{font-family:var(--mono);font-size:9.5px;color:var(--ink-4);letter-spacing:.04em;text-transform:uppercase;font-weight:700;white-space:nowrap}
+
+/* Panel switching */
+.panel{display:none}
+.panel.on{display:flex;flex-direction:column;gap:16px;animation:fadein .2s ease-out}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.i{width:16px;height:16px;display:inline-block;vertical-align:middle}
+.i.sm{width:13px;height:13px}
+.i.lg{width:20px;height:20px}
+
+#tw{position:fixed;bottom:18px;right:18px;background:rgba(255,255,255,.95);backdrop-filter:blur(14px);border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:14px 16px;width:260px;box-shadow:0 8px 28px rgba(0,0,0,.12);z-index:80;display:none;font-size:12px}
+#tw.on{display:block}
+#tw h3{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:10px}
+#tw .row{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+#tw button{flex:1;min-width:60px;font-size:11px;padding:6px 8px;border:1px solid var(--rule);background:rgba(255,255,255,.6);border-radius:6px;cursor:pointer;color:var(--ink-2);font-family:var(--font)}
+#tw button.on{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+#tw .grp-tw{margin-bottom:12px}
+#tw .lb{font-family:var(--mono);font-size:9px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-weight:700}
+
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--rule);font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase;display:flex;justify-content:space-between}
+</style>
+</head>
+<body data-screen-label="Combo A · Tabbed">
+<div class="wrap">
+
+  <div class="intro">
+    <div class="kicker">Application page · Combo A · wired tabs</div>
+    <h1>Overview, Interviews, JD, Docs, Timeline.</h1>
+    <p>Combo A with each tab content built out. Overview was rethought — dropped City (irrelevant for remote), merged min/max into a salary range, removed market-range noise, added a Next Action card and a role excerpt with key responsibilities. Click a tab to switch panel.</p>
+    <div class="tab-hint">↓ Click any tab to see its panel</div>
+  </div>
+
+  <div class="mock">
+    <div class="chrome">
+      <!-- rail -->
+      <aside class="rail">
+        <div class="logo"><svg viewBox="0 0 210 100" width="28" height="14"><g stroke="var(--amber)" stroke-linecap="round" fill="none" stroke-width="5"><line x1="16" y1="42" x2="60" y2="42" opacity=".5"/><line x1="14" y1="54" x2="72" y2="54" opacity=".85"/><line x1="20" y1="66" x2="60" y2="66" opacity=".5"/></g><g transform="translate(100 20) skewX(-14)"><rect x="0" y="0" width="40" height="12" rx="2" fill="var(--ink)"/><rect x="14" y="0" width="12" height="48" rx="2" fill="var(--ink)"/><path d="M 20 48 Q 20 64 6 64 Q -4 64 -5 54" fill="none" stroke="var(--amber)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></g></svg></div>
+        <div class="ic"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+        <div class="ic on"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div>
+        <div class="ic"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg></div>
+        <div class="ic"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 12l4-4 4 4 6-6"/></svg></div>
+        <div class="bot ic"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
+      </aside>
+
+      <div class="main">
+        <div class="topbar">
+          <span class="t">Application</span>
+          <span class="sp"></span>
+          <div class="srch"><svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/></svg>Search applications…<span class="kbd">⌘K</span></div>
+          <button class="btn dark"><svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add Application</button>
+          <div class="avatar">A</div>
+        </div>
+
+        <div class="main-body">
+          <!-- HERO -->
+          <div class="hero glass hero-blk">
+            <div class="co-logo">A</div>
+            <div>
+              <div class="co">Automattic</div>
+              <div class="rl">Experienced Software Engineer</div>
+              <div class="chips">
+                <span class="chip"><svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>Remote</span>
+                <span class="chip"><svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>$70K–170K USD</span>
+                <span class="chip"><svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>Applied 2d ago</span>
+              </div>
+            </div>
+            <div class="tr">
+              <button class="icbtn active" title="Starred"><svg class="i sm" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
+              <button class="icbtn" title="Archive"><svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/></svg></button>
+              <div class="dd"><span class="d" style="background:var(--blue)"></span>Applied<svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+              <div class="dd"><span style="color:var(--amber-d)">●</span>Medium<svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+            </div>
+          </div>
+
+          <!-- PIPELINE -->
+          <div class="pipe-wrap glass">
+            <div class="label">Pipeline</div>
+            <div class="pipe" style="flex:1">
+              <div class="pipe-step done"><span class="d"></span>Saved</div>
+              <div class="pipe-sep"></div>
+              <div class="pipe-step cur"><span class="d"></span>Applied</div>
+              <div class="pipe-sep"></div>
+              <div class="pipe-step"><span class="d"></span>Screening</div>
+              <div class="pipe-sep"></div>
+              <div class="pipe-step"><span class="d"></span>Interview</div>
+              <div class="pipe-sep"></div>
+              <div class="pipe-step"><span class="d"></span>Offer</div>
+            </div>
+            <button class="btn amber" style="margin-left:auto">Advance →</button>
+          </div>
+
+          <!-- TABS -->
+          <div class="tabs-wrap">
+            <div class="tab-row">
+              <div class="tab on" data-panel="overview">Overview</div>
+              <div class="tab" data-panel="interviews">Interviews<span class="ct">2</span></div>
+              <div class="tab" data-panel="jd">JD</div>
+              <div class="tab" data-panel="docs">Docs<span class="ct">3</span></div>
+              <div class="tab" data-panel="timeline">Timeline</div>
+            </div>
+          </div>
+
+          <!-- MAIN CONTENT (panels) -->
+          <div class="panel-col">
+
+            <!-- ============== OVERVIEW ============== -->
+            <div class="panel on" data-panel="overview">
+              <!-- subtle inline reminder -->
+              <div class="reminder">
+                <span class="rlabel">Next</span>
+                <span class="rtext">Recruiter intro with Maya Chen — Apr 24, 2:00pm</span>
+                <a class="rlink" href="#">Prep doc →</a>
+              </div>
+
+              <!-- key facts -->
+              <div class="grp glass">
+                <div class="grp-hd"><span class="t">At a glance</span></div>
+                <div class="kv-row">
+                  <div class="kv-item"><span class="k">Location</span><span class="v">Remote</span></div>
+                  <div class="kv-item"><span class="k">Salary range</span><span class="v m">$70K – $170K</span></div>
+                  <div class="kv-item"><span class="k">Source</span><span class="v">Company Website</span></div>
+                  <div class="kv-item"><span class="k">Applied</span><span class="v m">Apr 16, 2026</span></div>
+                  <div class="kv-item"><span class="k">Time in stage</span><span class="v">2 days</span></div>
+                  <div class="kv-item"><span class="k">Job posting</span><span class="v" style="font-family:var(--mono);font-size:13px;color:var(--amber-d)">automattic.com ↗</span></div>
+                </div>
+              </div>
+
+              <!-- role excerpt -->
+              <div class="grp glass">
+                <div class="grp-hd"><span class="t">About the role</span><span class="r" style="font-family:var(--mono);font-size:10px;color:var(--ink-3)">From job description</span></div>
+                <p class="role-excerpt">As an <b>Experienced Software Engineer</b>, you'll work on <b>WordPress.com, Jetpack, WooCommerce,</b> or one of our other distributed products. You'll write code that serves hundreds of millions of users, in a <b>fully remote, asynchronous culture</b> that values written communication above all else.</p>
+                <ul class="bullet-list">
+                  <li>Ship code independently within small cross-functional teams ("Divisions")</li>
+                  <li>Strong preference for <b>PHP, JavaScript, and/or React</b> experience</li>
+                  <li>Compensation ranges widely based on level and location</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- ============== INTERVIEWS ============== -->
+            <div class="panel" data-panel="interviews">
+              <div class="grp glass">
+                <div class="grp-hd">
+                  <span class="t">Interview schedule</span>
+                  <span class="r"><button class="btn amber"><svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Add interview</button></span>
+                </div>
+
+                <!-- upcoming -->
+                <div class="ivrow next">
+                  <div class="dt"><div class="m">Apr</div><div class="n">24</div><div class="y">Fri</div></div>
+                  <div class="bd">
+                    <div class="ttl">Recruiter intro<span class="kind">Screening</span></div>
+                    <div class="sub">Maya Chen · Recruiter<span class="dot"></span>Google Meet<span class="dot"></span>30 min</div>
+                  </div>
+                  <div class="out"><span class="badge upcoming">Upcoming</span><span class="tm">2:00pm</span></div>
+                </div>
+
+                <div class="ivrow">
+                  <div class="dt"><div class="m">Apr</div><div class="n">29</div><div class="y">Wed</div></div>
+                  <div class="bd">
+                    <div class="ttl">Technical screen<span class="kind">Tech</span></div>
+                    <div class="sub">TBD · Senior engineer<span class="dot"></span>CoderPad<span class="dot"></span>60 min</div>
+                  </div>
+                  <div class="out"><span class="badge pending">Pending invite</span><span class="tm">—</span></div>
+                </div>
+
+                <div class="ivrow">
+                  <div class="dt"><div class="m">May</div><div class="n">08</div><div class="y">Fri</div></div>
+                  <div class="bd">
+                    <div class="ttl">Trial project kickoff<span class="kind">Trial</span></div>
+                    <div class="sub">Paid trial · 10–40 hrs over 2 weeks</div>
+                  </div>
+                  <div class="out"><span class="badge pending">Tentative</span><span class="tm">—</span></div>
+                </div>
+              </div>
+
+              <div class="grp glass">
+                <div class="grp-hd"><span class="t">Prep notes</span></div>
+                <ul class="bullet-list">
+                  <li>Review Automattic's <b>Creed</b> and how async comms show up in the role</li>
+                  <li>Read Matt Mullenweg's latest blog post on AI &amp; publishing</li>
+                  <li>Draft 3 questions: scope of Division, trial-project expectations, mentorship</li>
+                  <li>Brush up on <b>React Server Components</b> — expect a system-design Q</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- ============== JD ============== -->
+            <div class="panel" data-panel="jd">
+              <div class="grp glass">
+                <div class="grp-hd"><span class="t">Role summary</span><span class="r"><button class="btn ghost">↗ Open full posting</button></span></div>
+
+                <div class="jd-hero">
+                  <div class="jd-stat"><span class="k">Role</span><span class="v">Experienced Software Engineer</span></div>
+                  <div class="jd-stat"><span class="k">Seniority</span><span class="v">IC3 – IC5</span></div>
+                  <div class="jd-stat"><span class="k">Team</span><span class="v">Division (flexible)</span></div>
+                  <div class="jd-stat"><span class="k">Stack</span><span class="v m">PHP · JS · React</span></div>
+                  <div class="jd-stat"><span class="k">Work mode</span><span class="v">Remote · Async</span></div>
+                  <div class="jd-stat">
+                    <span class="k">Fit score</span>
+                    <div class="fit-bar"><div class="fit-meter"><i></i></div><span class="fit-label">78% · strong</span></div>
+                  </div>
+                </div>
+
+                <div class="jd-text">
+                  <h4>About the role</h4>
+                  <p>As an Experienced Software Engineer at Automattic, you'll join one of our many distributed teams — Divisions — working on the products that power roughly <b>40% of the web</b>: WordPress.com, Jetpack, WooCommerce, Tumblr, and more.</p>
+                  <p>We value <b>written communication</b> over synchronous meetings. Most of your day-to-day is coding, code review, and asynchronous discussion on internal P2s.</p>
+
+                  <h4>What you'll work on</h4>
+                  <p>Divisions are small, cross-functional, and autonomous. You pick the one that fits. Examples: WP.com Performance, Jetpack Security, Woo Payments, Simple Note, Day One. Rotation is encouraged.</p>
+
+                  <h4>Requirements</h4>
+                </div>
+
+                <div class="skill-grid">
+                  <span class="skill match"><span class="dot" style="background:#22c55e"></span>React · 5y</span>
+                  <span class="skill match"><span class="dot" style="background:#22c55e"></span>TypeScript · 4y</span>
+                  <span class="skill match"><span class="dot" style="background:#22c55e"></span>PHP · 3y</span>
+                  <span class="skill match"><span class="dot" style="background:#22c55e"></span>REST APIs</span>
+                  <span class="skill match"><span class="dot" style="background:#22c55e"></span>Async comm</span>
+                  <span class="skill miss"><span class="dot" style="background:#ef4444"></span>WordPress ecosystem</span>
+                  <span class="skill miss"><span class="dot" style="background:#ef4444"></span>GraphQL at scale</span>
+                </div>
+              </div>
+
+              <div class="grp glass">
+                <div class="grp-hd"><span class="t">My fit notes</span></div>
+                <p class="role-excerpt">Strong match on frontend + TypeScript. Gap on WordPress internals — worth spending a weekend on the <b>WP Gutenberg</b> codebase before the tech screen. The async-first culture aligns perfectly with my remote-only preference.</p>
+              </div>
+            </div>
+
+            <!-- ============== DOCS ============== -->
+            <div class="panel" data-panel="docs">
+              <div class="grp glass">
+                <div class="grp-hd">
+                  <span class="t">Attached documents</span>
+                  <span class="r"><button class="btn amber"><svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Upload</button></span>
+                </div>
+                <div class="doc-grid">
+                  <div class="doc">
+                    <div class="ico"><span class="tag">PDF</span><svg class="i lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                    <div class="bd"><div class="nm">Resume · Automattic tailored</div><div class="meta">168 KB · Apr 16, 2026</div><div class="v">Sent with application</div></div>
+                  </div>
+                  <div class="doc">
+                    <div class="ico"><span class="tag">MD</span><svg class="i lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                    <div class="bd"><div class="nm">Cover letter · v3</div><div class="meta">8 KB · Apr 15, 2026</div><div class="v">Sent with application</div></div>
+                  </div>
+                  <div class="doc">
+                    <div class="ico"><span class="tag">PDF</span><svg class="i lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                    <div class="bd"><div class="nm">Writing sample · Async culture at scale</div><div class="meta">224 KB · Apr 15, 2026</div><div class="v">Requested by JD</div></div>
+                  </div>
+                  <div class="doc-drop"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Drop or click to attach</div>
+                </div>
+              </div>
+
+              <div class="grp glass">
+                <div class="grp-hd"><span class="t">Related links</span></div>
+                <div class="link-list">
+                  <div class="link-row"><div class="ico"><svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg></div><div class="nm">GitHub · pinned projects</div><div class="url">github.com/me ↗</div></div>
+                  <div class="link-row"><div class="ico"><svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg></div><div class="nm">Portfolio site</div><div class="url">myname.dev ↗</div></div>
+                  <div class="link-row"><div class="ico"><svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div><div class="nm">Automattic job posting</div><div class="url">automattic.com/work-with-us/experienced-software-engineer/ ↗</div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ============== TIMELINE ============== -->
+            <div class="panel" data-panel="timeline">
+              <div class="grp glass">
+                <div class="grp-hd"><span class="t">Full activity</span><span class="r" style="font-family:var(--mono);font-size:10px;color:var(--ink-3)">All events · newest first</span></div>
+
+                <div class="tl-full">
+                  <div class="tl-ev pending">
+                    <div class="when">May 06 · Est</div>
+                    <div class="body"><div class="t">Response expected</div><div class="d">Based on Automattic's typical 3-week turnaround from recruiter intro.</div></div>
+                    <div class="act">Forecast</div>
+                  </div>
+                  <div class="tl-ev pending">
+                    <div class="when">Apr 29 · 10am</div>
+                    <div class="body"><div class="t">Technical screen</div><div class="d">60-min pair-programming with senior engineer. CoderPad link pending.</div></div>
+                    <div class="act">Scheduled</div>
+                  </div>
+                  <div class="tl-ev pending">
+                    <div class="when">Apr 24 · 2pm</div>
+                    <div class="body"><div class="t">Recruiter intro with Maya Chen</div><div class="d">30-min Google Meet. Prep doc attached.</div><div class="meta"><span class="chip">Google Meet</span><span class="chip">30 min</span></div></div>
+                    <div class="act">Upcoming</div>
+                  </div>
+                  <div class="tl-ev done">
+                    <div class="when">Apr 18 · 3:14pm</div>
+                    <div class="body"><div class="t">Recruiter reached out</div><div class="d"><b>Maya Chen</b> emailed to schedule a recruiter screen. Replied same day.</div></div>
+                    <div class="act">Done</div>
+                  </div>
+                  <div class="tl-ev done">
+                    <div class="when">Apr 16 · 9:02am</div>
+                    <div class="body"><div class="t">Application submitted</div><div class="d">Via Company Website. Resume v5 and Cover letter v3 attached.</div><div class="meta"><span class="chip">Company Website</span><span class="chip">Resume v5</span><span class="chip">Cover v3</span></div></div>
+                    <div class="act">Done</div>
+                  </div>
+                  <div class="tl-ev done">
+                    <div class="when">Apr 15 · 10:22pm</div>
+                    <div class="body"><div class="t">Tailored resume for Automattic</div><div class="d">Emphasized async comms, WP ecosystem familiarity, written communication.</div></div>
+                    <div class="act">Prep</div>
+                  </div>
+                  <div class="tl-ev done">
+                    <div class="when">Mar 28 · 11:40am</div>
+                    <div class="body"><div class="t">Saved to board</div><div class="d">Tagged as high priority. Flagged for "async-first remote" preference.</div></div>
+                    <div class="act">Done</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT RAIL (only on Overview) -->
+          <aside class="rail-right" id="railRight">
+            <div>
+              <div class="sec-hd"><span class="sub">Notes</span><span class="r"><button class="btn ghost" style="padding:3px 8px;font-size:10.5px">Open editor →</button></span></div>
+              <div class="sticky">Reach out to David before screening. Research Jetpack vs WP.com split.<div class="hint">Click to expand</div></div>
+            </div>
+            <div class="pnl glass">
+              <div class="sec-hd"><span class="t">Contacts</span><span class="r"><button class="icbtn"><svg class="i sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button></span></div>
+              <div class="contact"><div class="av">DS</div><div><div class="nm">David Swanson</div><div class="rl">Engineering Manager</div></div></div>
+              <div class="contact"><div class="av b">MC</div><div><div class="nm">Maya Chen</div><div class="rl">Recruiter</div></div></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div>JobDash · Combo A · Tabbed</div>
+    <div>Overview · Interviews · JD · Docs · Timeline</div>
+  </footer>
+</div>
+
+<div id="tw">
+  <h3>Tweaks</h3>
+  <div class="grp-tw">
+    <div class="lb">Glass intensity</div>
+    <div class="row">
+      <button data-g="subtle">Subtle</button>
+      <button data-g="moderate" class="on">Moderate</button>
+      <button data-g="heavy">Heavy</button>
+    </div>
+  </div>
+  <div class="grp-tw">
+    <div class="lb">Jump to tab</div>
+    <div class="row">
+      <button data-jt="overview" class="on">Overview</button>
+      <button data-jt="interviews">Interviews</button>
+      <button data-jt="jd">JD</button>
+      <button data-jt="docs">Docs</button>
+      <button data-jt="timeline">Timeline</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TWEAK_DEFAULS = /*EDITMODE-BEGIN*/{
+  "glass": "heavy",
+  "tab": "overview"
+}/*EDITMODE-END*/;
+
+function applyGlass(v){
+  document.body.classList.remove('glass-subtle','glass-heavy');
+  if(v==='subtle')document.body.classList.add('glass-subtle');
+  if(v==='heavy')document.body.classList.add('glass-heavy');
+  document.querySelectorAll('#tw [data-g]').forEach(b=>b.classList.toggle('on',b.dataset.g===v));
+}
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.panel===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.dataset.panel===name));
+  document.querySelectorAll('#tw [data-jt]').forEach(b=>b.classList.toggle('on',b.dataset.jt===name));
+  document.querySelector('.main-body').classList.toggle('no-rail',name!=='overview');
+  try{localStorage.setItem('jd_tab',name)}catch(e){}
+}
+
+applyGlass(TWEAK_DEFAULS.glass||'moderate');
+const savedTab=(()=>{try{return localStorage.getItem('jd_tab')}catch(e){return null}})();
+showTab(savedTab||TWEAK_DEFAULS.tab||'overview');
+
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>showTab(t.dataset.panel));
+document.querySelectorAll('#tw [data-g]').forEach(b=>b.onclick=()=>{
+  applyGlass(b.dataset.g);
+  try{window.parent.postMessage({type:'__edit_mode_set_keys',edits:{glass:b.dataset.g}},'*')}catch(e){}
+});
+document.querySelectorAll('#tw [data-jt]').forEach(b=>b.onclick=()=>showTab(b.dataset.jt));
+
+window.addEventListener('message',e=>{
+  const d=e.data||{};
+  if(d.type==='__activate_edit_mode')document.getElementById('tw').classList.add('on');
+  if(d.type==='__deactivate_edit_mode')document.getElementById('tw').classList.remove('on');
+});
+setTimeout(()=>{try{window.parent.postMessage({type:'__edit_mode_available'},'*')}catch(e){}},100);
+</script>
+</body>
+</html>

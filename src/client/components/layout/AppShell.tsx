@@ -24,33 +24,18 @@ export function AppShell({ children }: AppShellProps) {
 					className="relative flex-1 overflow-y-auto pb-[58px] md:pb-0"
 					style={{
 						backgroundColor: "#f5f3f0",
-						backgroundImage: "radial-gradient(circle, rgba(41,37,36,0.13) 1px, transparent 1.2px)",
-						backgroundSize: "16px 16px",
+						backgroundImage: [
+							"radial-gradient(circle at 100% 100%, transparent 199px, rgba(245,158,11,0.10) 200px 201px, transparent 202px)",
+							"radial-gradient(circle at 100% 100%, transparent 339px, rgba(245,158,11,0.09) 340px 341px, transparent 342px)",
+							"radial-gradient(circle at 100% 100%, transparent 479px, rgba(245,158,11,0.08) 480px 481px, transparent 482px)",
+							"radial-gradient(circle at 100% 100%, transparent 619px, rgba(245,158,11,0.07) 620px 621px, transparent 622px)",
+							"radial-gradient(circle, rgba(41,37,36,0.13) 1px, transparent 1.2px)",
+						].join(", "),
+						backgroundSize: "100% 100%, 100% 100%, 100% 100%, 100% 100%, 16px 16px",
+						backgroundAttachment: "fixed",
 					}}
 				>
-					{/* Decorative amber arc rings — fixed to viewport bottom-right */}
-					<div
-						className="pointer-events-none fixed bottom-0 right-0 z-0 h-screen w-screen"
-						aria-hidden="true"
-					>
-						<svg
-							className="absolute bottom-0 right-0"
-							width="100%"
-							height="100%"
-							viewBox="0 0 1000 1000"
-							preserveAspectRatio="xMaxYMax meet"
-						>
-							<g fill="none" stroke="#f59e0b" strokeWidth="1">
-								<circle cx="1000" cy="1000" r="150" opacity="0.18" />
-								<circle cx="1000" cy="1000" r="280" opacity="0.14" />
-								<circle cx="1000" cy="1000" r="420" opacity="0.11" />
-								<circle cx="1000" cy="1000" r="580" opacity="0.08" />
-								<circle cx="1000" cy="1000" r="760" opacity="0.06" />
-								<circle cx="1000" cy="1000" r="960" opacity="0.04" />
-							</g>
-						</svg>
-					</div>
-					<div className="relative z-10">{children}</div>
+					{children}
 				</main>
 			</div>
 
