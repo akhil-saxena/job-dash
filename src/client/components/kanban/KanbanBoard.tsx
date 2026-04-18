@@ -127,7 +127,33 @@ export function KanbanBoard() {
 	return (
 		<>
 			{/* Desktop */}
-			<div className="hidden md:block">
+			<div className="relative hidden min-h-[calc(100vh-64px)] overflow-hidden md:block"
+				style={{
+					backgroundColor: "#f5f3f0",
+					backgroundImage: "radial-gradient(circle, rgba(41,37,36,0.13) 1px, transparent 1.2px)",
+					backgroundSize: "16px 16px",
+				}}
+			>
+				{/* SVG arc rings from bottom-right */}
+				<svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true">
+					<defs>
+						<radialGradient id="arcFade" cx="100%" cy="100%" r="120%">
+							<stop offset="0%" stopColor="#f59e0b" stopOpacity="0.22" />
+							<stop offset="60%" stopColor="#f59e0b" stopOpacity="0.10" />
+							<stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+						</radialGradient>
+					</defs>
+					<g fill="none" stroke="url(#arcFade)" strokeWidth="1.5">
+						<circle cx="1600" cy="900" r="260" />
+						<circle cx="1600" cy="900" r="420" />
+						<circle cx="1600" cy="900" r="600" />
+						<circle cx="1600" cy="900" r="800" />
+						<circle cx="1600" cy="900" r="1020" />
+						<circle cx="1600" cy="900" r="1260" />
+					</g>
+				</svg>
+
+				<div className="relative z-10">
 				<DragDropContext onDragEnd={handleDragEnd}>
 					{/* Header row — all status labels inline */}
 					<div className="flex gap-3 px-6 py-3">
@@ -155,6 +181,7 @@ export function KanbanBoard() {
 						))}
 					</div>
 				</DragDropContext>
+				</div>
 			</div>
 
 			{/* Mobile: collapsible sections (no DnD) */}
