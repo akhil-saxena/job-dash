@@ -48,8 +48,8 @@
 ### Job Description Snapshots
 
 - [ ] **SNAP-01**: User can save a job description by pasting markdown text
-- [ ] **SNAP-02**: User can save a job description by providing a URL (app auto-scrapes the posting content)
-- [ ] **SNAP-03**: Snapshots are versioned (user can re-scrape if JD changes)
+- ~~**SNAP-02**: User can save a job description by providing a URL (app auto-scrapes the posting content)~~ *Deferred to v2*
+- ~~**SNAP-03**: Snapshots are versioned (user can re-scrape if JD changes)~~ *Deferred to v2*
 - [ ] **SNAP-04**: Saved JD renders as formatted markdown in the detail page
 
 ### Tags & Labels

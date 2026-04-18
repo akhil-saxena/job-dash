@@ -110,14 +110,13 @@ Plans:
 **Plans**: TBD
 
 ### Phase 7: JD Snapshots & Documents
-**Goal**: Users can save job descriptions before postings disappear and upload documents per application
+**Goal**: Users can save job descriptions as markdown and upload documents per application
 **Depends on**: Phase 4
-**Requirements**: SNAP-01, SNAP-02, SNAP-03, SNAP-04, DOC-01, DOC-02, DOC-03
+**Requirements**: SNAP-01, SNAP-04, DOC-01, DOC-02, DOC-03
 **Success Criteria**:
-  1. Paste markdown JD or auto-scrape from URL
-  2. Versioned snapshots with re-scrape capability
-  3. Rendered markdown in glass card (JD tab)
-  4. Upload files to R2, listed as glass cards (Docs tab)
+  1. Paste markdown JD into detail page
+  2. Rendered markdown in glass card (JD tab)
+  3. Upload files to R2, listed as glass cards (Docs tab)
   5. Upload button expands to drop zone on drag-over
 **Plans**: TBD
 **UI hint**: yes
