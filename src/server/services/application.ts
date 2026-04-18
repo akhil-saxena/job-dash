@@ -91,6 +91,7 @@ export async function create(
 		priority?: string;
 		source?: string;
 		notes?: string;
+		jdText?: string;
 		appliedAt?: string;
 	},
 ) {
@@ -121,6 +122,7 @@ export async function create(
 				priority: input.priority || "medium",
 				source: input.source || null,
 				notes: input.notes || null,
+				jdText: input.jdText || null,
 				slug,
 				appliedAt: input.appliedAt ? new Date(input.appliedAt) : null,
 				createdAt: now,

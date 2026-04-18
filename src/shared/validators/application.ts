@@ -22,6 +22,7 @@ export const createApplicationSchema = z.object({
 	priority: z.enum(PRIORITIES).optional(),
 	source: z.string().max(50).optional(),
 	notes: z.string().optional(),
+	jdText: z.string().optional(),
 	appliedAt: z.string().datetime().optional(),
 });
 

@@ -1,7 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
+<<<<<<< HEAD
   "id": "2401d44a-a570-43fa-9178-801978c0662b",
+=======
+  "id": "4badaa23-9cfb-487c-97ba-b1d338b99778",
+>>>>>>> worktree-agent-a8043f48
   "prevId": "c58a5b6c-d6bd-456a-8456-47447b2a71cc",
   "tables": {
     "account": {
@@ -483,6 +487,16 @@
           "notNull": false,
           "autoincrement": false
         },
+<<<<<<< HEAD
+=======
+        "jd_text": {
+          "name": "jd_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+>>>>>>> worktree-agent-a8043f48
         "slug": {
           "name": "slug",
           "type": "text",
@@ -968,8 +982,13 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+<<<<<<< HEAD
     "application_tag": {
       "name": "application_tag",
+=======
+    "document": {
+      "name": "document",
+>>>>>>> worktree-agent-a8043f48
       "columns": {
         "id": {
           "name": "id",
@@ -985,15 +1004,46 @@
           "notNull": true,
           "autoincrement": false
         },
+<<<<<<< HEAD
         "tag_id": {
           "name": "tag_id",
+=======
+        "user_id": {
+          "name": "user_id",
+>>>>>>> worktree-agent-a8043f48
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
+<<<<<<< HEAD
         "user_id": {
           "name": "user_id",
+=======
+        "file_name": {
+          "name": "file_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "file_type": {
+          "name": "file_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "file_size": {
+          "name": "file_size",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "r2_key": {
+          "name": "r2_key",
+>>>>>>> worktree-agent-a8043f48
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -1006,6 +1056,7 @@
           "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
+<<<<<<< HEAD
         }
       },
       "indexes": {
@@ -1021,14 +1072,45 @@
           "name": "idx_application_tag_tag",
           "columns": [
             "tag_id"
+=======
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        }
+      },
+      "indexes": {
+        "idx_document_app": {
+          "name": "idx_document_app",
+          "columns": [
+            "application_id",
+            "created_at"
+          ],
+          "isUnique": false
+        },
+        "idx_document_user": {
+          "name": "idx_document_user",
+          "columns": [
+            "user_id"
+>>>>>>> worktree-agent-a8043f48
           ],
           "isUnique": false
         }
       },
       "foreignKeys": {
+<<<<<<< HEAD
         "application_tag_application_id_application_id_fk": {
           "name": "application_tag_application_id_application_id_fk",
           "tableFrom": "application_tag",
+=======
+        "document_application_id_application_id_fk": {
+          "name": "document_application_id_application_id_fk",
+          "tableFrom": "document",
+>>>>>>> worktree-agent-a8043f48
           "tableTo": "application",
           "columnsFrom": [
             "application_id"
@@ -1039,6 +1121,7 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
+<<<<<<< HEAD
         "application_tag_tag_id_tag_id_fk": {
           "name": "application_tag_tag_id_tag_id_fk",
           "tableFrom": "application_tag",
@@ -1351,6 +1434,11 @@
         "company_user_id_user_id_fk": {
           "name": "company_user_id_user_id_fk",
           "tableFrom": "company",
+=======
+        "document_user_id_user_id_fk": {
+          "name": "document_user_id_user_id_fk",
+          "tableFrom": "document",
+>>>>>>> worktree-agent-a8043f48
           "tableTo": "user",
           "columnsFrom": [
             "user_id"

@@ -6,6 +6,7 @@ import { interviewRoutes } from "../src/server/routes/interviews";
 import { tagRoutes } from "../src/server/routes/tags";
 import { deadlineRoutes } from "../src/server/routes/deadlines";
 import { companyRoutes } from "../src/server/routes/companies";
+import { documentRoutes } from "../src/server/routes/documents";
 import { requireAuth } from "../src/server/middleware/auth";
 
 const app = new Hono<AppEnv>();
@@ -35,5 +36,8 @@ app.route("/", deadlineRoutes);
 
 // Company routes (protected by middleware above)
 app.route("/", companyRoutes);
+
+// Document routes (protected by middleware above)
+app.route("/", documentRoutes);
 
 export default app;

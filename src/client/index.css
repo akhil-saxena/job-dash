@@ -85,3 +85,24 @@ body:where(.dark *) {
 .lucide {
   stroke-width: 1.8px;
 }
+
+/* JD markdown rendered content */
+.jd-markdown h1 { font-size: 1.25rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+.jd-markdown h2 { font-size: 1.1rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.4rem; }
+.jd-markdown h3 { font-size: 1rem; font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.3rem; }
+.jd-markdown p { margin-bottom: 0.6rem; line-height: 1.65; }
+.jd-markdown ul, .jd-markdown ol { padding-left: 1.25rem; margin-bottom: 0.6rem; }
+.jd-markdown ul { list-style-type: disc; }
+.jd-markdown ol { list-style-type: decimal; }
+.jd-markdown li { margin-bottom: 0.25rem; line-height: 1.55; }
+.jd-markdown code { background: rgba(0,0,0,0.04); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.85em; font-family: var(--mono, monospace); }
+.jd-markdown pre { background: rgba(0,0,0,0.04); padding: 0.75rem 1rem; border-radius: 8px; overflow-x: auto; margin-bottom: 0.6rem; }
+.jd-markdown pre code { background: transparent; padding: 0; }
+.jd-markdown strong { font-weight: 700; }
+.jd-markdown em { font-style: italic; }
+.jd-markdown a { color: #d97706; text-decoration: underline; }
+.jd-markdown blockquote { border-left: 3px solid #f59e0b; padding-left: 0.75rem; margin: 0.5rem 0; opacity: 0.85; }
+
+.dark .jd-markdown code { background: rgba(255,255,255,0.06); }
+.dark .jd-markdown pre { background: rgba(255,255,255,0.06); }
+.dark .jd-markdown a { color: #fbbf24; }

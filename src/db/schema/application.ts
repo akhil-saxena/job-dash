@@ -40,6 +40,7 @@ export const application = sqliteTable(
 			.notNull()
 			.default(false),
 		notes: text("notes"),
+		jdText: text("jd_text"),
 		slug: text("slug").notNull(),
 		appliedAt: integer("applied_at", { mode: "timestamp" }),
 		createdAt: integer("created_at", { mode: "timestamp" })

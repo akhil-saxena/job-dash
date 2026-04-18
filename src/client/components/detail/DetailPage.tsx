@@ -6,6 +6,7 @@ import { JDTab } from "./JDTab";
 import { DocsTab } from "./DocsTab";
 import { TimelineTab } from "./TimelineTab";
 import { useInterviewCount } from "@/client/hooks/useInterviews";
+import { useDocumentCount } from "@/client/hooks/useDocuments";
 import type { ApplicationDetail } from "@/client/hooks/useApplicationDetail";
 
 interface DetailPageProps {
@@ -21,12 +22,13 @@ interface TabDef {
 export function DetailPage({ app }: DetailPageProps) {
 	const [activeTab, setActiveTab] = useState("overview");
 	const { data: interviewCount } = useInterviewCount(app.id);
+	const { data: documentCount } = useDocumentCount(app.id);
 
 	const tabs: TabDef[] = [
 		{ label: "Overview", value: "overview" },
 		{ label: "Interviews", value: "interviews", count: interviewCount ?? 0 },
 		{ label: "JD", value: "jd" },
-		{ label: "Docs", value: "docs", count: 3 },
+		{ label: "Docs", value: "docs", count: documentCount ?? 0 },
 		{ label: "Timeline", value: "timeline" },
 	];
 

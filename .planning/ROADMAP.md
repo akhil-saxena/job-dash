@@ -107,27 +107,21 @@ Plans:
   3. Stale indicator at 7+ days with no status update
   4. Company entity deduplicated by domain, shared research notes
   5. Salary min/max/offered/currency per application
-**Plans**: 4 plans
-
-Plans:
-- [x] 06-01-PLAN.md — DB schema (tag, application_tag, deadline, company tables), constants, Zod validators, migration
-- [x] 06-02-PLAN.md — Service layer and API routes for tags, deadlines, companies with integration tests
-- [ ] 06-03-PLAN.md — Frontend tag picker, deadline manager, company panel
-- [ ] 06-04-PLAN.md — Urgency tints, stale indicators, salary fields
-
-**UI hint**: yes
+**Plans**: TBD
 
 ### Phase 7: JD Snapshots & Documents
 **Goal**: Users can save job descriptions before postings disappear and upload documents per application
 **Depends on**: Phase 4
-**Requirements**: SNAP-01, SNAP-02, SNAP-03, SNAP-04, DOC-01, DOC-02, DOC-03
+**Requirements**: SNAP-01, SNAP-04, DOC-01, DOC-02, DOC-03 (SNAP-02, SNAP-03 deferred)
 **Success Criteria**:
-  1. Paste markdown JD or auto-scrape from URL
-  2. Versioned snapshots with re-scrape capability
-  3. Rendered markdown in glass card (JD tab)
-  4. Upload files to R2, listed as glass cards (Docs tab)
-  5. Upload button expands to drop zone on drag-over
-**Plans**: TBD
+  1. Paste markdown JD (SNAP-01)
+  2. Rendered markdown in glass card JD tab (SNAP-04)
+  3. Document metadata table ready for R2 file uploads (DOC-01, DOC-02, DOC-03)
+**Plans**: 1 plan
+
+Plans:
+- [x] 07-01-PLAN.md -- DB schema (jd_text column + document table), API layer, JD markdown paste/render, docs tab wiring
+
 **UI hint**: yes
 
 ### Phase 8: Calendar & Analytics
@@ -169,8 +163,8 @@ Phases 1-4 are linear. 5, 6, 7 can partially overlap after 4. 8 depends on 6. 9 
 | 3. Frontend Shell & Kanban | 0/3 | Planning | - |
 | 4. Table, Detail & Navigation | 2/3 | Executing | - |
 | 5. Interview Tracking & Notes | 0/3 | Planning | - |
-| 6. Tags, Deadlines & Company | 2/4 | Executing | - |
-| 7. JD Snapshots & Documents | 0/0 | Not started | - |
+| 6. Tags, Deadlines & Company | 0/0 | Not started | - |
+| 7. JD Snapshots & Documents | 1/1 | Complete | 2026-04-18 |
 | 8. Calendar & Analytics | 0/0 | Not started | - |
 | 9. Command Palette & Polish | 0/0 | Not started | - |
 | 10. Design Refresh — Board & Detail | 3/3 | Complete    | 2026-04-18 |

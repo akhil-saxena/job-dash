@@ -16,6 +16,7 @@ export interface ApplicationDetail extends Application {
 	salaryOffered: number | null;
 	equity: string | null;
 	bonus: string | null;
+	jdText: string | null;
 	timeline: TimelineEvent[];
 }
 

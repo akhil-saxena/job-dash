@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 06-04-PLAN.md
-last_updated: "2026-04-18T18:51:27.937Z"
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-04-18T18:58:00.000Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 10
-  completed_phases: 6
-  total_plans: 25
-  completed_plans: 22
-  percent: 93
+  completed_phases: 5
+  total_plans: 20
+  completed_plans: 19
+  percent: 95
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-16)
 
 **Core value:** At a glance, the user knows exactly where every application stands and what needs attention today
-**Current focus:** Phase 05 — interview-tracking-notes
+**Current focus:** Phase 07 — jd-snapshots-documents
 
 ## Current Position
 
 Phase: 07
-Plan: Not started
-Status: Phase complete — ready for verification
+Plan: 1 of 1 complete
+Status: Plan 07-01 complete
 Last activity: 2026-04-18
 
-Progress: [=========.] 93%
+Progress: [=========.] 95%
 
 ## Performance Metrics
 
@@ -67,7 +67,7 @@ Progress: [=========.] 93%
 | Phase 05 P01 | 4min | 2 tasks | 8 files |
 | Phase 05 P02 | 14min | 3 tasks | 6 files |
 | Phase 05 P03 | 4min | 3 tasks | 9 files |
-| Phase 06 P04 | 4min | 2 tasks | 6 files |
+| Phase 07 P01 | 4min | 3 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -106,8 +106,9 @@ Recent decisions affecting current work:
 - [Phase 05]: Flat route paths for interview endpoints per Phase 4 Hono trie router decision
 - [Phase 05]: Per-field debounced mutations in QACard and InterviewRoundCard to prevent race conditions on partial updates
 - [Phase 05]: Extracted useDebouncedMutate to shared hook for reuse between OverviewTab and interview components
-- [Phase 06]: Used useQuery wrapping POST for idempotent company findOrCreate -- safe for auto re-fetching
-- [Phase 06]: Replaced static Contacts panel with CompanyResearchCard (contacts out of scope per PROJECT.md)
+- [Phase 07]: Used react-markdown for JD rendering (lightweight, standard, ESM-native)
+- [Phase 07]: Stored jdText as TEXT column on application table (no separate table since versioning is deferred)
+- [Phase 07]: Document upload button disabled (R2 binding not yet configured); metadata API fully functional
 
 ### Pending Todos
 
@@ -126,6 +127,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T18:41:30.410Z
-Stopped at: Completed 06-04-PLAN.md
+Last session: 2026-04-18T18:58:00.000Z
+Stopped at: Completed 07-01-PLAN.md
 Resume file: None
