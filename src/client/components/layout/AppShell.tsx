@@ -17,10 +17,10 @@ export function AppShell({ children }: AppShellProps) {
 			{/* Desktop sidebar */}
 			<Sidebar />
 
-			{/* Main content area */}
-			<div className="flex flex-1 flex-col">
+			{/* Main content area — min-w-0 prevents flex child from overflowing viewport */}
+			<div className="flex min-w-0 flex-1 flex-col overflow-hidden">
 				<Header />
-				<main className="flex-1 pb-[58px] md:pb-0">{children}</main>
+				<main className="flex-1 overflow-y-auto overflow-x-hidden pb-[58px] md:pb-0">{children}</main>
 			</div>
 
 			{/* Mobile bottom tab bar */}
