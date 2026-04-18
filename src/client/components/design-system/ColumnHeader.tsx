@@ -6,15 +6,17 @@ interface ColumnHeaderProps {
 	status: ApplicationStatus;
 	count: number;
 	variant?: "filled" | "minimal";
+	label?: string;
 }
 
 export function ColumnHeader({
 	status,
 	count,
 	variant = "filled",
+	label: labelOverride,
 }: ColumnHeaderProps) {
 	const color = STATUS_COLORS[status];
-	const label = STATUS_LABELS[status];
+	const label = labelOverride ?? STATUS_LABELS[status];
 
 	if (variant === "minimal") {
 		return (

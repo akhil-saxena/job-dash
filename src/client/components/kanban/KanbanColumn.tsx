@@ -7,13 +7,15 @@ import { KanbanCard } from "./KanbanCard";
 interface KanbanColumnProps {
 	status: ApplicationStatus;
 	apps: Application[];
+	label?: string;
+	count?: number;
 }
 
-export function KanbanColumn({ status, apps }: KanbanColumnProps) {
+export function KanbanColumn({ status, apps, label, count }: KanbanColumnProps) {
 	return (
 		<div className="flex min-h-[200px] flex-col gap-2">
 			{/* Column header stays OUTSIDE the Droppable */}
-			<ColumnHeader status={status} count={apps.length} variant="filled" />
+			<ColumnHeader status={status} count={count ?? apps.length} variant="filled" label={label} />
 
 			{/* Droppable card list */}
 			<Droppable droppableId={status}>

@@ -9,32 +9,42 @@ import { Button } from "@/client/components/design-system/Button";
 import { KanbanColumn } from "./KanbanColumn";
 import { MobileKanban } from "./MobileKanban";
 
-/** Core statuses — the main pipeline most people use */
+/** Always-visible columns */
 const CORE_STATUSES: ApplicationStatus[] = [
+	"wishlist",
 	"applied",
+	"screening",
 	"interviewing",
 	"offer",
 ];
 
-/** Secondary statuses — only show if they have applications */
-const SECONDARY_STATUSES: ApplicationStatus[] = [
-	"wishlist",
-	"screening",
+/** Grouped as "Closed" — show as one column if any have apps */
+const CLOSED_STATUSES: ApplicationStatus[] = [
 	"accepted",
 	"rejected",
 	"withdrawn",
 ];
 
-function getVisibleStatuses(
+export type VisibleColumn =
+	| { type: "status"; status: ApplicationStatus }
+	| { type: "closed"; statuses: ApplicationStatus[] };
+
+function getVisibleColumns(
 	grouped: Map<ApplicationStatus, unknown[]>,
-): ApplicationStatus[] {
-	const visible: ApplicationStatus[] = [...CORE_STATUSES];
-	for (const status of SECONDARY_STATUSES) {
-		if ((grouped.get(status)?.length ?? 0) > 0) {
-			visible.push(status);
-		}
+): VisibleColumn[] {
+	const columns: VisibleColumn[] = CORE_STATUSES.map((s) => ({
+		type: "status" as const,
+		status: s,
+	}));
+
+	const hasAnyClosed = CLOSED_STATUSES.some(
+		(s) => (grouped.get(s)?.length ?? 0) > 0,
+	);
+	if (hasAnyClosed) {
+		columns.push({ type: "closed", statuses: CLOSED_STATUSES });
 	}
-	return visible;
+
+	return columns;
 }
 
 function BoardSkeleton() {
@@ -90,25 +100,41 @@ export function KanbanBoard() {
 		);
 	}
 
-	const visibleStatuses = getVisibleStatuses(grouped);
+	const visibleColumns = getVisibleColumns(grouped);
 
 	return (
 		<>
-			{/* Desktop: horizontal scrollable columns with DragDropContext */}
+			{/* Desktop: columns fill full width with DragDropContext */}
 			<div className="hidden p-4 md:block md:p-6">
 				<DragDropContext onDragEnd={handleDragEnd}>
 					<div className="flex gap-3">
-						{visibleStatuses.map((status) => (
-							<div
-								key={status}
-								className="min-w-0 flex-1"
-							>
-								<KanbanColumn
-									status={status}
-									apps={grouped.get(status) ?? []}
-								/>
-							</div>
-						))}
+						{visibleColumns.map((col) => {
+							if (col.type === "status") {
+								return (
+									<div key={col.status} className="min-w-0 flex-1">
+										<KanbanColumn
+											status={col.status}
+											apps={grouped.get(col.status) ?? []}
+										/>
+									</div>
+								);
+							}
+							// Closed group — merge accepted/rejected/withdrawn into one column
+							const closedApps = col.statuses.flatMap(
+								(s) => grouped.get(s) ?? [],
+							);
+							const closedCount = closedApps.length;
+							return (
+								<div key="closed" className="min-w-0 flex-1 opacity-60">
+									<KanbanColumn
+										status="rejected"
+										label="Closed"
+										count={closedCount}
+										apps={closedApps}
+									/>
+								</div>
+							);
+						})}
 					</div>
 				</DragDropContext>
 			</div>
