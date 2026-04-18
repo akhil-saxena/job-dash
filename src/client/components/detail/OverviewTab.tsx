@@ -122,8 +122,9 @@ export function OverviewTab({ app }: OverviewTabProps) {
 
 	const handleAppliedAt = (val: string) => {
 		setAppliedAt(val);
-		const epoch = val ? Math.floor(new Date(val).getTime() / 1000) : null;
-		doMutate({ appliedAt: epoch });
+		// API expects ISO datetime string (z.string().datetime()), not epoch
+		const isoString = val ? new Date(val).toISOString() : undefined;
+		doMutate({ appliedAt: isoString });
 	};
 
 	const selectClasses =
