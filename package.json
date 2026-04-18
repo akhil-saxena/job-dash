@@ -29,6 +29,7 @@
     "nanoid": "^5.1.9",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-markdown": "^10.1.0",
     "resend": "^4.0.0",
     "zod": "^3.24.0",
     "zustand": "^5.0.12"
