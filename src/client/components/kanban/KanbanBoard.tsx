@@ -6,6 +6,7 @@ import {
 	useUpdateStatus,
 } from "@/client/hooks/useApplications";
 import { Button } from "@/client/components/design-system/Button";
+import { ColumnHeader } from "@/client/components/design-system/ColumnHeader";
 import { KanbanColumn } from "./KanbanColumn";
 import { MobileKanban } from "./MobileKanban";
 
