@@ -1,6 +1,6 @@
 interface CompanyBadgeProps {
 	companyName: string;
-	size?: "sm" | "md" | "lg"; // sm=24px, md=32px, lg=36px
+	size?: "sm" | "md" | "kanban" | "lg"; // sm=24px, md=32px, kanban=34px, lg=36px
 }
 
 const BADGE_COLORS = [
@@ -27,7 +27,7 @@ function getCompanyColor(name: string): string {
 	return BADGE_COLORS[Math.abs(hash) % BADGE_COLORS.length];
 }
 
-const SIZES = { sm: 24, md: 32, lg: 36 };
+const SIZES = { sm: 24, md: 32, kanban: 34, lg: 36 };
 
 export function CompanyBadge({ companyName, size = "sm" }: CompanyBadgeProps) {
 	const px = SIZES[size];

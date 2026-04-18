@@ -1,6 +1,5 @@
 import type { ApplicationStatus } from "@/shared/constants";
 import { STATUS_COLORS, STATUS_LABELS } from "@/client/lib/colors";
-import { Badge } from "./Badge";
 
 interface ColumnHeaderProps {
 	status: ApplicationStatus;
@@ -37,25 +36,23 @@ export function ColumnHeader({
 		);
 	}
 
-	// filled (default) — card style with count badge right-aligned
+	// filled (default) — dot + bold label + amber pill count badge
 	return (
-		<div
-			className="flex h-9 items-center gap-2 rounded-lg px-3"
-			style={{ backgroundColor: `color-mix(in srgb, ${color} 12%, white 88%)` }}
-		>
+		<div className="flex items-center gap-2 py-1.5">
 			<span
 				className="inline-block h-2 w-2 shrink-0 rounded-full"
 				style={{ backgroundColor: color }}
 			/>
-			<span className="text-xs font-semibold text-text-primary dark:text-dark-accent">
+			<span className="text-[13px] font-bold text-text-primary dark:text-dark-accent">
 				{label}
 			</span>
-			{count > 0 && (
-				<span
-					className="ml-auto grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[10px] font-semibold"
-					style={{ backgroundColor: `${color}1f`, color }}
-				>
+			{count > 0 ? (
+				<span className="ml-auto rounded-full bg-amber-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-amber-700 dark:bg-amber-500/20 dark:text-amber-400">
 					{count}
+				</span>
+			) : (
+				<span className="ml-auto rounded-full bg-black/[0.04] px-1.5 py-0.5 font-mono text-[10px] font-bold text-text-muted dark:bg-white/[0.06] dark:text-dark-accent/40">
+					0
 				</span>
 			)}
 		</div>
