@@ -67,10 +67,10 @@ export function KanbanCard({ app, index }: KanbanCardProps) {
 								size="md"
 							/>
 							<div className="min-w-0 flex-1">
-								<p className="truncate text-[15px] font-semibold leading-tight text-text-primary dark:text-dark-accent">
+								<p className="truncate text-[13px] font-semibold leading-tight text-text-primary dark:text-dark-accent">
 									{app.companyName}
 								</p>
-								<p className="mt-0.5 truncate text-[13px] text-text-secondary dark:text-dark-accent/60">
+								<p className="mt-0.5 truncate text-[11px] text-text-secondary dark:text-dark-accent/60">
 									{app.roleTitle}
 								</p>
 							</div>
