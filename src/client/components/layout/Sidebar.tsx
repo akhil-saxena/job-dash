@@ -28,8 +28,8 @@ export function Sidebar() {
 	return (
 		<aside className="hidden md:flex flex-col items-center w-[72px] h-screen sticky top-0 left-0 glass border-r border-white/30 dark:border-white/10 py-4">
 			{/* Logo */}
-			<Link to="/board" className="mb-6 flex h-10 w-10 items-center justify-center">
-				<img src="/logo-j.svg" alt="JobDash" className="h-8 w-8" />
+			<Link to="/board" className="mb-6 flex h-12 w-12 items-center justify-center overflow-visible">
+				<img src="/logo-j.svg" alt="JobDash" className="h-10 w-10" />
 			</Link>
 
 			{/* Nav items */}
@@ -46,7 +46,7 @@ export function Sidebar() {
 					>
 						<item.icon size={20} />
 						{/* Tooltip */}
-						<span className="pointer-events-none absolute left-full ml-2 whitespace-nowrap rounded-[var(--radius-btn)] bg-surface-accent px-2 py-1 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 dark:bg-dark-card dark:text-dark-accent">
+						<span className="pointer-events-none absolute left-full z-[100] ml-2 whitespace-nowrap rounded-[var(--radius-btn)] bg-surface-accent px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-dark-card dark:text-dark-accent">
 							{item.label}
 						</span>
 					</Link>
