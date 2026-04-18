@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useRouter } from "@tanstack/react-router";
 import { ChevronDown } from "lucide-react";
 import type { ApplicationStatus } from "@/shared/constants";
 import type { Application } from "@/client/hooks/useApplications";
 import { ColumnHeader } from "@/client/components/design-system/ColumnHeader";
-import { KanbanCard } from "./KanbanCard";
+import { Card } from "@/client/components/design-system/Card";
+import { CompanyBadge } from "./CompanyBadge";
+import { calculateUrgency, getDaysSinceUpdate, URGENCY_STYLES } from "@/client/lib/urgency";
 
 /** Priority-ordered sections for mobile (D-19) */
 const MOBILE_STATUS_ORDER: ApplicationStatus[] = [
@@ -21,6 +24,39 @@ interface CollapsibleSectionProps {
 	status: ApplicationStatus;
 	apps: Application[];
 	defaultOpen?: boolean;
+}
+
+/** Mobile card — no Draggable, just tap to navigate */
+function MobileCard({ app }: { app: Application }) {
+	const router = useRouter();
+	const urgency = calculateUrgency(app);
+	const urgencyClass = URGENCY_STYLES[urgency];
+	const days = getDaysSinceUpdate(app.updatedAt);
+	const isStale = urgency === "stale";
+
+	return (
+		<div
+			onClick={() => router.navigate({ to: "/app/$slug", params: { slug: app.slug } })}
+			className="cursor-pointer"
+		>
+			<Card hover padding="p-2.5" className={urgencyClass}>
+				<div className="flex items-center gap-2">
+					<CompanyBadge companyName={app.companyName} size="sm" />
+					<div className="min-w-0 flex-1">
+						<p className="truncate text-sm font-medium text-text-primary dark:text-dark-accent">
+							{app.companyName}
+						</p>
+						<p className="truncate text-xs text-text-secondary dark:text-dark-accent/60">
+							{app.roleTitle}
+						</p>
+					</div>
+					<span className={`shrink-0 text-xs ${isStale ? "font-bold text-status-rejected" : "text-text-muted dark:text-dark-accent/40"}`}>
+						{days}d
+					</span>
+				</div>
+			</Card>
+		</div>
+	);
 }
 
 function CollapsibleSection({
@@ -51,7 +87,7 @@ function CollapsibleSection({
 			{open && (
 				<div className="space-y-2 px-4 pb-4">
 					{apps.map((app) => (
-						<KanbanCard key={app.id} app={app} />
+						<MobileCard key={app.id} app={app} />
 					))}
 					{apps.length === 0 && (
 						<p className="py-4 text-center text-sm text-text-muted dark:text-dark-accent/40">
