@@ -87,8 +87,8 @@
 ### Notes & Markdown
 
 - [x] **NOTE-01**: Markdown editor for application notes with auto-save (debounced)
-- [ ] **NOTE-02**: "Saving..." / "Saved" indicator on all editors
-- [ ] **NOTE-03**: Markdown supported everywhere: notes, Q&A answers, company research, JD editing
+- [x] **NOTE-02**: "Saving..." / "Saved" indicator on all editors
+- [x] **NOTE-03**: Markdown supported everywhere: notes, Q&A answers, company research, JD editing
 
 ### Design & Polish
 
@@ -183,8 +183,8 @@ Deferred to future release.
 | INTV-03 | Phase 5 | Complete |
 | INTV-04 | Phase 5 | Complete |
 | NOTE-01 | Phase 5 | Complete |
-| NOTE-02 | Phase 5 | Pending |
-| NOTE-03 | Phase 5 | Pending |
+| NOTE-02 | Phase 5 | Complete |
+| NOTE-03 | Phase 5 | Complete |
 | COMP-01 | Phase 6 | Pending |
 | COMP-02 | Phase 6 | Pending |
 | COMP-03 | Phase 6 | Pending |

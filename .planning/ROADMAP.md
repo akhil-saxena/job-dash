@@ -93,7 +93,7 @@ Plans:
 Plans:
 - [x] 05-01-PLAN.md — DB schema (interview_round + interview_qa tables), constants, Zod validators, migration
 - [x] 05-02-PLAN.md — Interview CRUD API (service layer + Hono routes + integration tests)
-- [ ] 05-03-PLAN.md — Frontend InterviewsTab with accordion rounds, Q&A cards, star ratings, auto-save
+- [x] 05-03-PLAN.md — Frontend InterviewsTab with accordion rounds, Q&A cards, star ratings, auto-save
 
 **UI hint**: yes
 
