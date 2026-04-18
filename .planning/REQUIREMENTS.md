@@ -34,10 +34,10 @@
 
 ### Interviews
 
-- [ ] **INTV-01**: User can log interview rounds per application with round type (phone screen, recruiter call, technical, system design, behavioral, hiring manager, bar raiser, take-home, panel, custom)
-- [ ] **INTV-02**: Each round tracks: scheduled date/time, duration, interviewer name/role, meeting link, status (scheduled/completed/cancelled/no-show)
-- [ ] **INTV-03**: Each round has individual Q&A pairs (add/remove) with markdown for questions and answers, plus experience notes and feedback fields
-- [ ] **INTV-04**: User can self-rate each round (1-5 SVG stars)
+- [x] **INTV-01**: User can log interview rounds per application with round type (phone screen, recruiter call, technical, system design, behavioral, hiring manager, bar raiser, take-home, panel, custom)
+- [x] **INTV-02**: Each round tracks: scheduled date/time, duration, interviewer name/role, meeting link, status (scheduled/completed/cancelled/no-show)
+- [x] **INTV-03**: Each round has individual Q&A pairs (add/remove) with markdown for questions and answers, plus experience notes and feedback fields
+- [x] **INTV-04**: User can self-rate each round (1-5 SVG stars)
 
 ### Company Intelligence
 
@@ -178,10 +178,10 @@ Deferred to future release.
 | VIEW-02 | Phase 4 | Complete |
 | VIEW-04 | Phase 4 | Complete |
 | UI-05 | Phase 4 | Complete |
-| INTV-01 | Phase 5 | Pending |
-| INTV-02 | Phase 5 | Pending |
-| INTV-03 | Phase 5 | Pending |
-| INTV-04 | Phase 5 | Pending |
+| INTV-01 | Phase 5 | Complete |
+| INTV-02 | Phase 5 | Complete |
+| INTV-03 | Phase 5 | Complete |
+| INTV-04 | Phase 5 | Complete |
 | NOTE-01 | Phase 5 | Pending |
 | NOTE-02 | Phase 5 | Pending |
 | NOTE-03 | Phase 5 | Pending |
