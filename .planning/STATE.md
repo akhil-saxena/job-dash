@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 05-03-PLAN.md
-last_updated: "2026-04-18T17:47:06.344Z"
+stopped_at: Completed 06-04-PLAN.md
+last_updated: "2026-04-18T18:41:30.414Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 10
   completed_phases: 5
   total_plans: 19
-  completed_plans: 18
+  completed_plans: 19
   percent: 93
 ---
 
@@ -67,6 +67,7 @@ Progress: [=========.] 93%
 | Phase 05 P01 | 4min | 2 tasks | 8 files |
 | Phase 05 P02 | 14min | 3 tasks | 6 files |
 | Phase 05 P03 | 4min | 3 tasks | 9 files |
+| Phase 06 P04 | 4min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,8 @@ Recent decisions affecting current work:
 - [Phase 05]: Flat route paths for interview endpoints per Phase 4 Hono trie router decision
 - [Phase 05]: Per-field debounced mutations in QACard and InterviewRoundCard to prevent race conditions on partial updates
 - [Phase 05]: Extracted useDebouncedMutate to shared hook for reuse between OverviewTab and interview components
+- [Phase 06]: Used useQuery wrapping POST for idempotent company findOrCreate -- safe for auto re-fetching
+- [Phase 06]: Replaced static Contacts panel with CompanyResearchCard (contacts out of scope per PROJECT.md)
 
 ### Pending Todos
 
@@ -123,6 +126,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T17:45:20.633Z
-Stopped at: Completed 05-03-PLAN.md
+Last session: 2026-04-18T18:41:30.410Z
+Stopped at: Completed 06-04-PLAN.md
 Resume file: None

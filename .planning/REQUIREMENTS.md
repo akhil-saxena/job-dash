@@ -41,9 +41,9 @@
 
 ### Company Intelligence
 
-- [ ] **COMP-01**: Company entity persists across applications (deduplicated by domain)
-- [ ] **COMP-02**: User can write markdown research notes per company (Glassdoor reviews, tech stack, culture, flags)
-- [ ] **COMP-03**: Company notes persist when user applies to multiple roles at the same company
+- [x] **COMP-01**: Company entity persists across applications (deduplicated by domain)
+- [x] **COMP-02**: User can write markdown research notes per company (Glassdoor reviews, tech stack, culture, flags)
+- [x] **COMP-03**: Company notes persist when user applies to multiple roles at the same company
 
 ### Job Description Snapshots
 
@@ -66,8 +66,8 @@
 
 ### Salary
 
-- [ ] **SAL-01**: User can track salary expectation (min/max), offered amount, equity, and bonus per application
-- [ ] **SAL-02**: User can set currency per application (INR, USD, EUR, GBP)
+- [x] **SAL-01**: User can track salary expectation (min/max), offered amount, equity, and bonus per application
+- [x] **SAL-02**: User can set currency per application (INR, USD, EUR, GBP)
 
 ### Analytics
 
@@ -185,17 +185,17 @@ Deferred to future release.
 | NOTE-01 | Phase 5 | Complete |
 | NOTE-02 | Phase 5 | Complete |
 | NOTE-03 | Phase 5 | Complete |
-| COMP-01 | Phase 6 | Pending |
-| COMP-02 | Phase 6 | Pending |
-| COMP-03 | Phase 6 | Pending |
+| COMP-01 | Phase 6 | Complete |
+| COMP-02 | Phase 6 | Complete |
+| COMP-03 | Phase 6 | Complete |
 | TAG-01 | Phase 6 | Pending |
 | TAG-02 | Phase 6 | Pending |
 | TAG-03 | Phase 6 | Pending |
 | DEAD-01 | Phase 6 | Pending |
 | DEAD-02 | Phase 6 | Pending |
 | DEAD-03 | Phase 6 | Pending |
-| SAL-01 | Phase 6 | Pending |
-| SAL-02 | Phase 6 | Pending |
+| SAL-01 | Phase 6 | Complete |
+| SAL-02 | Phase 6 | Complete |
 | SNAP-01 | Phase 7 | Pending |
 | SNAP-02 | Phase 7 | Pending |
 | SNAP-03 | Phase 7 | Pending |
