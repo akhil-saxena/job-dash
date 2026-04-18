@@ -55,9 +55,11 @@ function formatLocation(
 	return "";
 }
 
-function daysSince(epoch: number): number {
-	const now = Date.now() / 1000;
-	return Math.floor((now - epoch) / 86400);
+function daysSince(value: number | string | null | undefined): number {
+	if (!value) return 0;
+	const epochSec = typeof value === "number" ? value : Math.floor(new Date(value).getTime() / 1000);
+	if (Number.isNaN(epochSec)) return 0;
+	return Math.max(0, Math.floor((Date.now() / 1000 - epochSec) / 86400));
 }
 
 export function DetailHero({ app }: DetailHeroProps) {
