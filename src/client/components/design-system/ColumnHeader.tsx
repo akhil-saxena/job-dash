@@ -45,9 +45,11 @@ export function ColumnHeader({
 				{label}
 			</span>
 			{count > 0 && (
-				<Badge variant="filled" color={status} size="sm">
-					{count}
-				</Badge>
+				<span className="ml-auto">
+					<Badge variant="filled" color={status} size="sm">
+						{count}
+					</Badge>
+				</span>
 			)}
 		</div>
 	);
