@@ -51,10 +51,11 @@ export function ColumnHeader({
 				{label}
 			</span>
 			{count > 0 && (
-				<span className="ml-auto">
-					<Badge variant="filled" color={status} size="sm">
-						{count}
-					</Badge>
+				<span
+					className="ml-auto grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[10px] font-semibold"
+					style={{ backgroundColor: `${color}1f`, color }}
+				>
+					{count}
 				</span>
 			)}
 		</div>
