@@ -29,7 +29,7 @@
 - [x] **VIEW-01**: Kanban board as the home/landing page with columns per status, drag-and-drop, card preview (company badge, role, days, urgency tint)
 - [x] **VIEW-02**: Table view with sortable columns, filterable by status/source/priority/tags, full-text search. Mobile: glass card list
 - [ ] **VIEW-03**: Calendar view showing scheduled interviews and deadlines in month/week layout with Google Calendar sync
-- [ ] **VIEW-04**: Application detail as a full page with sticky hero + tabbed sections (Overview, Interviews, JD, Docs, Timeline)
+- [x] **VIEW-04**: Application detail as a full page with sticky hero + tabbed sections (Overview, Interviews, JD, Docs, Timeline)
 - [ ] **VIEW-05**: Analytics page with pipeline funnel, source effectiveness, response time table, summary stats
 
 ### Interviews
@@ -93,7 +93,7 @@
 ### Design & Polish
 
 - [x] **UI-01**: Dark mode with system preference detection and manual toggle
-- [ ] **UI-02**: Desktop-first responsive design; mobile-friendly with bottom tab bar
+- [x] **UI-02**: Desktop-first responsive design; mobile-friendly with bottom tab bar
 - [x] **UI-03**: Glass card aesthetic: warm gradient bg, frosted glass surfaces, Apple system fonts
 - [x] **UI-04**: Consistent status color system across all views
 - [x] **UI-05**: Optimistic UI for drag-and-drop, status changes, pin/archive
@@ -171,12 +171,12 @@ Deferred to future release.
 | TRACK-08 | Phase 2 | Complete |
 | VIEW-01 | Phase 3 | Complete |
 | UI-01 | Phase 3 | Complete |
-| UI-02 | Phase 3 | Pending |
+| UI-02 | Phase 3 | Complete |
 | UI-03 | Phase 3 | Complete |
 | UI-04 | Phase 3 | Complete |
 | UI-06 | Phase 3 | Complete |
 | VIEW-02 | Phase 4 | Complete |
-| VIEW-04 | Phase 4 | Pending |
+| VIEW-04 | Phase 4 | Complete |
 | UI-05 | Phase 4 | Complete |
 | INTV-01 | Phase 5 | Pending |
 | INTV-02 | Phase 5 | Pending |
