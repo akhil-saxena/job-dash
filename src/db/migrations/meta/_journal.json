@@ -29,6 +29,13 @@
       "when": 1776532240954,
       "tag": "0003_fearless_vision",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1776536300111,
+      "tag": "0004_round_gauntlet",
+      "breakpoints": true
     }
   ]
 }
