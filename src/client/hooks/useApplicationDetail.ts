@@ -15,6 +15,7 @@ export interface ApplicationDetail extends Application {
 	applicationPortalUrl: string | null;
 	equity: string | null;
 	bonus: string | null;
+	jdText: string | null;
 	timeline: TimelineEvent[];
 }
 

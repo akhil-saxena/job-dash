@@ -3,6 +3,7 @@ import type { AppEnv } from "../src/shared/types";
 import { authRoutes } from "../src/server/routes/auth";
 import { applicationRoutes } from "../src/server/routes/applications";
 import { interviewRoutes } from "../src/server/routes/interviews";
+import { documentRoutes } from "../src/server/routes/documents";
 import { requireAuth } from "../src/server/middleware/auth";
 
 const app = new Hono<AppEnv>();
@@ -23,5 +24,8 @@ app.route("/", applicationRoutes);
 
 // Interview routes (protected by middleware above)
 app.route("/", interviewRoutes);
+
+// Document routes (protected by middleware above)
+app.route("/", documentRoutes);
 
 export default app;
