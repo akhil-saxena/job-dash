@@ -36,6 +36,7 @@ export const listApplicationsSchema = z.object({
 	priority: z.enum(PRIORITIES).optional(),
 	source: z.string().optional(),
 	search: z.string().optional(),
+	tag: z.string().optional(),
 	archived: z.coerce.boolean().optional(),
 	sort: z
 		.enum(["created_at", "updated_at", "applied_at", "company_name"])

@@ -11,6 +11,11 @@ import { CompanyBadge } from "./CompanyBadge";
 interface KanbanCardProps {
 	app: Application;
 	index: number;
+	deadlines?: Array<{
+		deadlineType: string;
+		dueAt: number;
+		isCompleted: number;
+	}>;
 }
 
 const PRIORITY_TINTS: Record<string, string> = {
@@ -19,9 +24,13 @@ const PRIORITY_TINTS: Record<string, string> = {
 	low: "",
 };
 
-export function KanbanCard({ app, index }: KanbanCardProps) {
+export function KanbanCard({ app, index, deadlines }: KanbanCardProps) {
 	const router = useRouter();
-	const urgency = calculateUrgency(app);
+	const urgency = calculateUrgency({
+		status: app.status,
+		updatedAt: app.updatedAt,
+		deadlines: deadlines ?? [],
+	});
 	const urgencyClass = URGENCY_STYLES[urgency];
 	const days = getDaysSinceUpdate(app.appliedAt ?? app.createdAt);
 	// Priority tint only if no urgency tint is active
