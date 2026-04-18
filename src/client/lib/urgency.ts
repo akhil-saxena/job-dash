@@ -55,13 +55,13 @@ export function calculateUrgency(app: UrgencyInput): UrgencyLevel {
  */
 export const URGENCY_STYLES: Record<UrgencyLevel, string> = {
 	"interview-today":
-		"bg-[rgba(245,158,11,0.06)] border border-[rgba(245,158,11,0.15)]",
+		"!bg-amber-50/95 !border-amber-200/60",
 	"interview-tomorrow":
-		"bg-[rgba(245,158,11,0.06)] border border-[rgba(245,158,11,0.15)]",
+		"!bg-amber-50/95 !border-amber-200/60",
 	"interview-week": "",
 	"offer-expiring":
-		"bg-[rgba(34,197,94,0.06)] border border-[rgba(34,197,94,0.15)]",
-	stale: "bg-[rgba(239,68,68,0.05)] border border-[rgba(239,68,68,0.12)]",
+		"!bg-green-50/95 !border-green-200/60",
+	stale: "!bg-red-50/95 !border-red-200/60",
 	rejected: "opacity-40",
 	normal: "",
 };

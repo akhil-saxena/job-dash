@@ -40,8 +40,7 @@ export function ColumnHeader({
 	// filled (default) — card style with count badge right-aligned
 	return (
 		<div
-			className="flex h-9 items-center gap-2 rounded-lg px-3"
-			style={{ backgroundColor: `${color}14` }}
+			className="flex h-9 items-center gap-2 rounded-lg bg-white/80 px-3 backdrop-blur-sm dark:bg-zinc-800/80"
 		>
 			<span
 				className="inline-block h-2 w-2 shrink-0 rounded-full"
