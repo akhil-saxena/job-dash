@@ -17,7 +17,7 @@ JobDash: a multi-user job application tracker on Cloudflare's edge stack. 9 phas
 - [ ] **Phase 5: Interview Tracking & Notes** - Interview round logging with Q&A pairs, markdown notes with auto-save, SVG star ratings
 - [ ] **Phase 6: Tags, Deadlines & Company Intelligence** - Custom tags, deadline tracking with urgency tints, company entity with research notes, salary fields
 - [ ] **Phase 7: JD Snapshots & Documents** - Job description save/scrape with versioning, document uploads to R2
-- [ ] **Phase 8: Calendar & Analytics** - Calendar with Google Calendar sync, analytics dashboard (funnel, sources, response times)
+- [ ] **Phase 8: Calendar & Analytics** - Read-only calendar (interviews + deadlines, month + This Week list) and analytics dashboard (funnel, sources, response times). Google Calendar sync deferred.
 - [ ] **Phase 9: Command Palette & Polish** - Cmd+K palette, optimistic UI, responsive polish, settings page
 
 ## Phase Details
@@ -125,18 +125,20 @@ Plans:
 **UI hint**: yes
 
 ### Phase 8: Calendar & Analytics
-**Goal**: Users can view interviews/deadlines on a calendar with Google Calendar sync, and analyze their pipeline with charts
+**Goal**: Users can view interviews and deadlines on a read-only calendar, and analyze their pipeline with charts (funnel, source breakdown, response times, summary stats)
 **Depends on**: Phase 6
 **Requirements**: VIEW-03, VIEW-05, ANLY-01, ANLY-02, ANLY-03, ANLY-04, ANLY-05
 **Success Criteria**:
-  1. Month grid with interview/deadline events as colored chips
-  2. "This Week" list below calendar
-  3. Google Calendar sync (read/write, using existing Google OAuth)
-  4. Pipeline funnel horizontal bars
-  5. Source effectiveness chart
-  6. Response time table with green/amber/red cells
-  7. Summary stat cards with date range filter
-**Plans**: TBD
+  1. Month grid with interview/deadline events as colored chips (stack-of-3 with "+N more" overflow)
+  2. "This Week" list below calendar; clicking any event navigates to the application detail with relevant tab pre-selected
+  3. Pipeline funnel horizontal bars (flow model from timeline events; Applied → Screening → Interviewing → Offer; count + conversion %)
+  4. Source effectiveness chart (stacked horizontal bars by final outcome)
+  5. Response time table with green/amber/red cells (by stage transition, thresholds user-configurable in Settings)
+  6. Summary stat cards: Total Apps, Currently Active, Offers Received, Rejection Rate
+  7. Global date range filter (presets + custom picker) controls all analytics
+  8. Settings page gains an "Analytics" section for response-time threshold configuration
+**Scope note**: Google Calendar sync originally scoped here was deferred by user on 2026-04-23. Candidate for a future standalone phase.
+**Plans**: 08-01 Calendar · 08-02 Analytics + Settings thresholds
 **UI hint**: yes
 
 ### Phase 9: Command Palette & Polish
