@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { ChevronDown, Plus, Trash2, ExternalLink, Clock, User, Video } from "lucide-react";
+import { ChevronDown, Plus, Trash2, ExternalLink, Clock, User, Video, Calendar } from "lucide-react";
 import { StarRating } from "./StarRating";
 import { SaveIndicator } from "./SaveIndicator";
 import { QACard } from "./QACard";
@@ -42,6 +42,28 @@ function formatScheduledDate(scheduledAt: string | null): string | null {
 	}
 }
 
+// datetime-local input expects "YYYY-MM-DDTHH:mm" in LOCAL time.
+// Server stores a Date (unix timestamp); it's serialised as an ISO string
+// (UTC). Convert in both directions so the user sees their local time.
+function toLocalInputValue(scheduledAt: string | null): string {
+	if (!scheduledAt) return "";
+	const ts = Number(scheduledAt);
+	const d = Number.isNaN(ts) ? new Date(scheduledAt) : new Date(ts * 1000);
+	if (Number.isNaN(d.getTime())) return "";
+	const pad = (n: number) => String(n).padStart(2, "0");
+	return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function fromLocalInputValue(value: string): string | null {
+	if (!value) return null;
+	// `new Date("YYYY-MM-DDTHH:mm")` interprets as LOCAL time (no Z suffix).
+	// `.toISOString()` converts to UTC ISO, which is what the API's
+	// `z.string().datetime()` expects.
+	const d = new Date(value);
+	if (Number.isNaN(d.getTime())) return null;
+	return d.toISOString();
+}
+
 function isUpcoming(round: InterviewRound): boolean {
 	if (round.status !== "scheduled" || !round.scheduledAt) return false;
 	const ts = Number(round.scheduledAt);
@@ -59,6 +81,7 @@ export function InterviewRoundCard({ round, index, applicationId }: InterviewRou
 	const deleteQA = useDeleteQA(applicationId);
 
 	// Local state for auto-save fields
+	const [scheduledAtLocal, setScheduledAtLocal] = useState(() => toLocalInputValue(round.scheduledAt));
 	const [interviewerName, setInterviewerName] = useState(round.interviewerName ?? "");
 	const [interviewerRole, setInterviewerRole] = useState(round.interviewerRole ?? "");
 	const [durationMinutes, setDurationMinutes] = useState(round.durationMinutes);
@@ -175,6 +198,23 @@ export function InterviewRoundCard({ round, index, applicationId }: InterviewRou
 				<div className="px-4 pb-4">
 					{/* A. Editable fields row */}
 					<div className="flex flex-wrap gap-3 border-t border-black/[0.06] dark:border-white/[0.06] pt-4">
+						{/* Scheduled at */}
+						<div className="flex flex-col gap-1 min-w-[200px]">
+							<label className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-text-muted dark:text-dark-accent/40">
+								<Calendar size={10} /> Scheduled
+							</label>
+							<input
+								type="datetime-local"
+								value={scheduledAtLocal}
+								onChange={(e) => {
+									const v = e.target.value;
+									setScheduledAtLocal(v);
+									debouncedMutate({ scheduledAt: fromLocalInputValue(v) });
+								}}
+								className="rounded-lg border border-black/[0.08] bg-transparent px-2.5 py-1.5 text-[12px] text-text-primary focus:border-amber-400 focus:outline-none dark:border-white/[0.08] dark:text-dark-accent [color-scheme:light] dark:[color-scheme:dark]"
+							/>
+						</div>
+
 						{/* Interviewer name */}
 						<div className="flex flex-col gap-1 min-w-[140px]">
 							<label className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-text-muted dark:text-dark-accent/40">
