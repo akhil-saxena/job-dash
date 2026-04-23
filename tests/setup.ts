@@ -38,8 +38,10 @@ CREATE INDEX IF NOT EXISTS \`idx_company_user_name\` ON \`company\` (\`user_id\`
 CREATE TABLE IF NOT EXISTS \`document\` (\`id\` text PRIMARY KEY NOT NULL, \`application_id\` text NOT NULL, \`user_id\` text NOT NULL, \`file_name\` text NOT NULL, \`file_type\` text NOT NULL, \`file_size\` integer NOT NULL, \`r2_key\` text NOT NULL, \`created_at\` integer DEFAULT (unixepoch()) NOT NULL, \`updated_at\` integer DEFAULT (unixepoch()) NOT NULL, FOREIGN KEY (\`application_id\`) REFERENCES \`application\`(\`id\`) ON UPDATE no action ON DELETE cascade, FOREIGN KEY (\`user_id\`) REFERENCES \`user\`(\`id\`) ON UPDATE no action ON DELETE cascade);
 CREATE INDEX IF NOT EXISTS \`idx_document_app\` ON \`document\` (\`application_id\`,\`created_at\`);
 CREATE INDEX IF NOT EXISTS \`idx_document_user\` ON \`document\` (\`user_id\`);
+CREATE TABLE IF NOT EXISTS \`user_settings\` (\`user_id\` text PRIMARY KEY NOT NULL, \`analytics_thresholds\` text, \`created_at\` integer DEFAULT (unixepoch()) NOT NULL, \`updated_at\` integer DEFAULT (unixepoch()) NOT NULL, FOREIGN KEY (\`user_id\`) REFERENCES \`user\`(\`id\`) ON UPDATE no action ON DELETE cascade);
+CREATE INDEX IF NOT EXISTS \`idx_timeline_event_user_occurred\` ON \`timeline_event\` (\`user_id\`,\`occurred_at\`);
 `;
 
-// 08-01: no schema changes; see 08-02 for user_settings table
+// 08-02: user_settings table + idx_timeline_event_user_occurred index appended above.
 // D1 exec() handles multiple semicolon-separated statements
 await env.DB.exec(migrationSQL);

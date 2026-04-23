@@ -5,3 +5,4 @@ export * from "./tag";
 export * from "./deadline";
 export * from "./company";
 export * from "./document";
+export * from "./userSettings";
