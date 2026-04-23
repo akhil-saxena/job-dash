@@ -7,6 +7,7 @@ import { tagRoutes } from "../src/server/routes/tags";
 import { deadlineRoutes } from "../src/server/routes/deadlines";
 import { companyRoutes } from "../src/server/routes/companies";
 import { documentRoutes } from "../src/server/routes/documents";
+import { calendarRoutes } from "../src/server/routes/calendar";
 import { requireAuth } from "../src/server/middleware/auth";
 
 const app = new Hono<AppEnv>();
@@ -39,5 +40,8 @@ app.route("/", companyRoutes);
 
 // Document routes (protected by middleware above)
 app.route("/", documentRoutes);
+
+// Calendar routes (protected by middleware above)
+app.route("/", calendarRoutes);
 
 export default app;
