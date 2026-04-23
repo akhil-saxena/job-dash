@@ -84,6 +84,11 @@ export function useCreateApplication() {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["applications"] });
+			// 08-02 Pitfall 4: new applications feed funnel + stats — refresh
+			// analytics so the dashboard and calendar stay current without a
+			// 60s staleTime wait.
+			queryClient.invalidateQueries({ queryKey: ["analytics"] });
+			queryClient.invalidateQueries({ queryKey: ["calendar"] });
 		},
 	});
 }
@@ -125,6 +130,13 @@ export function useUpdateStatus() {
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: ["applications"] });
+			// 08-02 Pitfall 4: status changes power the funnel + response
+			// times + stat cards. Invalidate analytics immediately so the
+			// dashboard reflects the kanban drag without the 60s staleTime
+			// wait. Also bump calendar since some stage changes can add or
+			// remove interview/deadline context.
+			queryClient.invalidateQueries({ queryKey: ["analytics"] });
+			queryClient.invalidateQueries({ queryKey: ["calendar"] });
 		},
 	});
 }
@@ -237,6 +249,10 @@ export function useUpdateApplication() {
 			if (variables.slug) {
 				queryClient.invalidateQueries({ queryKey: ["application", variables.slug] });
 			}
+			// 08-02 Pitfall 4: detail-page PATCH may include status / source
+			// / other analytics-relevant fields.
+			queryClient.invalidateQueries({ queryKey: ["analytics"] });
+			queryClient.invalidateQueries({ queryKey: ["calendar"] });
 		},
 	});
 }
