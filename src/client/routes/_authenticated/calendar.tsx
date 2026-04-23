@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
 	addDays,
 	addMonths,
@@ -8,7 +8,7 @@ import {
 	startOfMonth,
 	subMonths,
 } from "date-fns";
-import { AlertCircle, CalendarDays } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Button } from "@/client/components/design-system/Button";
 import { Card } from "@/client/components/design-system/Card";
 import {
@@ -171,13 +171,13 @@ function CalendarPage() {
 				</div>
 			</div>
 
-			{/* Body: loading / error / empty / data */}
+			{/* Body: loading / error / data (grid always renders when not
+			    loading/error — an empty month shows the grid with no chips;
+			    ThisWeekList below handles the "Clear week ahead" copy). */}
 			{isLoading ? (
 				<CalendarSkeleton />
 			) : isError ? (
 				<CalendarErrorState onRetry={() => refetch()} />
-			) : allEvents.length === 0 ? (
-				<CalendarEmptyState />
 			) : (
 				<CalendarMonthGrid
 					anchor={anchor}
@@ -263,28 +263,3 @@ function CalendarErrorState({ onRetry }: { onRetry: () => void }) {
 	);
 }
 
-function CalendarEmptyState() {
-	return (
-		<Card padding="p-12">
-			<div className="flex flex-col items-center justify-center gap-3 text-center">
-				<CalendarDays
-					size={32}
-					className="text-text-muted dark:text-dark-accent/40"
-				/>
-				<div className="text-xl font-semibold text-text-primary dark:text-dark-accent">
-					Nothing scheduled yet
-				</div>
-				<div className="max-w-md text-sm text-text-secondary dark:text-dark-accent/60">
-					Interviews and deadlines from your applications will appear
-					here automatically. Nothing to remember — we'll pull them
-					in.
-				</div>
-				<Link to="/board">
-					<Button variant="ghost" size="sm">
-						Go to Board
-					</Button>
-				</Link>
-			</div>
-		</Card>
-	);
-}
