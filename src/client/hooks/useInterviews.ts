@@ -77,6 +77,7 @@ export function useCreateRound(applicationId: string) {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["interviews", applicationId] });
 			queryClient.invalidateQueries({ queryKey: ["interview-count", applicationId] });
+			queryClient.invalidateQueries({ queryKey: ["calendar"] });
 		},
 		onError: (err: Error) => {
 			showToast(err.message, "error");
@@ -103,6 +104,7 @@ export function useUpdateRound(applicationId: string) {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["interviews", applicationId] });
+			queryClient.invalidateQueries({ queryKey: ["calendar"] });
 		},
 		onError: (err: Error) => {
 			showToast(err.message, "error");
@@ -125,6 +127,7 @@ export function useDeleteRound(applicationId: string) {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["interviews", applicationId] });
 			queryClient.invalidateQueries({ queryKey: ["interview-count", applicationId] });
+			queryClient.invalidateQueries({ queryKey: ["calendar"] });
 			showToast("Round deleted", "success");
 		},
 		onError: (err: Error) => {

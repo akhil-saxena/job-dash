@@ -63,6 +63,7 @@ export function useCreateDeadline() {
 		onSuccess: (_data, variables) => {
 			queryClient.invalidateQueries({ queryKey: ["deadlines", variables.appId] });
 			queryClient.invalidateQueries({ queryKey: ["deadlines", "upcoming"] });
+			queryClient.invalidateQueries({ queryKey: ["calendar"] });
 		},
 		onError: (err: Error) => {
 			showToast(err.message, "error");
@@ -84,6 +85,7 @@ export function useCompleteDeadline() {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["deadlines"] });
+			queryClient.invalidateQueries({ queryKey: ["calendar"] });
 		},
 		onError: (err: Error) => {
 			showToast(err.message, "error");
@@ -105,6 +107,7 @@ export function useDeleteDeadline() {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["deadlines"] });
+			queryClient.invalidateQueries({ queryKey: ["calendar"] });
 		},
 		onError: (err: Error) => {
 			showToast(err.message, "error");
