@@ -11,6 +11,7 @@ import type { ApplicationDetail } from "@/client/hooks/useApplicationDetail";
 
 interface DetailPageProps {
 	app: ApplicationDetail;
+	initialTab?: string;
 }
 
 interface TabDef {
@@ -19,8 +20,14 @@ interface TabDef {
 	count?: number;
 }
 
-export function DetailPage({ app }: DetailPageProps) {
-	const [activeTab, setActiveTab] = useState("overview");
+const VALID_TABS = ["overview", "interviews", "jd", "docs", "timeline"] as const;
+
+export function DetailPage({ app, initialTab }: DetailPageProps) {
+	const startTab =
+		initialTab && (VALID_TABS as readonly string[]).includes(initialTab)
+			? initialTab
+			: "overview";
+	const [activeTab, setActiveTab] = useState(startTab);
 	const { data: interviewCount } = useInterviewCount(app.id);
 	const { data: documentCount } = useDocumentCount(app.id);
 

@@ -1,14 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
 import { useApplicationBySlug } from "@/client/hooks/useApplicationDetail";
 import { DetailPage } from "@/client/components/detail/DetailPage";
 import { Button } from "@/client/components/design-system/Button";
 
+const detailSearchSchema = z.object({
+	tab: z
+		.enum(["overview", "interviews", "jd", "docs", "timeline"])
+		.optional(),
+});
+
 export const Route = createFileRoute("/_authenticated/app/$slug")({
+	validateSearch: (search: Record<string, unknown>) =>
+		detailSearchSchema.parse(search),
 	component: AppDetailPage,
 });
 
 function AppDetailPage() {
 	const { slug } = Route.useParams();
+	const { tab } = Route.useSearch();
 	const { data: app, isLoading, isError, refetch } = useApplicationBySlug(slug);
 
 	if (isLoading) {
@@ -40,5 +50,5 @@ function AppDetailPage() {
 		);
 	}
 
-	return <DetailPage app={app} />;
+	return <DetailPage app={app} initialTab={tab} />;
 }
