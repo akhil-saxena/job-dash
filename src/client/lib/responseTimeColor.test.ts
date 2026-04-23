@@ -1,10 +1,29 @@
-import { describe, it } from "vitest";
+import { describe, it, expect } from "vitest";
+import { getResponseTimeZone } from "./responseTimeColor";
 
-// Stubs for Task 2 (Wave 1) — real assertions land when getResponseTimeZone is implemented.
+const T = { greenBelow: 7, amberBelow: 14 };
+
 describe("getResponseTimeZone", () => {
-	it.todo("avgDays < greenBelow → 'green'");
-	it.todo("greenBelow <= avgDays < amberBelow → 'amber'");
-	it.todo("avgDays >= amberBelow → 'red'");
-	it.todo("avgDays === null → 'none'");
-	it.todo("boundary: avgDays exactly greenBelow → 'amber' (strict <)");
+	it("avgDays < greenBelow → 'green'", () => {
+		expect(getResponseTimeZone(3, T)).toBe("green");
+		expect(getResponseTimeZone(6.9, T)).toBe("green");
+	});
+
+	it("greenBelow <= avgDays < amberBelow → 'amber'", () => {
+		expect(getResponseTimeZone(10, T)).toBe("amber");
+		expect(getResponseTimeZone(13.9, T)).toBe("amber");
+	});
+
+	it("avgDays >= amberBelow → 'red'", () => {
+		expect(getResponseTimeZone(14, T)).toBe("red");
+		expect(getResponseTimeZone(20, T)).toBe("red");
+	});
+
+	it("avgDays === null → 'none'", () => {
+		expect(getResponseTimeZone(null, T)).toBe("none");
+	});
+
+	it("boundary: avgDays exactly greenBelow → 'amber' (strict <)", () => {
+		expect(getResponseTimeZone(7, T)).toBe("amber");
+	});
 });
