@@ -197,7 +197,7 @@ export async function updateRound(
 	input: {
 		roundType?: string;
 		customTypeName?: string;
-		scheduledAt?: string;
+		scheduledAt?: string | null;
 		durationMinutes?: number;
 		interviewerName?: string;
 		interviewerRole?: string;
@@ -215,7 +215,7 @@ export async function updateRound(
 
 	if (input.roundType !== undefined) setValues.roundType = input.roundType;
 	if (input.customTypeName !== undefined) setValues.customTypeName = input.customTypeName;
-	if (input.scheduledAt !== undefined) setValues.scheduledAt = new Date(input.scheduledAt);
+	if (input.scheduledAt !== undefined) setValues.scheduledAt = input.scheduledAt === null ? null : new Date(input.scheduledAt);
 	if (input.durationMinutes !== undefined) setValues.durationMinutes = input.durationMinutes;
 	if (input.interviewerName !== undefined) setValues.interviewerName = input.interviewerName;
 	if (input.interviewerRole !== undefined) setValues.interviewerRole = input.interviewerRole;

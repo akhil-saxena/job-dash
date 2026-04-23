@@ -48,5 +48,10 @@ export function useCalendarMonth(anchor: Date) {
 			const json = (await res.json()) as { data: CalendarMonthData };
 			return json.data;
 		},
+		// Global staleTime is 60s, which is fine for kanban/list. For the
+		// calendar, events are edited on a different page and the user
+		// expects a fresh view on every return — refetch on mount and
+		// defeat stale-cache hangovers from earlier failed loads.
+		refetchOnMount: "always",
 	});
 }

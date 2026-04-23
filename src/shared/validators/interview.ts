@@ -4,7 +4,7 @@ import { INTERVIEW_ROUND_TYPES, INTERVIEW_STATUSES } from "@/shared/constants";
 export const createInterviewRoundSchema = z.object({
 	roundType: z.enum(INTERVIEW_ROUND_TYPES),
 	customTypeName: z.string().max(100).optional(),
-	scheduledAt: z.string().datetime().optional(),
+	scheduledAt: z.string().datetime().nullable().optional(),
 	durationMinutes: z.number().int().min(5).max(480).optional(),
 	interviewerName: z.string().max(200).optional(),
 	interviewerRole: z.string().max(200).optional(),
