@@ -138,7 +138,12 @@ Plans:
   7. Global date range filter (presets + custom picker) controls all analytics
   8. Settings page gains an "Analytics" section for response-time threshold configuration
 **Scope note**: Google Calendar sync originally scoped here was deferred by user on 2026-04-23. Candidate for a future standalone phase.
-**Plans**: 08-01 Calendar · 08-02 Analytics + Settings thresholds
+**Plans**: 2 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Calendar view: month grid + This Week list + event chips + click-through navigation
+- [ ] 08-02-PLAN.md — Analytics dashboard + Settings thresholds: funnel, sources, response-time table, 4 stat cards, global date range filter
+
 **UI hint**: yes
 
 ### Phase 9: Command Palette & Polish
@@ -167,7 +172,7 @@ Phases 1-4 are linear. 5, 6, 7 can partially overlap after 4. 8 depends on 6. 9 
 | 5. Interview Tracking & Notes | 0/3 | Planning | - |
 | 6. Tags, Deadlines & Company | 0/0 | Not started | - |
 | 7. JD Snapshots & Documents | 1/1 | Complete | 2026-04-18 |
-| 8. Calendar & Analytics | 0/0 | Not started | - |
+| 8. Calendar & Analytics | 0/2 | Planning | - |
 | 9. Command Palette & Polish | 0/0 | Not started | - |
 | 10. Design Refresh — Board & Detail | 3/3 | Complete    | 2026-04-18 |
 
