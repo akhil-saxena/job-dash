@@ -1,10 +1,11 @@
 ---
 phase: 8
 slug: calendar-analytics
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-04-23
+reviewed_at: 2026-04-23
 ---
 
 # Phase 8 — UI Design Contract
@@ -61,7 +62,7 @@ Declared values (all multiples of 4, matches Phase 3 tokens):
 
 | Token | Value | Usage in Phase 8 |
 |-------|-------|------------------|
-| xs | 4px | Event-chip internal padding (`px-1` gaps between chip dot + text); stat-card caption gap |
+| xs | 4px | Event-chip internal padding (`px-1` gaps between chip dot + text); stat-card caption gap; day-cell padding (`p-1`) |
 | sm | 8px | Stack gap between event chips inside a day cell; gap inside stat cards between value and label; gap between filter chips |
 | md | 16px | Default card inner padding (`p-4`); gap between analytics panels on mobile |
 | lg | 24px | Section padding on analytics page; gap between stat-card grid and first chart |
@@ -80,18 +81,18 @@ All other values follow the 4/8/16/24/32/48/64 scale.
 
 ## Typography
 
-Three sizes, two weights. Inherits `--font-sans` (Apple system stack) from `src/client/index.css`.
+Four sizes, two weights. Inherits `--font-sans` (Apple system stack) from `src/client/index.css`.
 
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
-| Body | 14px (`text-sm`) | 400 regular | 1.5 | Event chip text; This Week row role/company; table cell text; settings threshold hint copy |
-| Label | 12px (`text-xs`) | 600 semibold | 1.4 | Stat card label ("TOTAL APPS"); filter chip text; column headers in response-time table; weekday headers (Mon/Tue/…) in month grid |
+| Label | 12px (`text-xs`) | 600 semibold | 1.4 | Stat card label ("TOTAL APPS"); filter chip text; column headers in response-time table; weekday headers (Mon/Tue/…) in month grid (uppercase, tracking-wider); event chip text; day-number badge in calendar cells |
+| Body | 14px (`text-sm`) | 400 regular | 1.5 | This Week row role/company; table cell text; settings threshold hint copy |
 | Heading | 20px (`text-xl`) | 600 semibold | 1.2 | Section headings on analytics page ("Pipeline", "Sources", "Response Time"); settings section title ("Analytics") |
 | Display | 28px (`text-[28px]`) | 600 semibold | 1.1 | Stat card values (big numbers); month name ("April 2026") in calendar header |
 
 **Tabular numerals:** Stat card values, response-time table cells, and conversion-% labels use `tabular-nums` (font-variant-numeric) so digits align vertically.
 
-**Micro-label exception:** Day-of-week weekday labels above the month grid use 10px (`text-[10px]`) semibold uppercase tracking-wider — matches the existing `ColumnHeader` minimal variant already used on kanban board. This is an established micro-label pattern, not a new size tier.
+**Weekday headers:** Use the 12px label tier with `uppercase tracking-wider` and semibold weight — matches the existing `ColumnHeader` minimal variant already used on the kanban board. No new size tier is introduced.
 
 **Dark-mode text:** Use `text-text-primary dark:text-dark-accent` for headings, `text-text-secondary dark:text-dark-accent/70` for body, `text-text-muted dark:text-dark-accent/40` for muted captions (tokens defined in `index.css`).
 
@@ -189,12 +190,12 @@ Color alone must NOT carry meaning. Enforced as follows:
 1. **Page header** (existing AppShell header + new in-page sub-header):
    - In-page sub-header row: month name display (28px semibold), month nav (‹ Today ›) as ghost buttons on the right.
    - Height: 56px, `lg:px-6 px-4 py-3`.
-2. **Weekday strip:** 7-column grid, 10px uppercase semibold labels (`Sun Mon Tue Wed Thu Fri Sat`), padding `py-2`, no background.
+2. **Weekday strip:** 7-column grid, 12px uppercase semibold labels with `tracking-wider` (`Sun Mon Tue Wed Thu Fri Sat`), padding `py-2`, no background. Uses the Label typography tier.
 3. **Month grid:** `grid grid-cols-7 gap-px` with a 1px divider color of `rgba(0,0,0,0.06)` / `rgba(255,255,255,0.06)` dark.
-   - Each cell: min-height 96px desktop, 64px mobile. `p-1.5`. Rounded corners only on the outer 4 cells (top-left, top-right, bottom-left, bottom-right of the whole grid) — inner cells are flat.
+   - Each cell: min-height 96px desktop, 64px mobile. `p-1` (4px padding — preserves density so the day number badge + up to 3 stacked 20px chips + gaps + "+N more" indicator all fit inside the 64px mobile cell; `p-2` would overflow). Rounded corners only on the outer 4 cells (top-left, top-right, bottom-left, bottom-right of the whole grid) — inner cells are flat.
    - Cell background: `glass` utility for in-month days, `bg-transparent` for out-of-month days with `opacity-40`.
-   - Day number: top-right, 12px semibold. Current day: day number wrapped in a `rounded-full h-5 w-5 bg-surface-accent text-white` badge (dark: `bg-dark-accent text-dark-dominant`).
-   - Event chip stack: below day number, `flex flex-col gap-1`. Max 3 chips. Each chip is `h-5 rounded-[var(--radius-pill)] px-2 text-[11px] truncate`.
+   - Day number: top-right, 12px semibold (Label tier). Current day: day number wrapped in a `rounded-full h-5 w-5 bg-surface-accent text-white` badge (dark: `bg-dark-accent text-dark-dominant`).
+   - Event chip stack: below day number, `flex flex-col gap-1`. Max 3 chips. Each chip is `h-5 rounded-[var(--radius-pill)] px-2 text-xs truncate` (12px Label tier — fits inside the 20px chip height with `px-2` padding).
    - "+N more" row: appears as the 4th row when 4+ events exist, same chip shell, text: `+{N} more`, color `text-text-secondary`, hover `bg-black/[0.04]`.
 4. **This Week list:**
    - Section heading: "This Week" (20px semibold), right-aligned subtext: date range ("Apr 23 – Apr 29").
@@ -247,7 +248,7 @@ Added to `/settings` as a new section (existing settings page is placeholder; th
    - Row layout (desktop): `flex items-center gap-4`:
      - Left: transition label 14px semibold (e.g. "Applied → Screening"), `w-48`.
      - Middle: two inputs side by side. Each `Input` (raised, size sm, `w-20`) with inline suffix "d". Input 1 = green-below (days), Input 2 = amber-below (days). Between them: small caption "green <" and "amber <" in 12px text-text-muted.
-     - Right: three color preview dots horizontally (`h-3 w-3 rounded-full`) labelled below each: "Green", "Amber", "Red" (10px text-text-muted).
+     - Right: three color preview dots horizontally (`h-3 w-3 rounded-full`) labelled below each: "Green", "Amber", "Red" (12px text-text-muted).
    - Mobile (< 640px): row collapses to a 2-row stack. Label on top (`mb-2`). Inputs + preview in a `flex-wrap` below.
 3. **Helper copy below the card:** 12px text-text-muted: "Applied to the Response Time table on the Analytics page. Values beyond Amber are Red."
 4. Reset-to-defaults `Button` (outline, sm): bottom-right of the card. Copy: "Reset defaults".
@@ -424,7 +425,7 @@ Every empty state follows this shape: icon (lucide, 32px, `text-text-muted`) →
 - **Date range filter chips:**
   - Active chip uses the accent (filled variant from the design system — `FilterChips` already handles active state).
   - Click a preset → immediate refetch of all four analytics queries (stat cards, funnel, sources, response time). Optimistic: show skeletons during refetch.
-  - Click "Custom" → opens Modal with two native date inputs. Apply button triggers refetch. Close without apply preserves the previously-applied range.
+  - Click "Custom" → opens Modal with two native date inputs. Apply button triggers refetch. Closing without applying (via the "Keep previous range" button, Esc, or backdrop click) preserves the previously-applied range unchanged.
   - Default: All time (D-17). Last-used range persisted to `localStorage` key `jobdash:analytics:dateRange`.
 - **Funnel bar hover:** tooltip (Recharts default styled via CSS) shows: `{stage}`, `{count} applications`, `{pct}% conversion`. Subtle bar fill shift on hover (`brightness(0.9)`).
 - **Source bar segment hover:** segment-level tooltip shows outcome + count. Entire bar row gets a faint 1px right border on hover to indicate the row is being inspected.
@@ -481,7 +482,7 @@ Uses existing Tailwind v4 defaults: `sm 640`, `md 768`, `lg 1024`, `xl 1280`. Ph
 
 | Viewport | Behavior |
 |----------|----------|
-| `< 640px` (sm) | Day cell min-height 64px. Show max 2 chips per cell (plus "+N more"). Weekday labels shortened to 1 letter (`S M T W T F S`). This Week list: full-width. Month nav: arrows scale down to 28px. |
+| `< 640px` (sm) | Day cell min-height 64px. Show max 2 chips per cell (plus "+N more"). Weekday labels shortened to 1 letter (`S M T W T F S`), still at 12px label tier. This Week list: full-width. Month nav: arrows scale down to 28px. |
 | `640–1023px` | Day cell min-height 80px. Max 3 chips per cell. Weekday labels 3-letter. |
 | `≥ 1024px` (lg) | Day cell min-height 96px. Max 3 chips. Full weekday abbreviations. This Week list appears BELOW the grid (not side-by-side — spec is explicit). |
 
@@ -511,7 +512,7 @@ Uses existing Tailwind v4 defaults: `sm 640`, `md 768`, `lg 1024`, `xl 1280`. Ph
 | Primary CTA (analytics empty state — add first app) | `Add an application` |
 | Month nav "jump to today" | `Today` |
 | Custom date-range "apply" | `Apply range` |
-| Custom date-range "cancel" / close | `Cancel` |
+| Custom date-range close (without applying) | `Keep previous range` |
 | Reset thresholds button | `Reset defaults` |
 | Reset thresholds confirmation | `Reset analytics thresholds to defaults?` |
 | Error retry | `Retry` |
