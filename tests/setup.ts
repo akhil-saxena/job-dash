@@ -40,5 +40,6 @@ CREATE INDEX IF NOT EXISTS \`idx_document_app\` ON \`document\` (\`application_i
 CREATE INDEX IF NOT EXISTS \`idx_document_user\` ON \`document\` (\`user_id\`);
 `;
 
+// 08-01: no schema changes; see 08-02 for user_settings table
 // D1 exec() handles multiple semicolon-separated statements
 await env.DB.exec(migrationSQL);
