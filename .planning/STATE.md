@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Phase 8 plans created and verified
-last_updated: "2026-04-23T15:51:08.265Z"
-last_activity: 2026-04-18
+status: executing
+stopped_at: Completed 08-01-PLAN.md (Calendar view delivered)
+last_updated: "2026-04-23T16:59:47.370Z"
+last_activity: 2026-04-23
 progress:
   total_phases: 10
   completed_phases: 8
   total_plans: 27
-  completed_plans: 25
+  completed_plans: 26
   percent: 95
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-16)
 
 **Core value:** At a glance, the user knows exactly where every application stands and what needs attention today
-**Current focus:** Phase 07 — jd-snapshots-documents
+**Current focus:** Phase 08 — calendar-analytics
 
 ## Current Position
 
-Phase: 10
-Plan: Not started
-Status: Plan 07-01 complete
-Last activity: 2026-04-18
+Phase: 08 (calendar-analytics) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
+Last activity: 2026-04-23
 
 Progress: [=========.] 95%
 
@@ -68,6 +68,7 @@ Progress: [=========.] 95%
 | Phase 05 P02 | 14min | 3 tasks | 6 files |
 | Phase 05 P03 | 4min | 3 tasks | 9 files |
 | Phase 07 P01 | 4min | 3 tasks | 17 files |
+| Phase 08 P01 | 59min | 4 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,11 @@ Recent decisions affecting current work:
 - [Phase 07]: Used react-markdown for JD rendering (lightweight, standard, ESM-native)
 - [Phase 07]: Stored jdText as TEXT column on application table (no separate table since versioning is deferred)
 - [Phase 07]: Document upload button disabled (R2 binding not yet configured); metadata API fully functional
+- [Phase 08]: [Phase 08]: Kept the month grid always visible instead of replacing it with an empty-state card (UI-SPEC deviation — better UX during smoke test)
+- [Phase 08]: [Phase 08]: Folded Phase 5 gap fix (datetime input for interview scheduledAt) into 08-01 — VIEW-03 verification couldn't complete without it
+- [Phase 08]: [Phase 08]: Cross-hook calendar query invalidation — useInterviews/useDeadlines mutations trigger ['calendar'] refetch (Pitfall 4 from 08-RESEARCH)
+- [Phase 08]: [Phase 08]: useCalendarMonth uses refetchOnMount:'always' — calendar events are edited on a different page so 60s global staleTime is too slow
+- [Phase 08]: [Phase 08]: Made interview scheduledAt null-safe end-to-end (validator accepts null, service handles null explicitly) — prevents 1970-01-01 silent data bug
 
 ### Pending Todos
 
@@ -127,6 +133,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-23T15:51:08.253Z
-Stopped at: Phase 8 plans created and verified
-Resume file: .planning/phases/08-calendar-analytics/08-01-PLAN.md
+Last session: 2026-04-23T16:57:39.841Z
+Stopped at: Completed 08-01-PLAN.md (Calendar view delivered)
+Resume file: None

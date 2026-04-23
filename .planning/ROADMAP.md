@@ -141,7 +141,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 08-01-PLAN.md — Calendar view: month grid + This Week list + event chips + click-through navigation
+- [x] 08-01-PLAN.md — Calendar view: month grid + This Week list + event chips + click-through navigation
 - [ ] 08-02-PLAN.md — Analytics dashboard + Settings thresholds: funnel, sources, response-time table, 4 stat cards, global date range filter
 
 **UI hint**: yes
@@ -172,7 +172,7 @@ Phases 1-4 are linear. 5, 6, 7 can partially overlap after 4. 8 depends on 6. 9 
 | 5. Interview Tracking & Notes | 0/3 | Planning | - |
 | 6. Tags, Deadlines & Company | 0/0 | Not started | - |
 | 7. JD Snapshots & Documents | 1/1 | Complete | 2026-04-18 |
-| 8. Calendar & Analytics | 0/2 | Planning | - |
+| 8. Calendar & Analytics | 1/2 | In Progress | - |
 | 9. Command Palette & Polish | 0/0 | Not started | - |
 | 10. Design Refresh — Board & Detail | 3/3 | Complete    | 2026-04-18 |
 
