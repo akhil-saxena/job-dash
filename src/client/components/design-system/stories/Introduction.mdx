@@ -1,0 +1,104 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Design System/Introduction" />
+
+# JobDash Design System
+
+A custom Tailwind v4 design system built for a minimal-warm aesthetic:
+glass surfaces, rounded corners, warm palette, native dark-mode.
+
+No external UI library. All primitives live under
+`src/client/components/design-system/` and are framework-agnostic
+inside the React + Vite client.
+
+## Design tokens
+
+Defined in [`src/client/index.css`](../../../index.css) via Tailwind v4
+`@theme`.
+
+### Color — status
+
+| Token | Hex | Use |
+|-------|-----|-----|
+| `--color-status-wishlist` | `#6b7280` | Wishlist applications |
+| `--color-status-applied` | `#3b82f6` | Applied status · funnel bar · interview event chips |
+| `--color-status-screening` | `#8b5cf6` | Screening status · funnel bar · follow-up deadlines |
+| `--color-status-interviewing` | `#f59e0b` | Interviewing status · funnel bar · amber zone · application deadlines |
+| `--color-status-offer` | `#22c55e` | Offer status · funnel bar · green zone · offer-expiry deadlines |
+| `--color-status-accepted` | `#10b981` | Accepted offer (terminal) |
+| `--color-status-rejected` | `#ef4444` | Rejected · red zone · past-due deadlines · destructive actions |
+| `--color-status-withdrawn` | `#64748b` | Withdrawn (terminal) |
+
+### Color — surfaces & text
+
+| Token | Light | Dark | Use |
+|-------|-------|------|-----|
+| `--color-surface-accent` | `#292524` | — | Primary CTA fill · active filter chip · focus ring |
+| `--color-text-primary` | `#1c1917` | `#f4f4f5` (dark-accent) | Headings, body |
+| `--color-text-secondary` | `#78716c` | — | Captions, secondary rows |
+| `--color-text-muted` | `#a8a29e` | — | Muted labels, placeholder |
+| `--color-dark-dominant` | — | `#18181b` | Dark-mode page background |
+| `--color-dark-card` | — | `#27272a` | Dark-mode card surface |
+| `--color-dark-accent` | — | `#f4f4f5` | Dark-mode primary text |
+
+### Radius scale
+
+| Token | Value | Use |
+|-------|-------|-----|
+| `--radius-btn` | 6px | Buttons, small chips |
+| `--radius-card` | 8px | Cards, tables, dropdowns |
+| `--radius-input` | 10px | Inputs, selects, date fields |
+| `--radius-card-mobile` | 12px | Cards on mobile |
+| `--radius-modal` | 14px | Modals, hero cards |
+| `--radius-pill` | 99px | Pills, badges, date-range cells |
+
+### Typography tiers
+
+| Tier | Size | Weight | Usage |
+|------|------|--------|-------|
+| Label | 12px (`text-xs`) | 600 | Stat labels, chip text, column headers |
+| Body | 14px (`text-sm`) | 400 | Paragraphs, table cells, captions |
+| Heading | 20px (`text-xl`) | 600 | Section headings |
+| Display | 28px (`text-[28px]`) | 600 | Stat card values, page titles |
+
+### Glass surface utility
+
+```css
+.glass {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+.dark .glass {
+  background: rgba(39, 39, 42, 0.65);
+  border-color: rgba(63, 63, 70, 0.5);
+}
+```
+
+## Primitive catalog
+
+Explore each primitive in the sidebar. All primitives:
+
+- accept a `variant` (usually `"glass"` or `"raised"`)
+- accept a `size` where applicable (`"sm" | "md"` or `"sm" | "md" | "lg"`)
+- use design tokens instead of hard-coded colors
+- render identical in both light and dark mode (toolbar toggle above)
+
+## When to reach for what
+
+| Need | Use |
+|------|-----|
+| Text / email / password input | `Input` |
+| Numeric with optional prefix / suffix | `NumberField` |
+| Date, datetime, time | `DateField` |
+| Single-select dropdown | `Select` |
+| Plain multi-line text | `Textarea` |
+| Markdown notes (with preview) | `MarkdownField` |
+| Primary / secondary / ghost action | `Button` |
+| Status pill | `Badge` |
+| Surface / panel | `Card` |
+| Overlay dialog | `Modal` |
+| Preset / tab filters | `FilterChips` |
+| Scrollable table column header | `ColumnHeader` / `SortableHeader` |
+| Global command / search input | `SearchBar` |
+| Detail-page tab row | `TabBar` |
