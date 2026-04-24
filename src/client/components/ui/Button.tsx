@@ -6,6 +6,12 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	loading?: boolean;
 }
 
+/**
+ * Auth-form button — tuned to match the design-system palette while keeping
+ * the legacy variant names (primary / secondary / outline / google) that the
+ * auth forms use. `primary` maps to the surface-accent fill used elsewhere
+ * for primary CTAs.
+ */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 	(
 		{
@@ -20,19 +26,21 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 		ref,
 	) => {
 		const base =
-			"inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 disabled:pointer-events-none disabled:opacity-50";
-		const variants = {
-			primary: "bg-stone-800 text-white hover:bg-stone-700",
-			secondary: "bg-stone-100 text-stone-800 hover:bg-stone-200",
+			"inline-flex items-center justify-center rounded-[var(--radius-btn)] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-accent/40 disabled:pointer-events-none disabled:opacity-50";
+		const variants: Record<string, string> = {
+			primary:
+				"bg-surface-accent text-white hover:bg-[#1c1917] dark:bg-dark-accent dark:text-dark-dominant dark:hover:bg-[#e4e4e7]",
+			secondary:
+				"bg-black/[0.04] text-text-primary hover:bg-black/[0.08] dark:bg-white/[0.06] dark:text-dark-accent dark:hover:bg-white/[0.1]",
 			outline:
-				"border border-stone-300 bg-white text-stone-800 hover:bg-stone-50",
+				"border border-black/10 bg-transparent text-text-primary hover:bg-black/[0.04] dark:border-white/15 dark:text-dark-accent dark:hover:bg-white/[0.06]",
 			google:
-				"border border-stone-300 bg-white text-stone-700 hover:bg-stone-50 gap-2",
+				"border border-black/10 bg-white text-text-primary hover:bg-black/[0.03] gap-2 dark:border-white/15 dark:bg-dark-card dark:text-dark-accent dark:hover:bg-white/[0.06]",
 		};
-		const sizes = {
-			sm: "h-8 px-3 text-sm",
-			md: "h-10 px-4 text-sm",
-			lg: "h-12 px-6 text-base",
+		const sizes: Record<string, string> = {
+			sm: "h-[30px] px-3 text-xs",
+			md: "h-[36px] px-4 text-sm",
+			lg: "h-[44px] px-6 text-sm",
 		};
 
 		return (
