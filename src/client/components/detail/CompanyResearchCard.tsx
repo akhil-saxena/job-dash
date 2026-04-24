@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useCompanyForApplication, useUpdateCompany } from "@/client/hooks/useCompany";
 import { useDebouncedMutate } from "@/client/hooks/useDebouncedMutate";
+import { MarkdownField } from "@/client/components/design-system/MarkdownField";
 import { SaveIndicator } from "./SaveIndicator";
 
 interface CompanyResearchCardProps {
@@ -86,16 +87,15 @@ export function CompanyResearchCard({ companyName }: CompanyResearchCardProps) {
 				Research notes for {company.name} -- shared across all applications to this company
 			</p>
 
-			{/* Markdown notes textarea */}
-			<textarea
-				value={notes}
-				onChange={(e) => handleNotes(e.target.value)}
-				placeholder="Add research notes -- Glassdoor reviews, tech stack, culture, interview tips..."
-				className="mt-2.5 w-full min-h-[100px] rounded-lg border border-dashed border-black/[0.12] bg-transparent p-3 text-[14px] leading-relaxed text-text-primary placeholder:text-text-muted/50 focus:border-amber-400 focus:outline-none resize-y dark:border-white/[0.1] dark:text-dark-accent dark:placeholder:text-dark-accent/30"
-				style={{ fontFamily: "inherit" }}
-			/>
-			<div className="mt-1.5 text-[9px] text-text-muted dark:text-dark-accent/30" style={{ fontFamily: "var(--mono, monospace)" }}>
-				**bold** *italic* - lists `code` -- markdown supported
+			{/* Markdown notes — edit/preview toggle */}
+			<div className="mt-2.5">
+				<MarkdownField
+					value={notes}
+					onChange={handleNotes}
+					placeholder="Add research notes — Glassdoor reviews, tech stack, culture, interview tips…"
+					minHeight="100px"
+					emptyLabel="Click to add company notes"
+				/>
 			</div>
 		</div>
 	);

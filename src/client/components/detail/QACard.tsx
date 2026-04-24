@@ -3,6 +3,7 @@ import { Trash2 } from "lucide-react";
 import { useUpdateQA } from "@/client/hooks/useInterviews";
 import type { InterviewQA } from "@/client/hooks/useInterviews";
 import { useDebouncedMutate } from "@/client/hooks/useDebouncedMutate";
+import { MarkdownField } from "@/client/components/design-system/MarkdownField";
 import { SaveIndicator } from "./SaveIndicator";
 
 interface QACardProps {
@@ -79,22 +80,20 @@ export function QACard({ qa, applicationId, onDelete, index }: QACardProps) {
 				</div>
 			</div>
 
-			{/* Answer textarea */}
+			{/* Answer — edit/preview markdown */}
 			<div className="mt-2.5">
-				<textarea
+				<MarkdownField
 					value={answer}
-					onChange={(e) => handleAnswerChange(e.target.value)}
-					placeholder="Type your answer... (markdown supported)"
-					className="w-full min-h-[60px] rounded-lg border border-dashed border-black/[0.08] bg-transparent p-2.5 text-[12.5px] leading-relaxed text-text-secondary placeholder:text-text-muted/50 focus:border-amber-400 focus:outline-none resize-y dark:border-white/[0.08] dark:text-dark-accent/80 dark:placeholder:text-dark-accent/30"
+					onChange={handleAnswerChange}
+					placeholder="Type your answer… (markdown supported)"
+					minHeight="80px"
+					emptyLabel="Click to add an answer"
 				/>
-				<div className="mt-1 flex items-center justify-between">
-					<span className="text-[9px] text-text-muted dark:text-dark-accent/30" style={{ fontFamily: "var(--mono, monospace)" }}>
-						**bold** *italic* - lists `code` -- markdown supported
-					</span>
-					{(answerDirty || updateQA.isPending) && (
+				{(answerDirty || updateQA.isPending) && (
+					<div className="mt-1 flex justify-end">
 						<SaveIndicator isPending={updateQA.isPending} hasUnsaved={answerDirty} />
-					)}
-				</div>
+					</div>
+				)}
 			</div>
 		</div>
 	);

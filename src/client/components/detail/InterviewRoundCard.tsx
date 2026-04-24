@@ -3,6 +3,7 @@ import { ChevronDown, Plus, Trash2, ExternalLink, Clock, User, Video, Calendar }
 import { StarRating } from "./StarRating";
 import { SaveIndicator } from "./SaveIndicator";
 import { QACard } from "./QACard";
+import { MarkdownField } from "@/client/components/design-system/MarkdownField";
 import { useUpdateRound, useDeleteRound, useCreateQA, useDeleteQA } from "@/client/hooks/useInterviews";
 import type { InterviewRound } from "@/client/hooks/useInterviews";
 import { useDebouncedMutate } from "@/client/hooks/useDebouncedMutate";
@@ -317,19 +318,17 @@ export function InterviewRoundCard({ round, index, applicationId }: InterviewRou
 								<SaveIndicator isPending={updateRound.isPending} hasUnsaved={notesDirty} />
 							)}
 						</div>
-						<textarea
+						<MarkdownField
 							value={experienceNotes}
-							onChange={(e) => {
-								setExperienceNotes(e.target.value);
+							onChange={(val) => {
+								setExperienceNotes(val);
 								setNotesDirty(true);
-								debouncedNotes({ experienceNotes: e.target.value || null });
+								debouncedNotes({ experienceNotes: val || null });
 							}}
 							placeholder="How did it go? (markdown supported)"
-							className="w-full min-h-[80px] rounded-lg border border-dashed border-black/[0.08] bg-transparent p-2.5 text-[12.5px] leading-relaxed text-text-secondary placeholder:text-text-muted/50 focus:border-amber-400 focus:outline-none resize-y dark:border-white/[0.08] dark:text-dark-accent/80 dark:placeholder:text-dark-accent/30"
+							minHeight="100px"
+							emptyLabel="Click to add experience notes"
 						/>
-						<div className="mt-1 text-[9px] text-text-muted dark:text-dark-accent/30" style={{ fontFamily: "var(--mono, monospace)" }}>
-							**bold** *italic* - lists `code` -- markdown supported
-						</div>
 					</div>
 
 					{/* C. Feedback */}
@@ -341,19 +340,17 @@ export function InterviewRoundCard({ round, index, applicationId }: InterviewRou
 								<SaveIndicator isPending={updateRound.isPending} hasUnsaved={feedbackDirty} />
 							)}
 						</div>
-						<textarea
+						<MarkdownField
 							value={feedback}
-							onChange={(e) => {
-								setFeedback(e.target.value);
+							onChange={(val) => {
+								setFeedback(val);
 								setFeedbackDirty(true);
-								debouncedFeedback({ feedback: e.target.value || null });
+								debouncedFeedback({ feedback: val || null });
 							}}
-							placeholder="Interviewer feedback, areas to improve... (markdown supported)"
-							className="w-full min-h-[80px] rounded-lg border border-dashed border-black/[0.08] bg-transparent p-2.5 text-[12.5px] leading-relaxed text-text-secondary placeholder:text-text-muted/50 focus:border-amber-400 focus:outline-none resize-y dark:border-white/[0.08] dark:text-dark-accent/80 dark:placeholder:text-dark-accent/30"
+							placeholder="Interviewer feedback, areas to improve… (markdown supported)"
+							minHeight="100px"
+							emptyLabel="Click to add feedback"
 						/>
-						<div className="mt-1 text-[9px] text-text-muted dark:text-dark-accent/30" style={{ fontFamily: "var(--mono, monospace)" }}>
-							**bold** *italic* - lists `code` -- markdown supported
-						</div>
 					</div>
 
 					{/* D. Q&A Pairs */}

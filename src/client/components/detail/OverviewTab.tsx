@@ -1,7 +1,9 @@
-import { useState, useCallback } from "react";
-import { ExternalLink, Pencil } from "lucide-react";
+import { useCallback, useRef, useState } from "react";
+import { ExternalLink } from "lucide-react";
+import Markdown from "react-markdown";
 import { useUpdateApplication } from "@/client/hooks/useApplications";
 import { useDebouncedMutate } from "@/client/hooks/useDebouncedMutate";
+import { MarkdownField } from "@/client/components/design-system/MarkdownField";
 import type { ApplicationDetail } from "@/client/hooks/useApplicationDetail";
 import { TagPicker } from "./TagPicker";
 import { DeadlineSection } from "./DeadlineSection";
@@ -13,18 +15,18 @@ interface OverviewTabProps {
 }
 
 function formatDate(value: number | string | null | undefined): string {
-	if (!value) return "\u2014";
+	if (!value) return "—";
 	try {
 		const d = typeof value === "number" ? new Date(value * 1000) : new Date(value);
-		if (Number.isNaN(d.getTime())) return "\u2014";
+		if (Number.isNaN(d.getTime())) return "—";
 		return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-	} catch { return "\u2014"; }
+	} catch { return "—"; }
 }
 
 function formatSalary(min: number | null, max: number | null, currency: string): string {
-	if (!min && !max) return "\u2014";
+	if (!min && !max) return "—";
 	const fmt = (n: number) => n >= 1000 ? `$${Math.round(n / 1000)}K` : `$${n}`;
-	if (min && max) return `${fmt(min)} \u2013 ${fmt(max)} ${currency}`;
+	if (min && max) return `${fmt(min)} – ${fmt(max)} ${currency}`;
 	if (min) return `${fmt(min)}+ ${currency}`;
 	return `${fmt(max!)} ${currency}`;
 }
@@ -39,19 +41,28 @@ function fullUrl(url: string): string {
 	return url.startsWith("http") ? url : `https://${url}`;
 }
 
-/** A single key-value item in the "At a glance" section */
-function KV({ label, value, mono, link }: { label: string; value: string; mono?: boolean; link?: string }) {
+/**
+ * Key-value row in the "At a glance" section. All values use the same sans
+ * typography so Location / Salary / Source / Applied / Time / Job posting
+ * read as a cohesive grid rather than a mix of mono and sans.
+ */
+function KV({ label, value, link }: { label: string; value: string; link?: string }) {
 	return (
 		<div className="flex flex-col gap-1">
-			<span className="text-[9px] font-bold uppercase tracking-widest text-text-muted dark:text-dark-accent/40" style={{ fontFamily: "var(--mono, monospace)" }}>
+			<span className="text-[10px] font-bold uppercase tracking-widest text-text-muted dark:text-dark-accent/40">
 				{label}
 			</span>
 			{link ? (
-				<a href={fullUrl(link)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[15px] font-semibold text-amber-600 hover:underline dark:text-amber-400" style={mono ? { fontFamily: "var(--mono, monospace)", fontSize: "14px" } : undefined}>
+				<a
+					href={fullUrl(link)}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="inline-flex items-center gap-1 text-[15px] font-semibold text-amber-600 hover:underline dark:text-amber-400"
+				>
 					{value} <ExternalLink size={11} />
 				</a>
 			) : (
-				<span className={`text-[15px] font-semibold text-text-primary dark:text-dark-accent`} style={mono ? { fontFamily: "var(--mono, monospace)", fontSize: "14px" } : undefined}>
+				<span className="text-[15px] font-semibold text-text-primary dark:text-dark-accent">
 					{value}
 				</span>
 			)}
@@ -62,7 +73,7 @@ function KV({ label, value, mono, link }: { label: string; value: string; mono?:
 export function OverviewTab({ app }: OverviewTabProps) {
 	const updateApplication = useUpdateApplication();
 	const [notes, setNotes] = useState(app.notes || "");
-	const [editing, setEditing] = useState(false);
+	const notesSectionRef = useRef<HTMLDivElement | null>(null);
 
 	const doMutate = useCallback(
 		(fields: Record<string, unknown>) => {
@@ -77,10 +88,32 @@ export function OverviewTab({ app }: OverviewTabProps) {
 		debouncedMutate({ notes: val || null });
 	};
 
+	const scrollToNotes = () => {
+		notesSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+		const textarea = notesSectionRef.current?.querySelector("textarea");
+		// If the markdown field is in preview mode, the textarea won't exist —
+		// in that case the scroll + edit-toggle is handled by the user's click
+		// on Edit inside the section. Keep scroll-only as a minimum affordance.
+		textarea?.focus();
+	};
+
 	const salaryLabel = formatSalary(app.salaryMin, app.salaryMax, app.salaryCurrency);
 	const location = app.locationType
-		? `${app.locationType.charAt(0).toUpperCase() + app.locationType.slice(1)}${app.locationCity ? ` \u00b7 ${app.locationCity}` : ""}`
-		: "\u2014";
+		? `${app.locationType.charAt(0).toUpperCase() + app.locationType.slice(1)}${app.locationCity ? ` · ${app.locationCity}` : ""}`
+		: "—";
+	const sourceLabel = app.source
+		? app.source.charAt(0).toUpperCase() + app.source.slice(1)
+		: "—";
+	const timeInStageDays = Math.max(
+		0,
+		Math.floor(
+			(Date.now() / 1000 -
+				(typeof app.updatedAt === "number"
+					? app.updatedAt
+					: new Date(app.updatedAt).getTime() / 1000)) /
+				86400,
+		),
+	);
 
 	return (
 		<div className="grid gap-5 md:grid-cols-[1fr_300px]">
@@ -95,37 +128,29 @@ export function OverviewTab({ app }: OverviewTabProps) {
 					</div>
 				)}
 
-				{/* 2. At a glance -- KV grid with flex row layout */}
+				{/* 2. At a glance -- unified KV grid */}
 				<div className="rounded-[14px] bg-white/55 backdrop-blur-[14px] border border-white/50 p-5 dark:bg-zinc-800/50 dark:border-white/10">
 					<div className="mb-4 flex items-center gap-2">
-						<span className="text-[13px] font-bold tracking-tight text-text-secondary dark:text-dark-accent/60" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-							<span className="inline-block h-[15px] w-[4px] rounded-sm bg-amber-500" />
+						<span className="inline-block h-[15px] w-[4px] rounded-sm bg-amber-500" />
+						<span className="text-[13px] font-bold tracking-tight text-text-secondary dark:text-dark-accent/60">
 							At a glance
 						</span>
-						<button
-							type="button"
-							onClick={() => setEditing(!editing)}
-							className="ml-auto text-text-muted hover:text-text-secondary transition-colors dark:text-dark-accent/40"
-							title="Edit details"
-						>
-							<Pencil size={13} />
-						</button>
 					</div>
 					<div className="flex flex-wrap gap-x-8 gap-y-4">
 						<KV label="Location" value={location} />
-						<KV label="Salary range" value={salaryLabel} mono />
-						<KV label="Source" value={app.source ? app.source.charAt(0).toUpperCase() + app.source.slice(1) : "\u2014"} />
-						<KV label="Applied" value={formatDate(app.appliedAt)} mono />
-						<KV label="Time in stage" value={`${Math.max(0, Math.floor((Date.now() / 1000 - (typeof app.updatedAt === "number" ? app.updatedAt : new Date(app.updatedAt).getTime() / 1000)) / 86400))} days`} />
+						<KV label="Salary range" value={salaryLabel} />
+						<KV label="Source" value={sourceLabel} />
+						<KV label="Applied" value={formatDate(app.appliedAt)} />
+						<KV label="Time in stage" value={`${timeInStageDays} days`} />
 						{app.jobPostingUrl ? (
-							<KV label="Job posting" value={hostname(app.jobPostingUrl) ?? "View"} mono link={app.jobPostingUrl} />
+							<KV label="Job posting" value={hostname(app.jobPostingUrl) ?? "View"} link={app.jobPostingUrl} />
 						) : (
-							<KV label="Job posting" value="\u2014" />
+							<KV label="Job posting" value="—" />
 						)}
 					</div>
 					{app.applicationPortalUrl && (
 						<div className="mt-4 pt-4 border-t border-black/[0.06] dark:border-white/[0.06]">
-							<KV label="Application portal" value={hostname(app.applicationPortalUrl) ?? "Open"} mono link={app.applicationPortalUrl} />
+							<KV label="Application portal" value={hostname(app.applicationPortalUrl) ?? "Open"} link={app.applicationPortalUrl} />
 						</div>
 					)}
 				</div>
@@ -136,84 +161,62 @@ export function OverviewTab({ app }: OverviewTabProps) {
 				{/* 3b. Salary / Compensation */}
 				<SalaryCard app={app} />
 
-				{/* 4. About the role */}
-				<div className="rounded-[14px] bg-white/55 backdrop-blur-[14px] border border-white/50 p-5 dark:bg-zinc-800/50 dark:border-white/10">
+				{/* 5. Notes -- markdown edit/preview */}
+				<div
+					ref={notesSectionRef}
+					className="rounded-[14px] bg-white/55 backdrop-blur-[14px] border border-white/50 p-5 dark:bg-zinc-800/50 dark:border-white/10"
+				>
 					<div className="mb-3 flex items-center gap-2">
 						<span className="inline-block h-[15px] w-[4px] rounded-sm bg-amber-500" />
-						<span className="text-[13px] font-bold tracking-tight text-text-secondary dark:text-dark-accent/60">About the role</span>
-					</div>
-					<p className="text-[13px] leading-relaxed text-text-secondary dark:text-dark-accent/60 mb-3">
-						Review the full job description in the JD tab for complete details.
-					</p>
-					<ul className="space-y-1.5 text-[12.5px] text-text-secondary dark:text-dark-accent/60">
-						<li className="flex items-start gap-2">
-							<span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-amber-400" />
-							Design and implement scalable systems
-						</li>
-						<li className="flex items-start gap-2">
-							<span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-amber-400" />
-							Collaborate with cross-functional teams
-						</li>
-						<li className="flex items-start gap-2">
-							<span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-amber-400" />
-							Ship high-quality, well-tested code
-						</li>
-						<li className="flex items-start gap-2">
-							<span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-amber-400" />
-							Mentor junior engineers and drive technical direction
-						</li>
-					</ul>
-				</div>
-
-				{/* 5. Notes -- editable */}
-				<div className="rounded-[14px] bg-white/55 backdrop-blur-[14px] border border-white/50 p-5 dark:bg-zinc-800/50 dark:border-white/10">
-					<div className="mb-3 flex items-center gap-2">
-						<span className="text-[13px] font-bold tracking-tight text-text-secondary dark:text-dark-accent/60" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-							<span className="inline-block h-[15px] w-[4px] rounded-sm bg-amber-500" />
+						<span className="text-[13px] font-bold tracking-tight text-text-secondary dark:text-dark-accent/60">
 							Notes
 						</span>
 						{updateApplication.isPending && (
-							<span className="text-[10px] text-text-muted dark:text-dark-accent/40">Saving...</span>
+							<span className="text-[10px] text-text-muted dark:text-dark-accent/40">Saving…</span>
 						)}
 						{!updateApplication.isPending && notes && (
 							<span className="text-[10px] text-green-600 dark:text-green-400">Saved</span>
 						)}
 					</div>
-					<textarea
+					<MarkdownField
 						value={notes}
-						onChange={(e) => handleNotes(e.target.value)}
-						placeholder="Add notes -- prep tips, key contacts, follow-up reminders..."
-						className="w-full min-h-[120px] rounded-lg border border-dashed border-black/[0.12] bg-transparent p-3 text-[14px] leading-relaxed text-text-primary placeholder:text-text-muted/50 focus:border-amber-400 focus:outline-none resize-y dark:border-white/[0.1] dark:text-dark-accent dark:placeholder:text-dark-accent/30"
-						style={{ fontFamily: "inherit" }}
+						onChange={handleNotes}
+						placeholder="Add notes — prep tips, key contacts, follow-up reminders…"
+						minHeight="140px"
+						emptyLabel="Click to add notes"
 					/>
-					<div className="mt-1.5 text-[9px] text-text-muted dark:text-dark-accent/30" style={{ fontFamily: "var(--mono, monospace)" }}>
-						**bold** * *italic* * - lists * `code` -- markdown supported
-					</div>
 				</div>
 			</div>
 
 			{/* Right sidebar */}
 			<div className="flex flex-col gap-4">
 
-				{/* Sticky note style */}
-				<div
-					className="rounded-[10px] p-4 text-[13.5px] font-semibold leading-snug shadow-sm cursor-text"
+				{/* Sticky note — click to scroll + focus Notes section below */}
+				<button
+					type="button"
+					onClick={scrollToNotes}
+					className="rounded-[10px] p-4 text-left text-[13.5px] font-medium leading-snug shadow-sm transition-transform hover:-translate-y-px focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/50"
 					style={{
 						background: "linear-gradient(145deg, #fef3c7, #fde68a)",
 						border: "1px solid rgba(245,158,11,0.25)",
 						transform: "rotate(-0.6deg)",
 						boxShadow: "0 2px 8px rgba(245,158,11,0.15)",
 					}}
+					aria-label="Jump to notes section"
 				>
 					{notes ? (
-						<span className="text-text-primary">{notes.slice(0, 120)}{notes.length > 120 ? "\u2026" : ""}</span>
+						<div className="jd-markdown prose prose-sm max-w-none text-text-primary [&_*]:!text-text-primary [&_p]:!mb-1 [&_a]:!text-amber-800">
+							<Markdown>
+								{notes.slice(0, 160) + (notes.length > 160 ? "…" : "")}
+							</Markdown>
+						</div>
 					) : (
-						<span className="text-amber-700/60 italic">Quick note -- click to edit above</span>
+						<span className="italic text-amber-700/70">Quick note — click to jump to notes</span>
 					)}
-					<div className="mt-2.5 text-[9px] font-bold uppercase tracking-widest text-amber-700/60" style={{ fontFamily: "var(--mono, monospace)" }}>
-						Click to expand
+					<div className="mt-2.5 text-[9px] font-bold uppercase tracking-widest text-amber-700/60">
+						Open notes ↓
 					</div>
-				</div>
+				</button>
 
 				{/* Tags */}
 				<TagPicker applicationId={app.id} />
