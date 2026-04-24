@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal } from "@/client/components/design-system/Modal";
 import { Button } from "@/client/components/design-system/Button";
+import { DateField } from "@/client/components/design-system/DateField";
 
 interface CustomRangeModalProps {
 	open: boolean;
@@ -29,29 +30,29 @@ export function CustomRangeModal({
 	}, [open, initialFrom, initialTo]);
 
 	const canApply = Boolean(from && to && from <= to);
+	const invalidOrder = Boolean(from && to && from > to);
 
 	return (
 		<Modal open={open} onClose={onClose} title="Custom date range">
 			<div className="flex flex-col gap-4">
 				<div className="grid grid-cols-2 gap-3">
-					<label className="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wider text-text-secondary dark:text-dark-accent/60">
-						From
-						<input
-							type="date"
-							value={from}
-							onChange={(e) => setFrom(e.target.value)}
-							className="rounded-[var(--radius-input)] border border-black/[0.06] bg-white/80 px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-surface-accent/20 dark:border-white/10 dark:bg-dark-card/80 dark:text-dark-accent"
-						/>
-					</label>
-					<label className="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wider text-text-secondary dark:text-dark-accent/60">
-						To
-						<input
-							type="date"
-							value={to}
-							onChange={(e) => setTo(e.target.value)}
-							className="rounded-[var(--radius-input)] border border-black/[0.06] bg-white/80 px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-surface-accent/20 dark:border-white/10 dark:bg-dark-card/80 dark:text-dark-accent"
-						/>
-					</label>
+					<DateField
+						label="From"
+						value={from}
+						onChange={(e) => setFrom(e.target.value)}
+						max={to || undefined}
+						variant="raised"
+						size="md"
+					/>
+					<DateField
+						label="To"
+						value={to}
+						onChange={(e) => setTo(e.target.value)}
+						min={from || undefined}
+						variant="raised"
+						size="md"
+						error={invalidOrder ? "To must be on or after From" : undefined}
+					/>
 				</div>
 				<div className="flex items-center justify-end gap-2">
 					<Button variant="ghost" size="sm" onClick={onClose}>

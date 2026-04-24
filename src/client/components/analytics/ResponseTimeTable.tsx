@@ -78,11 +78,15 @@ export function ResponseTimeTable({
 								{label}
 							</td>
 							<td
-								className={`px-4 py-3 text-sm font-semibold rounded-[var(--radius-pill)] ${zoneClass}`}
-								title={cellTitle}
+								className="py-3 pl-3 text-right"
 								aria-label={ariaLabel}
+								title={cellTitle}
 							>
-								{cellCopy}
+								<span
+									className={`inline-flex items-center justify-end rounded-[var(--radius-pill)] px-3 py-1 text-sm font-semibold tabular-nums ${zoneClass}`}
+								>
+									{cellCopy}
+								</span>
 							</td>
 						</tr>
 					);

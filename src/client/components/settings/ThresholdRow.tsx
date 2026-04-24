@@ -63,69 +63,50 @@ export function ThresholdRow({
 	};
 
 	return (
-		<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-			<div className="text-sm font-semibold text-text-primary dark:text-dark-accent sm:w-48">
+		<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
+			<div className="text-sm font-semibold text-text-primary dark:text-dark-accent sm:w-48 sm:shrink-0">
 				{transitionLabel}
 			</div>
 
-			<div className="flex flex-wrap items-center gap-3">
-				<label className="flex items-center gap-1 text-xs text-text-muted dark:text-dark-accent/40">
-					green &lt;
-					<input
-						type="number"
-						min={0}
-						max={365}
-						value={Number.isNaN(green) ? "" : green}
-						onChange={(e) => {
-							const v = Number(e.target.value);
-							setGreen(v);
-							commit(v, amber);
-						}}
-						onBlur={(e) => {
-							const v = Number(e.target.value);
-							commit(v, amber);
-						}}
-						className="w-20 rounded-[var(--radius-input)] border border-black/[0.06] bg-white/80 px-2 py-1 text-sm text-text-primary shadow-sm focus:outline-none focus:ring-2 focus:ring-surface-accent/20 dark:border-white/10 dark:bg-dark-card/80 dark:text-dark-accent"
-						aria-label={`${transitionLabel} green-below days`}
+			<div className="flex flex-wrap items-center gap-4">
+				<NumberDayField
+					label="Green <"
+					value={green}
+					ariaLabel={`${transitionLabel} green-below days`}
+					dotColor="#22c55e"
+					onChange={(v) => {
+						setGreen(v);
+						commit(v, amber);
+					}}
+					onBlur={(v) => commit(v, amber)}
+					hasError={invalid && green >= amber}
+				/>
+				<NumberDayField
+					label="Amber <"
+					value={amber}
+					ariaLabel={`${transitionLabel} amber-below days`}
+					dotColor="#f59e0b"
+					onChange={(v) => {
+						setAmber(v);
+						commit(green, v);
+					}}
+					onBlur={(v) => commit(green, v)}
+					hasError={invalid && green >= amber}
+				/>
+				<div className="flex items-center gap-1.5 rounded-[var(--radius-input)] bg-black/[0.03] px-2 py-1 dark:bg-white/[0.04]">
+					<span
+						className="h-2.5 w-2.5 rounded-full"
+						style={{ backgroundColor: "#ef4444" }}
+						aria-hidden="true"
 					/>
-					<span className="text-xs text-text-muted dark:text-dark-accent/40">
-						d
+					<span className="text-[11px] font-medium text-text-muted dark:text-dark-accent/50">
+						Red ≥ {Number.isFinite(amber) ? amber : "—"}d
 					</span>
-				</label>
-
-				<label className="flex items-center gap-1 text-xs text-text-muted dark:text-dark-accent/40">
-					amber &lt;
-					<input
-						type="number"
-						min={0}
-						max={365}
-						value={Number.isNaN(amber) ? "" : amber}
-						onChange={(e) => {
-							const v = Number(e.target.value);
-							setAmber(v);
-							commit(green, v);
-						}}
-						onBlur={(e) => {
-							const v = Number(e.target.value);
-							commit(green, v);
-						}}
-						className="w-20 rounded-[var(--radius-input)] border border-black/[0.06] bg-white/80 px-2 py-1 text-sm text-text-primary shadow-sm focus:outline-none focus:ring-2 focus:ring-surface-accent/20 dark:border-white/10 dark:bg-dark-card/80 dark:text-dark-accent"
-						aria-label={`${transitionLabel} amber-below days`}
-					/>
-					<span className="text-xs text-text-muted dark:text-dark-accent/40">
-						d
-					</span>
-				</label>
-
-				<div className="flex items-center gap-2">
-					<PreviewDot color="#22c55e" label="Green" />
-					<PreviewDot color="#f59e0b" label="Amber" />
-					<PreviewDot color="#ef4444" label="Red" />
 				</div>
 			</div>
 
 			{invalid ? (
-				<div className="text-xs text-status-rejected">
+				<div className="text-xs text-status-rejected sm:ml-auto">
 					green must be less than amber
 				</div>
 			) : null}
@@ -133,17 +114,56 @@ export function ThresholdRow({
 	);
 }
 
-function PreviewDot({ color, label }: { color: string; label: string }) {
+interface NumberDayFieldProps {
+	label: string;
+	value: number;
+	ariaLabel: string;
+	dotColor: string;
+	hasError?: boolean;
+	onChange: (v: number) => void;
+	onBlur: (v: number) => void;
+}
+
+function NumberDayField({
+	label,
+	value,
+	ariaLabel,
+	dotColor,
+	hasError,
+	onChange,
+	onBlur,
+}: NumberDayFieldProps) {
 	return (
-		<div className="flex flex-col items-center gap-0.5">
-			<span
-				className="h-3 w-3 rounded-full"
-				style={{ backgroundColor: color }}
-				aria-hidden="true"
-			/>
-			<span className="text-[10px] text-text-muted dark:text-dark-accent/40">
+		<label className="flex flex-col gap-1">
+			<span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-text-muted dark:text-dark-accent/40">
+				<span
+					className="h-2 w-2 rounded-full"
+					style={{ backgroundColor: dotColor }}
+					aria-hidden="true"
+				/>
 				{label}
 			</span>
-		</div>
+			<div
+				className={`relative flex items-center rounded-[var(--radius-input)] border bg-white/80 shadow-sm transition-colors focus-within:ring-2 dark:bg-dark-card/80 ${
+					hasError
+						? "border-status-rejected/40 focus-within:border-status-rejected focus-within:ring-status-rejected/20"
+						: "border-black/[0.06] focus-within:border-surface-accent/40 focus-within:ring-surface-accent/20 dark:border-white/10 dark:focus-within:border-dark-accent/40 dark:focus-within:ring-dark-accent/20"
+				}`}
+			>
+				<input
+					type="number"
+					min={0}
+					max={365}
+					value={Number.isNaN(value) ? "" : value}
+					onChange={(e) => onChange(Number(e.target.value))}
+					onBlur={(e) => onBlur(Number(e.target.value))}
+					aria-label={ariaLabel}
+					className="h-[34px] w-16 bg-transparent pl-3 pr-1 text-sm tabular-nums text-text-primary focus:outline-none dark:text-dark-accent"
+				/>
+				<span className="pr-2.5 text-xs font-medium text-text-muted dark:text-dark-accent/50">
+					d
+				</span>
+			</div>
+		</label>
 	);
 }

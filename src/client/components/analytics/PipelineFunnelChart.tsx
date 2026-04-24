@@ -10,6 +10,38 @@ import {
 } from "recharts";
 import type { FunnelData } from "@/client/hooks/useAnalytics";
 
+type ChartRow = {
+	label: string;
+	count: number;
+	fill: string;
+	conversionCopy: string;
+	prevLabel: string | null;
+	ariaLabel: string;
+};
+
+function FunnelTooltip({
+	active,
+	payload,
+}: {
+	active?: boolean;
+	payload?: Array<{ payload: ChartRow }>;
+}) {
+	if (!active || !payload?.length) return null;
+	const row = payload[0].payload;
+	return (
+		<div className="rounded-[var(--radius-card)] border border-black/[0.06] bg-white/95 px-3 py-2 text-xs shadow-sm dark:border-white/10 dark:bg-dark-card/95">
+			<div className="font-semibold text-text-primary dark:text-dark-accent">
+				{row.label}: {row.count} applications
+			</div>
+			<div className="mt-0.5 text-text-secondary dark:text-dark-accent/70">
+				{row.prevLabel
+					? `${row.conversionCopy} conversion from ${row.prevLabel}`
+					: "Top of funnel"}
+			</div>
+		</div>
+	);
+}
+
 // ANLY-01 / UI-SPEC funnel palette — each stage uses the existing status color.
 const FUNNEL_STAGES = [
 	{ key: "applied", label: "Applied", fill: "#3b82f6" },
@@ -31,29 +63,25 @@ interface PipelineFunnelChartProps {
 	data: FunnelData;
 }
 
-type ChartRow = {
-	label: string;
-	count: number;
-	fill: string;
-	conversionCopy: string;
-	ariaLabel: string;
-};
-
 export function PipelineFunnelChart({ data }: PipelineFunnelChartProps) {
 	const rows: ChartRow[] = FUNNEL_STAGES.map((stage) => {
 		const entry = data[stage.key];
 		const prev = PREV_STAGE[stage.key];
-		const conversionCopy = prev
-			? `${entry.conversionPct}% of ${FUNNEL_STAGES.find((s) => s.key === prev)!.label}`
+		const prevLabel = prev
+			? (FUNNEL_STAGES.find((s) => s.key === prev)?.label ?? null)
+			: null;
+		const conversionCopy = prevLabel
+			? `${entry.conversionPct}% of ${prevLabel}`
 			: "100%";
-		const ariaLabel = prev
-			? `${stage.label} stage: ${entry.count} applications, ${entry.conversionPct}% conversion from ${FUNNEL_STAGES.find((s) => s.key === prev)!.label}`
+		const ariaLabel = prevLabel
+			? `${stage.label} stage: ${entry.count} applications, ${entry.conversionPct}% conversion from ${prevLabel}`
 			: `${stage.label} stage: ${entry.count} applications, baseline`;
 		return {
 			label: stage.label,
 			count: entry.count,
 			fill: stage.fill,
 			conversionCopy,
+			prevLabel,
 			ariaLabel,
 		};
 	});
@@ -78,13 +106,7 @@ export function PipelineFunnelChart({ data }: PipelineFunnelChartProps) {
 			>
 				<XAxis type="number" hide />
 				<YAxis type="category" dataKey="label" hide />
-				<Tooltip
-					cursor={false}
-					formatter={(value: number, _name: string, entry: any) => [
-						`${value} apps · ${entry?.payload?.conversionCopy ?? ""}`,
-						entry?.payload?.label ?? "",
-					]}
-				/>
+				<Tooltip cursor={false} content={<FunnelTooltip />} />
 				<Bar
 					dataKey="count"
 					radius={[0, 4, 4, 0]}

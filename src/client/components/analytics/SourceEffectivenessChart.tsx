@@ -24,6 +24,47 @@ interface SourceEffectivenessChartProps {
 	data: SourceRow[];
 }
 
+function SourcesTooltip({
+	active,
+	payload,
+	label,
+}: {
+	active?: boolean;
+	payload?: Array<{ dataKey: string; name: string; value: number; color: string }>;
+	label?: string;
+}) {
+	if (!active || !payload?.length) return null;
+	return (
+		<div className="min-w-[180px] rounded-[var(--radius-card)] border border-black/[0.06] bg-white/95 px-3 py-2 shadow-sm dark:border-white/10 dark:bg-dark-card/95">
+			<div className="mb-1.5 text-xs font-semibold text-text-primary dark:text-dark-accent">
+				{label}
+			</div>
+			<div className="flex flex-col gap-1">
+				{SEGMENTS.map((seg) => {
+					const entry = payload.find((p) => p.dataKey === seg.key);
+					const value = entry?.value ?? 0;
+					return (
+						<div
+							key={seg.key}
+							className="flex items-center gap-2 text-xs text-text-secondary dark:text-dark-accent/70"
+						>
+							<span
+								className="h-2 w-2 shrink-0 rounded-full"
+								style={{ backgroundColor: seg.fill }}
+								aria-hidden="true"
+							/>
+							<span className="flex-1">{seg.label}</span>
+							<span className="tabular-nums font-semibold text-text-primary dark:text-dark-accent">
+								{value}
+							</span>
+						</div>
+					);
+				})}
+			</div>
+		</div>
+	);
+}
+
 export function SourceEffectivenessChart({
 	data,
 }: SourceEffectivenessChartProps) {
@@ -57,7 +98,7 @@ export function SourceEffectivenessChart({
 					width={120}
 					tick={{ fontSize: 12 }}
 				/>
-				<Tooltip cursor={false} />
+				<Tooltip cursor={{ fill: "rgba(0,0,0,0.03)" }} content={<SourcesTooltip />} />
 				<Legend
 					align="left"
 					verticalAlign="bottom"
