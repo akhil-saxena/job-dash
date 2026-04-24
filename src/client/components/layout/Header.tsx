@@ -3,6 +3,7 @@ import { useMatches, useRouter, Link } from "@tanstack/react-router";
 import { Sun, Moon, Monitor, User, Settings, LogOut } from "lucide-react";
 import { SearchBar } from "@/client/components/design-system/SearchBar";
 import { Button } from "@/client/components/design-system/Button";
+import { Avatar } from "@/client/components/design-system/Avatar";
 import { useTheme } from "@/client/hooks/useTheme";
 import { useQuickAdd } from "@/client/hooks/useQuickAdd";
 import { useSearch } from "@/client/hooks/useSearch";
@@ -36,28 +37,6 @@ const MODE_ICONS = {
 	dark: Moon,
 	system: Monitor,
 } as const;
-
-function getCompanyColor(name: string): string {
-	const colors = [
-		"#ef4444",
-		"#f97316",
-		"#f59e0b",
-		"#84cc16",
-		"#22c55e",
-		"#14b8a6",
-		"#06b6d4",
-		"#3b82f6",
-		"#6366f1",
-		"#8b5cf6",
-		"#a855f7",
-		"#ec4899",
-	];
-	let hash = 0;
-	for (let i = 0; i < name.length; i++) {
-		hash = name.charCodeAt(i) + ((hash << 5) - hash);
-	}
-	return colors[Math.abs(hash) % colors.length];
-}
 
 export function Header() {
 	const matches = useMatches();
@@ -98,8 +77,6 @@ export function Header() {
 	}, []);
 	const userName = session?.user?.name ?? "User";
 	const userEmail = session?.user?.email ?? "";
-	const userInitial = userName.charAt(0).toUpperCase();
-	const avatarColor = getCompanyColor(userName);
 
 	async function handleSignOut() {
 		setMenuOpen(false);
@@ -143,11 +120,10 @@ export function Header() {
 				<button
 					type="button"
 					onClick={() => setMenuOpen(!menuOpen)}
-					className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold text-white transition-opacity hover:opacity-80"
-					style={{ backgroundColor: avatarColor }}
+					className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber/30"
 					aria-label="Account menu"
 				>
-					{userInitial}
+					<Avatar name={userName} size="sm" />
 				</button>
 
 				{menuOpen && (

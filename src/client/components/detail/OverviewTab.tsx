@@ -4,6 +4,8 @@ import Markdown from "react-markdown";
 import { useUpdateApplication } from "@/client/hooks/useApplications";
 import { useDebouncedMutate } from "@/client/hooks/useDebouncedMutate";
 import { MarkdownField } from "@/client/components/design-system/MarkdownField";
+import { StickyNote } from "@/client/components/design-system/StickyNote";
+import { SectionHeader } from "@/client/components/design-system/SectionHeader";
 import type { ApplicationDetail } from "@/client/hooks/useApplicationDetail";
 import { TagPicker } from "./TagPicker";
 import { DeadlineSection } from "./DeadlineSection";
@@ -130,12 +132,7 @@ export function OverviewTab({ app }: OverviewTabProps) {
 
 				{/* 2. At a glance -- unified KV grid */}
 				<div className="rounded-[14px] bg-white/55 backdrop-blur-[14px] border border-white/50 p-5 dark:bg-zinc-800/50 dark:border-white/10">
-					<div className="mb-4 flex items-center gap-2">
-						<span className="inline-block h-[15px] w-[4px] rounded-sm bg-amber-500" />
-						<span className="text-[13px] font-bold tracking-tight text-text-secondary dark:text-dark-accent/60">
-							At a glance
-						</span>
-					</div>
+					<SectionHeader title="At a glance" className="mb-4" />
 					<div className="flex flex-wrap gap-x-8 gap-y-4">
 						<KV label="Location" value={location} />
 						<KV label="Salary range" value={salaryLabel} />
@@ -166,18 +163,17 @@ export function OverviewTab({ app }: OverviewTabProps) {
 					ref={notesSectionRef}
 					className="rounded-[14px] bg-white/55 backdrop-blur-[14px] border border-white/50 p-5 dark:bg-zinc-800/50 dark:border-white/10"
 				>
-					<div className="mb-3 flex items-center gap-2">
-						<span className="inline-block h-[15px] w-[4px] rounded-sm bg-amber-500" />
-						<span className="text-[13px] font-bold tracking-tight text-text-secondary dark:text-dark-accent/60">
-							Notes
-						</span>
-						{updateApplication.isPending && (
-							<span className="text-[10px] text-text-muted dark:text-dark-accent/40">Saving…</span>
-						)}
-						{!updateApplication.isPending && notes && (
-							<span className="text-[10px] text-green-600 dark:text-green-400">Saved</span>
-						)}
-					</div>
+					<SectionHeader
+						title="Notes"
+						caption={
+							updateApplication.isPending
+								? "Saving…"
+								: notes
+									? "Saved"
+									: undefined
+						}
+						className="mb-3"
+					/>
 					<MarkdownField
 						value={notes}
 						onChange={handleNotes}
@@ -192,31 +188,19 @@ export function OverviewTab({ app }: OverviewTabProps) {
 			<div className="flex flex-col gap-4">
 
 				{/* Sticky note — click to scroll + focus Notes section below */}
-				<button
-					type="button"
-					onClick={scrollToNotes}
-					className="rounded-[10px] p-4 text-left text-[13.5px] font-medium leading-snug shadow-sm transition-transform hover:-translate-y-px focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/50"
-					style={{
-						background: "linear-gradient(145deg, #fef3c7, #fde68a)",
-						border: "1px solid rgba(245,158,11,0.25)",
-						transform: "rotate(-0.6deg)",
-						boxShadow: "0 2px 8px rgba(245,158,11,0.15)",
-					}}
-					aria-label="Jump to notes section"
-				>
+				<StickyNote onClick={scrollToNotes} hint="Open notes ↓">
 					{notes ? (
-						<div className="jd-markdown prose prose-sm max-w-none text-text-primary [&_*]:!text-text-primary [&_p]:!mb-1 [&_a]:!text-amber-800">
+						<div className="jd-markdown prose prose-sm max-w-none text-[#292524] [&_*]:!text-[#292524] [&_p]:!mb-1 [&_a]:!text-amber-800">
 							<Markdown>
 								{notes.slice(0, 160) + (notes.length > 160 ? "…" : "")}
 							</Markdown>
 						</div>
 					) : (
-						<span className="italic text-amber-700/70">Quick note — click to jump to notes</span>
+						<span className="italic text-amber-700/70">
+							Quick note — click to jump to notes
+						</span>
 					)}
-					<div className="mt-2.5 text-[9px] font-bold uppercase tracking-widest text-amber-700/60">
-						Open notes ↓
-					</div>
-				</button>
+				</StickyNote>
 
 				{/* Tags */}
 				<TagPicker applicationId={app.id} />
