@@ -19,33 +19,31 @@ type InputAsTextarea = InputBaseProps & {
 type InputProps = InputAsInput | InputAsTextarea;
 
 const baseClasses =
-	"block w-full px-3 py-2 text-text-primary dark:text-dark-accent placeholder:text-text-muted dark:placeholder:text-dark-accent/40 focus:outline-none focus:ring-2 focus:ring-surface-accent/20 focus:border-surface-accent/40 dark:focus:ring-dark-accent/20 dark:focus:border-dark-accent/40 transition-colors rounded-[var(--radius-input)]";
+	"block w-full px-3 py-2 text-sm text-ink placeholder:text-ink-4 focus:outline-none transition-colors rounded-[var(--radius-input)] dark:text-cream-2 dark:placeholder:text-ink-4";
 
 const variantClasses: Record<string, string> = {
-	glass: "glass border-white/30 dark:border-white/10",
+	glass:
+		"glass border-white/40 dark:border-white/10 focus:border-amber focus:shadow-[0_0_0_3px_rgba(245,158,11,0.12)]",
 	raised:
-		"bg-white/80 dark:bg-dark-card/80 shadow-sm border border-black/[0.06] dark:border-white/10",
+		"bg-white/60 dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/10 focus:border-amber focus:shadow-[0_0_0_3px_rgba(245,158,11,0.12)]",
 };
 
 export const Input = forwardRef<
 	HTMLInputElement | HTMLTextAreaElement,
 	InputProps
->(({ variant = "glass", label, error, hint, as = "input", className = "", ...props }, ref) => {
+>(({ variant = "raised", label, error, hint, as = "input", className = "", ...props }, ref) => {
 	const inputId =
 		props.id ||
 		(label ? label.toLowerCase().replace(/\s+/g, "-") : undefined);
 	const errorClasses = error
-		? "border-status-rejected/40 focus:border-status-rejected focus:ring-status-rejected/20"
+		? "!border-status-rejected focus:!border-status-rejected focus:!shadow-[0_0_0_3px_rgba(239,68,68,0.12)]"
 		: "";
 	const combinedClasses = `${baseClasses} ${variantClasses[variant]} ${errorClasses} ${className}`;
 
 	return (
-		<div className="space-y-1.5">
+		<div className="flex flex-col gap-1.5">
 			{label ? (
-				<label
-					htmlFor={inputId}
-					className="block text-xs font-semibold uppercase tracking-wide text-text-secondary dark:text-dark-accent/60"
-				>
+				<label htmlFor={inputId} className="ds-label">
 					{label}
 				</label>
 			) : null}
@@ -53,7 +51,7 @@ export const Input = forwardRef<
 				<textarea
 					ref={ref as React.Ref<HTMLTextAreaElement>}
 					id={inputId}
-					className={`${combinedClasses} resize-y min-h-[80px]`}
+					className={`${combinedClasses} resize-y min-h-[80px] leading-relaxed`}
 					{...(props as TextareaHTMLAttributes<HTMLTextAreaElement>)}
 				/>
 			) : (
@@ -65,12 +63,9 @@ export const Input = forwardRef<
 				/>
 			)}
 			{error ? (
-				<p className="text-xs text-status-rejected">{error}</p>
-			) : null}
-			{hint && !error ? (
-				<p className="text-[10px] text-text-muted dark:text-dark-accent/40">
-					{hint}
-				</p>
+				<p className="text-[11px] font-medium text-status-rejected">{error}</p>
+			) : hint ? (
+				<p className="text-[11px] text-ink-3 dark:text-ink-4">{hint}</p>
 			) : null}
 		</div>
 	);

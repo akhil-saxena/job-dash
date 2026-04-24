@@ -2,103 +2,175 @@ import { Meta } from "@storybook/blocks";
 
 <Meta title="Design System/Introduction" />
 
-# JobDash Design System
+# JobDash Design System · v1
 
-A custom Tailwind v4 design system built for a minimal-warm aesthetic:
-glass surfaces, rounded corners, warm palette, native dark-mode.
+A custom Tailwind v4 design system — warm, glass-backed, with an amber
+accent and JetBrains Mono labels. Inspired by the JobDash design brief
+in `logo/JobDash Design System.html`.
 
 No external UI library. All primitives live under
-`src/client/components/design-system/` and are framework-agnostic
-inside the React + Vite client.
+`src/client/components/design-system/` and consume the CSS tokens
+defined in `src/client/index.css`.
 
-## Design tokens
+## Foundations
 
-Defined in [`src/client/index.css`](../../../index.css) via Tailwind v4
-`@theme`.
+### Typography
 
-### Color — status
+Three families, each with a clear role:
 
-| Token | Hex | Use |
-|-------|-----|-----|
-| `--color-status-wishlist` | `#6b7280` | Wishlist applications |
-| `--color-status-applied` | `#3b82f6` | Applied status · funnel bar · interview event chips |
-| `--color-status-screening` | `#8b5cf6` | Screening status · funnel bar · follow-up deadlines |
-| `--color-status-interviewing` | `#f59e0b` | Interviewing status · funnel bar · amber zone · application deadlines |
-| `--color-status-offer` | `#22c55e` | Offer status · funnel bar · green zone · offer-expiry deadlines |
-| `--color-status-accepted` | `#10b981` | Accepted offer (terminal) |
-| `--color-status-rejected` | `#ef4444` | Rejected · red zone · past-due deadlines · destructive actions |
-| `--color-status-withdrawn` | `#64748b` | Withdrawn (terminal) |
+| Family | Role | Usage |
+|--------|------|-------|
+| **System sans** (`var(--font-sans)`) | Body copy | Paragraphs, table cells, field values |
+| **Archivo** (`var(--font-display)`) | Display / headings | Section titles, page headers, sticky-note headlines |
+| **JetBrains Mono** (`var(--font-mono)`) | Labels + data | Field labels (uppercase), mono badges, tabular numerals, keyboard hints |
 
-### Color — surfaces & text
+The app-wide `.ds-label` utility encodes the canonical label treatment:
+10px JetBrains Mono 600-weight uppercase with 0.08em tracking. Reach
+for it whenever you'd otherwise write 4 equivalent Tailwind classes.
 
-| Token | Light | Dark | Use |
-|-------|-------|------|-----|
-| `--color-surface-accent` | `#292524` | — | Primary CTA fill · active filter chip · focus ring |
-| `--color-text-primary` | `#1c1917` | `#f4f4f5` (dark-accent) | Headings, body |
-| `--color-text-secondary` | `#78716c` | — | Captions, secondary rows |
-| `--color-text-muted` | `#a8a29e` | — | Muted labels, placeholder |
-| `--color-dark-dominant` | — | `#18181b` | Dark-mode page background |
-| `--color-dark-card` | — | `#27272a` | Dark-mode card surface |
-| `--color-dark-accent` | — | `#f4f4f5` | Dark-mode primary text |
+### Color — ink + cream + amber
+
+First-class tokens (defined in `@theme`, usable as `bg-ink`, `text-ink-3`,
+`bg-cream-2`, `text-amber-d`, etc.):
+
+| Token | Hex | Role |
+|-------|-----|------|
+| `--color-ink` | `#292524` | Primary text, dark surfaces, ink-filled CTA |
+| `--color-ink-2` | `#57534e` | Secondary text |
+| `--color-ink-3` | `#78716c` | Muted text, labels, captions |
+| `--color-ink-4` | `#a8a29e` | Placeholder, disabled |
+| `--color-ink-5` | `#d6d3d1` | Borders, separators |
+| `--color-cream` | `#f5f3f0` | Warm surface / page background |
+| `--color-cream-2` | `#ece8e3` | Hover / subtle surface |
+| `--color-cream-3` | `#e7e2dc` | Active / pressed |
+| `--color-amber` | `#f59e0b` | Brand accent · focus rings · section bars |
+| `--color-amber-d` | `#d97706` | Amber hover / caption |
+| `--color-amber-l` | `#fef3c7` | Amber highlight background |
+
+### Status palette
+
+Reused for charts, badges, and pipeline dots:
+
+| Token | Hex | Stage / meaning |
+|-------|-----|-----------------|
+| `--color-status-wishlist` | `#6b7280` | Wishlist |
+| `--color-status-applied` | `#3b82f6` | Applied · interview events |
+| `--color-status-screening` | `#8b5cf6` | Screening |
+| `--color-status-interviewing` | `#f59e0b` | Interviewing |
+| `--color-status-offer` | `#22c55e` | Offer · green zone |
+| `--color-status-rejected` | `#ef4444` | Rejected · red zone |
+| `--color-status-withdrawn` | `#64748b` | Withdrawn |
 
 ### Radius scale
 
 | Token | Value | Use |
 |-------|-------|-----|
-| `--radius-btn` | 6px | Buttons, small chips |
-| `--radius-card` | 8px | Cards, tables, dropdowns |
-| `--radius-input` | 10px | Inputs, selects, date fields |
+| `--radius-btn` | 7px | Buttons, small chips |
+| `--radius-input` | 8px | Inputs, selects, date fields |
+| `--radius-card` | 10px | Cards, dropdowns, tables |
 | `--radius-card-mobile` | 12px | Cards on mobile |
 | `--radius-modal` | 14px | Modals, hero cards |
-| `--radius-pill` | 99px | Pills, badges, date-range cells |
+| `--radius-xl` | 18px | Oversized surfaces |
+| `--radius-pill` | 999px | Pills, badges |
 
-### Typography tiers
+### Glass + dot-grid
 
-| Tier | Size | Weight | Usage |
-|------|------|--------|-------|
-| Label | 12px (`text-xs`) | 600 | Stat labels, chip text, column headers |
-| Body | 14px (`text-sm`) | 400 | Paragraphs, table cells, captions |
-| Heading | 20px (`text-xl`) | 600 | Section headings |
-| Display | 28px (`text-[28px]`) | 600 | Stat card values, page titles |
-
-### Glass surface utility
+The `.glass` utility renders the canonical warm translucent surface:
 
 ```css
 .glass {
   background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.5);
 }
 .dark .glass {
-  background: rgba(39, 39, 42, 0.65);
-  border-color: rgba(63, 63, 70, 0.5);
+  background: rgba(40, 37, 34, 0.7);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 ```
 
+The `<body>` ships with a fixed dot-grid overlay at 16px × 16px — tiny
+ink dots at 0.08 alpha in light, white dots at 0.04 alpha in dark. This
+is intentional — it reinforces the sense of a reference grid without
+asserting a visible ruler.
+
+### Amber focus ring
+
+Every interactive primitive (button, input, select, toggle, checkbox,
+radio, date picker) lands on the same amber halo when focused:
+
+```
+border-color: var(--color-amber);
+box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12);
+```
+
+The utility class `.ds-focus-ring` bakes this into any arbitrary target.
+
 ## Primitive catalog
 
-Explore each primitive in the sidebar. All primitives:
+Explore each in the sidebar. All primitives are light/dark-ready —
+toggle the theme with the **Theme** selector in the toolbar above.
 
-- accept a `variant` (usually `"glass"` or `"raised"`)
-- accept a `size` where applicable (`"sm" | "md"` or `"sm" | "md" | "lg"`)
-- use design tokens instead of hard-coded colors
-- render identical in both light and dark mode (toolbar toggle above)
+### Form inputs
 
-## When to reach for what
+| Primitive | When to use |
+|-----------|-------------|
+| `Input` | Single-line text / email / password. `variant="raised" \| "glass"` |
+| `NumberField` | Numeric with optional `prefix` / `suffix` (`$`, `d`, `%`). `mono` prop for tabular numerals |
+| `DateField` | Native date / datetime / time input, styled + color-scheme-aware |
+| `InlineDatePicker` | Custom popover calendar when brand-consistent chrome matters |
+| `Select` | Styled native `<select>` with trailing chevron |
+| `Textarea` | Plain multi-line — use when markdown rendering is NOT desired |
+| `MarkdownField` | Notes with edit/preview toggle and rendered markdown |
 
-| Need | Use |
-|------|-----|
-| Text / email / password input | `Input` |
-| Numeric with optional prefix / suffix | `NumberField` |
-| Date, datetime, time | `DateField` |
-| Single-select dropdown | `Select` |
-| Plain multi-line text | `Textarea` |
-| Markdown notes (with preview) | `MarkdownField` |
-| Primary / secondary / ghost action | `Button` |
-| Status pill | `Badge` |
-| Surface / panel | `Card` |
-| Overlay dialog | `Modal` |
-| Preset / tab filters | `FilterChips` |
-| Scrollable table column header | `ColumnHeader` / `SortableHeader` |
-| Global command / search input | `SearchBar` |
-| Detail-page tab row | `TabBar` |
+### Toggles
+
+| Primitive | When to use |
+|-----------|-------------|
+| `Checkbox` | Multiple independent boolean options |
+| `Radio` / `RadioGroup` | Mutually-exclusive choice |
+| `Toggle` | On/off preference (shows state immediately, commits immediately) |
+
+### People + presence
+
+| Primitive | When to use |
+|-----------|-------------|
+| `Avatar` | User badge — deterministic gradient from name, optional presence dot |
+| `AvatarStack` | Overlapping avatars with `+N` overflow tail |
+
+### Surfaces
+
+| Primitive | When to use |
+|-----------|-------------|
+| `Card` | Default glass surface |
+| `StickyNote` | Lived-in amber note with a hint footer (Overview sidebar) |
+| `Modal` | Overlay dialog; mobile becomes bottom sheet with grab handle |
+
+### Section & data
+
+| Primitive | When to use |
+|-----------|-------------|
+| `SectionHeader` | Amber bar + Archivo title + mono count + actions — the repeated detail-page pattern |
+| `ProgressBar` | 0–100 scalar with 4 tones (amber / green / blue / ink) |
+| `FilterChips` | Preset / tab filter row (3 variants: tab, outlined, underline) |
+| `Badge` | Status pill (filled / outlined / dot / mono tone palette) |
+
+### Navigation-adjacent
+
+| Primitive | When to use |
+|-----------|-------------|
+| `Button` | All CTAs — 5 variants: filled (default ink), amber (hero), outline, ghost, danger |
+| `SearchBar` | Global search with `⌘K` hint |
+| `TabBar` / `ColumnHeader` | Detail tabs + sortable table columns |
+
+## Conventions
+
+- **Labels** use `.ds-label` (JetBrains Mono 10px uppercase).
+- **Primary CTAs** default to `Button variant="filled"` (ink-dark). Reserve
+  `variant="amber"` for the single most important action per view (e.g.
+  "Advance →" on the detail pipeline bar).
+- **Destructive** actions use `variant="danger"` — never a red filled.
+- **Mono data** (dates, money, measurements) renders in JetBrains Mono
+  or with `tabular-nums` for vertical alignment.
+- **Glass** is the default surface. Reach for `bg-cream-2` solid only
+  for nested / inset surfaces.

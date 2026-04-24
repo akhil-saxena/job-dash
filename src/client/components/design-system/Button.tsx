@@ -1,18 +1,62 @@
 import { type ButtonHTMLAttributes, forwardRef } from "react";
 
+type ButtonVariant = "filled" | "amber" | "outline" | "ghost" | "danger";
+type ButtonSize = "sm" | "md" | "lg";
+
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-	variant?: "filled" | "outline" | "ghost";
-	size?: "sm" | "md";
+	variant?: ButtonVariant;
+	size?: ButtonSize;
+	/** Legacy prop — use `variant="danger"` for destructive actions. */
 	color?: "default" | "destructive";
 	loading?: boolean;
 }
 
+const base =
+	"inline-flex items-center justify-center gap-1.5 font-semibold whitespace-nowrap transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber/30 disabled:pointer-events-none disabled:opacity-50 rounded-[var(--radius-btn)] active:scale-[0.97]";
+
+const variants: Record<ButtonVariant, string> = {
+	// Dark/ink-filled CTA — the primary "dark" button from the DS reference
+	filled:
+		"bg-ink text-cream border border-ink hover:bg-[#1c1917] dark:bg-cream-3 dark:text-ink dark:border-cream-3 dark:hover:bg-[#e4e4e7]",
+	// Amber brand CTA — use sparingly for the single primary accent action
+	amber:
+		"bg-amber text-white border border-amber-d hover:bg-amber-d",
+	// Secondary / neutral — glass surface, thin border
+	outline:
+		"bg-[rgba(255,255,255,0.55)] backdrop-blur-sm text-ink-2 border border-black/[0.08] hover:bg-cream-2 hover:border-black/[0.12] dark:bg-white/[0.06] dark:text-cream-2 dark:border-white/10 dark:hover:bg-white/10",
+	// Minimal hoverable
+	ghost:
+		"bg-transparent text-ink-2 border border-transparent hover:bg-black/[0.04] dark:text-cream-2 dark:hover:bg-white/[0.06]",
+	// Destructive
+	danger:
+		"bg-[rgba(239,68,68,0.1)] text-[#dc2626] border border-[rgba(239,68,68,0.25)] hover:bg-status-rejected hover:text-white hover:border-status-rejected",
+};
+
+const sizes: Record<ButtonSize, string> = {
+	sm: "h-7 px-2.5 text-[11px]",
+	md: "h-[30px] px-3.5 text-xs",
+	lg: "h-[38px] px-5 text-sm",
+};
+
+/**
+ * Primary action button — JobDash DS v1.
+ *
+ * Variants:
+ * - `filled` (default): ink-dark filled CTA — the common "save / submit"
+ * - `amber`: amber brand CTA — reserved for the top-of-page hero action
+ *   (e.g. "Advance →" on the detail pipeline)
+ * - `outline`: neutral glass-backed secondary action
+ * - `ghost`: minimal hoverable — use inside toolbars and dropdown rows
+ * - `danger`: destructive action (delete, remove)
+ *
+ * `color="destructive"` is a legacy alias for `variant="danger"`.
+ */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 	(
 		{
 			variant = "filled",
 			size = "md",
-			color = "default",
+			color,
 			loading,
 			children,
 			className = "",
@@ -21,49 +65,23 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 		},
 		ref,
 	) => {
-		const base =
-			"inline-flex items-center justify-center font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-surface-accent/40 disabled:pointer-events-none disabled:opacity-50 rounded-[var(--radius-btn)]";
-
-		const variants: Record<string, Record<string, string>> = {
-			filled: {
-				default:
-					"bg-surface-accent text-white hover:bg-[#1c1917] dark:bg-dark-accent dark:text-dark-dominant dark:hover:bg-[#e4e4e7]",
-				destructive:
-					"bg-status-rejected text-white hover:bg-[#dc2626] dark:bg-status-rejected dark:hover:bg-[#dc2626]",
-			},
-			outline: {
-				default:
-					"border border-black/10 bg-transparent hover:bg-black/[0.04] dark:border-white/15 dark:hover:bg-white/[0.06]",
-				destructive:
-					"border border-status-rejected/30 text-status-rejected bg-transparent hover:bg-status-rejected/[0.06]",
-			},
-			ghost: {
-				default:
-					"bg-black/[0.04] hover:bg-black/[0.08] dark:bg-white/[0.06] dark:hover:bg-white/[0.1]",
-				destructive:
-					"bg-status-rejected/[0.06] text-status-rejected hover:bg-status-rejected/[0.1]",
-			},
-		};
-
-		const sizes: Record<string, string> = {
-			sm: "h-[30px] px-3 text-xs",
-			md: "h-[34px] px-4 text-sm",
-		};
-
-		const variantClass = variants[variant]?.[color] ?? variants.filled.default;
+		// Legacy: translate color="destructive" to variant="danger"
+		const resolved: ButtonVariant =
+			color === "destructive" ? "danger" : variant;
 
 		return (
 			<button
 				ref={ref}
-				className={`${base} ${variantClass} ${sizes[size]} ${className}`}
+				className={`${base} ${variants[resolved]} ${sizes[size]} ${className}`}
 				disabled={disabled || loading}
 				{...props}
 			>
 				{loading ? (
 					<svg
-						className="mr-2 h-4 w-4 animate-spin"
+						className="h-3.5 w-3.5 animate-spin"
 						viewBox="0 0 24 24"
 						fill="none"
+						aria-hidden="true"
 					>
 						<circle
 							className="opacity-25"

@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* JobDash display + mono fonts — Archivo for headings, JetBrains Mono for
+   labels + data + badges. Loaded from Google Fonts; body text still uses
+   the native system sans stack (Apple / Segoe / etc.) for performance. */
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
 /* Dark mode: class-based with system preference fallback */
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -7,7 +12,8 @@
   /* Typography */
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display",
     "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
-  --font-mono: "SF Mono", "Menlo", "Monaco", monospace;
+  --font-display: "Archivo", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", "Menlo", "Monaco", monospace;
 
   /* Status colors */
   --color-status-wishlist: #6b7280;
@@ -19,10 +25,28 @@
   --color-status-rejected: #ef4444;
   --color-status-withdrawn: #64748b;
 
-  /* Surface colors */
-  --color-surface-accent: #292524;
+  /* Ink / cream palette (JobDash DS v1 — first-class tokens).
+     --ink is the primary text/surface-accent color; variants go 2..5 for
+     decreasing opacity/weight. --cream is the warm background. */
+  --color-ink: #292524;
+  --color-ink-2: #57534e;
+  --color-ink-3: #78716c;
+  --color-ink-4: #a8a29e;
+  --color-ink-5: #d6d3d1;
+  --color-cream: #f5f3f0;
+  --color-cream-2: #ece8e3;
+  --color-cream-3: #e7e2dc;
 
-  /* Text colors */
+  /* Amber accent — brand highlight. Used for focus rings, primary CTAs,
+     active states, hover affordances. */
+  --color-amber: #f59e0b;
+  --color-amber-d: #d97706;
+  --color-amber-l: #fef3c7;
+
+  /* Surface / text tokens (legacy aliases — kept so existing code keeps
+     compiling; new components should prefer --color-ink / --color-cream
+     directly). */
+  --color-surface-accent: #292524;
   --color-text-primary: #1c1917;
   --color-text-secondary: #78716c;
   --color-text-muted: #a8a29e;
@@ -37,20 +61,21 @@
   --color-dark-accent: #f4f4f5;
 
   /* Radius scale */
-  --radius-btn: 6px;
-  --radius-card: 8px;
-  --radius-input: 10px;
+  --radius-btn: 7px;
+  --radius-card: 10px;
+  --radius-input: 8px;
   --radius-card-mobile: 12px;
   --radius-modal: 14px;
-  --radius-pill: 99px;
+  --radius-pill: 999px;
+  --radius-xl: 18px;
 }
 
 /* Glass effect utility classes */
 @layer components {
   .glass {
     background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border: 1px solid rgba(255, 255, 255, 0.5);
   }
 
@@ -60,25 +85,60 @@
   }
 
   .dark .glass {
-    background: rgba(39, 39, 42, 0.65);
-    border-color: rgba(63, 63, 70, 0.5);
+    background: rgba(40, 37, 34, 0.7);
+    border-color: rgba(255, 255, 255, 0.08);
   }
 
   .dark .glass-hover:hover {
-    background: rgba(39, 39, 42, 0.85);
+    background: rgba(40, 37, 34, 0.85);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Label token — JetBrains Mono uppercase, tight tracking.
+     Used everywhere a "mono label" is called for (stat labels, field
+     labels, section counts, stage meta). */
+  .ds-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+  }
+  .dark .ds-label {
+    color: var(--color-ink-4);
+  }
+
+  /* Amber focus-ring utility — the signature JobDash focus look. Apply to
+     any interactive element to get the consistent 3px amber halo. */
+  .ds-focus-ring:focus,
+  .ds-focus-ring:focus-within {
+    outline: none;
+    border-color: var(--color-amber);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12);
   }
 }
 
-/* Warm gradient body background */
+/* Warm gradient body background with subtle dot-grid overlay. Matches the
+   JobDash design-system reference exactly — light mode uses ink dots at
+   0.08 alpha, dark mode uses white dots at 0.04 alpha, both at 16px grid. */
 body {
-  background: linear-gradient(145deg, #f5f3f0, #ece8e3, #e8e4df);
+  background-color: #f5f3f0;
+  background-image:
+    linear-gradient(145deg, #f5f3f0, #ece8e3, #e8e4df),
+    radial-gradient(circle, rgba(41, 37, 36, 0.08) 1px, transparent 1.2px);
+  background-size: 100% 100%, 16px 16px;
+  background-attachment: fixed;
+  background-blend-mode: normal;
   min-height: 100vh;
 }
 
 .dark body,
 body:where(.dark *) {
-  background: #18181b;
+  background-color: #18181b;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.04) 1px, transparent 1.2px);
+  background-size: 16px 16px;
 }
 
 /* Global Lucide icon stroke width */
@@ -121,15 +181,15 @@ input[type="time"]:hover::-webkit-calendar-picker-indicator {
 }
 
 /* JD markdown rendered content */
-.jd-markdown h1 { font-size: 1.25rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; }
-.jd-markdown h2 { font-size: 1.1rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.4rem; }
-.jd-markdown h3 { font-size: 1rem; font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.3rem; }
+.jd-markdown h1 { font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+.jd-markdown h2 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.4rem; }
+.jd-markdown h3 { font-family: var(--font-display); font-size: 1rem; font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.3rem; }
 .jd-markdown p { margin-bottom: 0.6rem; line-height: 1.65; }
 .jd-markdown ul, .jd-markdown ol { padding-left: 1.25rem; margin-bottom: 0.6rem; }
 .jd-markdown ul { list-style-type: disc; }
 .jd-markdown ol { list-style-type: decimal; }
 .jd-markdown li { margin-bottom: 0.25rem; line-height: 1.55; }
-.jd-markdown code { background: rgba(0,0,0,0.04); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.85em; font-family: var(--mono, monospace); }
+.jd-markdown code { background: rgba(0,0,0,0.04); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.85em; font-family: var(--font-mono); }
 .jd-markdown pre { background: rgba(0,0,0,0.04); padding: 0.75rem 1rem; border-radius: 8px; overflow-x: auto; margin-bottom: 0.6rem; }
 .jd-markdown pre code { background: transparent; padding: 0; }
 .jd-markdown strong { font-weight: 700; }
